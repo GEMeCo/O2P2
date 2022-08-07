@@ -1,178 +1,270 @@
-#include <CL/sycl.hpp>
-#include <iostream>
+// ================================================================================================
+//
+// This is the main file. A single object is created, FEAnalysis. It manages the entire process.
+// 
+// ================================================================================================
+// 
+// The following configuration is required:
+// - Create an environment variable named $eigen_root, and address it to the path of eigen
+// - In tab C++/General, additional include directories, type: $(SolutionDir)include;$(Eigen_root)
+// 
+// - In debug configuration, tab C++/Preprocessor, definitions: include _DEBUG
+// 
+// - In intel libraries for oneapi, use oneMKL
+// 
+// ================================================================================================
+#define EIGEN_USE_MKL_ALL
 
+// Custom Header Files
+#include "FEAnalysis.h"
+#include "Common.h"
+#include "Profiler.h"
 
-constexpr int num = 16;
-using namespace sycl;
+/**
+ * @brief This main routine creates a single object, FEAnalysis. It manages the entire process.
+ * @param argc The number of arguments in the call
+ * @param args An array of arguments
+ * @return Returns 0 if succeeded
+ */
+int main(int argc, char** args)
+{
+    std::string stProj;              // Project
+    std::string stArquivo;           // Input File
+    std::ifstream file;              // Input File Stream
 
+    // Jabá
+    std::cout << "Copyright(C) 2022 Rogerio Carrazedo - All Rights Reserved." << std::endl
+        << "Structural Engineering Department / University of Sao Paulo at Sao Carlos School of Engineering." << std::endl << std::endl
+        << "This program comes with ABSOLUTELY NO WARRANTY." << std::endl
+        << "This is a free software. You are welcome to redistribute it under conditions stablished in the license." << std::endl << std::endl;
 
-int main() {
-    auto r = range{ num };
-    buffer<int> a{ r };
+    // --------------------------------------------------------------------------------------------
+    // Check if program call has the project name
+    if (argc >= 1)
+    {
+        std::cout << "Project Name: ";
+        std::cin >> stProj;
+    }
+    else
+    {
+        std::cout << "The following input project was submitted: " << args[1];
+        stProj = args[1];
+    }
+    stArquivo = stProj + ".txt";
 
+    // Check if there were any execution issue
+    try {
 
-    queue{}.submit([&](handler& h) {
-        accessor out{ a, h };
-        h.parallel_for(r, [=](item<1> idx) {
-            out[idx] = idx;
-            });
-        });
+#ifdef _DEBUG
+        Instrumentor::beginSession("Profile");
 
+        logFile.open(stProj + ".log", std::ios::trunc);
+        LOG("Project Name: " + stProj);
+#endif //_DEBUG
 
-    host_accessor result{ a };
-    for (int i = 0; i < num; ++i)
-        std::cout << result[i] << "\n";
+        // Any instruction inside a try structure may throw and exception
+        file.open(stArquivo);
+        if (!file) {
+            LOG("\n\n\nmain: An exception was thrown when opening file " + stArquivo + "\n\n\n");
+            throw std::invalid_argument("\n\n\nAn exception was thrown when opening file " + stArquivo + "\n\n\n");
+        }
+
+        // Line from file
+        std::string stLine;
+        std::string stFlag = "#DIM#";
+
+        // Look up for flags
+        stFlag = "#DIM#";
+
+        // Output log in debug mode
+        LOG("\nmain: Reading flag " + stFlag);
+
+        while (stLine.compare(0, stFlag.size(), stFlag)) {
+            std::getline(file, stLine);
+            if (file.eof()) {
+                LOG("\n\n\nmain: Reading Error!\nFlag " + stFlag + " not found\n\n\n");
+                throw std::invalid_argument("\n\n\nReading Error!\nFlag " + stFlag + " not found\n\n\n");
+            }
+        }
+
+        int nDim;
+        file >> nDim;
+
+        if (nDim == 2)
+        {
+            {
+                Timer timer("FEAnalysis.initComponents");
+                FEAnalysis<2>::initComponents(file);
+                file.close();
+            }
+            {
+                Timer timer("FEAnalysis.runAnalysis");
+                FEAnalysis<2>::runAnalysis();
+            }
+            {
+                Timer timer("FEAnalysis.drawResults");
+                FEAnalysis<2>::drawResults(stProj);
+            }
+        }
+        /*else if (nDim == 3) {
+            {
+                Timer timer("FEAnalysis.initComponents");
+                FEAnalysis<3>::initComponents(file);
+                file.close();
+            }
+            {
+                Timer timer("FEAnalysis.runAnalysis");
+                FEAnalysis<3>::runAnalysis();
+            }
+            {
+                Timer timer("FEAnalysis.drawResults");
+                FEAnalysis<3>::drawResults(stProj);
+            }
+        }*/
+        else {
+            LOG("\n\n\nmain: Wrong dimensionality\nCheck problem input file\n\n\n");
+            throw std::invalid_argument("\n\n\nWrong dimensionality\nCheck problem input file\n\n\n");
+        }
+
+        file.close();
+
+#ifdef _DEBUG
+        Instrumentor::endSession();
+        logFile.close();
+#endif //_DEBUG
+    }
+
+    // Domain error (like negative in square root)
+    catch (std::domain_error& e) {
+        std::cerr << "\n\n\nDomain error in function: " << e.what() << "\n\n\n";
+        system("pause");
+        return 1;
+    }
+
+    // invalid_argument -> Something went wrong in the input files
+    catch (std::invalid_argument& e) {
+        std::cerr << e.what();
+        system("pause");
+        return 1;
+    }
+
+    // length_error -> Required dimensions are not available
+    catch (std::length_error& e) {
+        std::cerr << "\n\n\nRequired size are invalid: " << e.what() << "\n\n\n";
+        system("pause");
+        return 1;
+    }
+
+    // out_of_range -> Some function tried to acess memory out of its limits
+    catch (std::out_of_range& e) {
+        std::cerr << "\n\n\nOut of range size: " << e.what() << "\n\n\n";
+        system("pause");
+        return 1;
+    }
+
+    std::cout << "\n\nClick a button to exit!";
+    std::cin.get();
+    std::cin.get();
+
+    return 0;
 }
 
-////==============================================================
-//// Copyright © Intel Corporation
-////
-//// SPDX-License-Identifier: MIT
-//// =============================================================
-//#include <CL/sycl.hpp>
-//#include <vector>
-//#include <iostream>
-//#if FPGA || FPGA_EMULATOR
-//#include <ext/intel/fpga_extensions.hpp>
-//#endif
-//
-//using namespace sycl;
-//
-//// Vector type and data size for this example.
-//size_t vector_size = 10000;
-//typedef std::vector<int> IntVector;
-//
-//// Create an exception handler for asynchronous SYCL exceptions
-//static auto exception_handler = [](sycl::exception_list e_list) {
-//    for (std::exception_ptr const& e : e_list) {
-//        try {
-//            std::rethrow_exception(e);
-//        }
-//        catch (std::exception const& e) {
-//#if _DEBUG
-//            std::cout << "Failure" << std::endl;
-//#endif
-//            std::terminate();
-//        }
-//    }
-//};
-//
-////************************************
-//// Vector add in DPC++ on device: returns sum in 4th parameter "sum_parallel".
-////************************************
-//void VectorAdd(queue& q, const IntVector& a_vector, const IntVector& b_vector,
-//    IntVector& sum_parallel) {
-//    // Create the range object for the vectors managed by the buffer.
-//    range<1> num_items{ a_vector.size() };
-//
-//    // Create buffers that hold the data shared between the host and the devices.
-//    // The buffer destructor is responsible to copy the data back to host when it
-//    // goes out of scope.
-//    buffer a_buf(a_vector);
-//    buffer b_buf(b_vector);
-//    buffer sum_buf(sum_parallel.data(), num_items);
-//
-//    // Submit a command group to the queue by a lambda function that contains the
-//    // data access permission and device computation (kernel).
-//    q.submit([&](handler& h) {
-//        // Create an accessor for each buffer with access permission: read, write or
-//        // read/write. The accessor is a mean to access the memory in the buffer.
-//        accessor a(a_buf, h, read_only);
-//        accessor b(b_buf, h, read_only);
-//
-//        // The sum_accessor is used to store (with write permission) the sum data.
-//        accessor sum(sum_buf, h, write_only, no_init);
-//
-//        // Use parallel_for to run vector addition in parallel on device. This
-//        // executes the kernel.
-//        //    1st parameter is the number of work items.
-//        //    2nd parameter is the kernel, a lambda that specifies what to do per
-//        //    work item. The parameter of the lambda is the work item id.
-//        // DPC++ supports unnamed lambda kernel by default.
-//        h.parallel_for(num_items, [=](auto i) { sum[i] = a[i] + b[i]; });
-//        });
-//}
-//
-////************************************
-//// Initialize the vector from 0 to vector_size - 1
-////************************************
-//void InitializeVector(IntVector& a) {
-//    for (size_t i = 0; i < a.size(); i++) a.at(i) = i;
-//}
-//
-////************************************
-//// Demonstrate vector add both in sequential on CPU and in parallel on device.
-////************************************
-//int main(int argc, char* argv[]) {
-//    // Change vector_size if it was passed as argument
-//    if (argc > 1) vector_size = std::stoi(argv[1]);
-//    // Create device selector for the device of your interest.
-//#if FPGA_EMULATOR
-//  // DPC++ extension: FPGA emulator selector on systems without FPGA card.
-//    ext::intel::fpga_emulator_selector d_selector;
-//#elif FPGA
-//  // DPC++ extension: FPGA selector on systems with FPGA card.
-//    ext::intel::fpga_selector d_selector;
-//#else
-//  // The default device selector will select the most performant device.
-//    default_selector d_selector;
-//#endif
-//
-//    // Create vector objects with "vector_size" to store the input and output data.
-//    IntVector a, b, sum_sequential, sum_parallel;
-//    a.resize(vector_size);
-//    b.resize(vector_size);
-//    sum_sequential.resize(vector_size);
-//    sum_parallel.resize(vector_size);
-//
-//    // Initialize input vectors with values from 0 to vector_size - 1
-//    InitializeVector(a);
-//    InitializeVector(b);
-//
-//    try {
-//        queue q(d_selector, exception_handler);
-//
-//        // Print out the device information used for the kernel code.
-//        std::cout << "Running on device: "
-//            << q.get_device().get_info<info::device::name>() << "\n";
-//        std::cout << "Vector size: " << a.size() << "\n";
-//
-//        // Vector addition in DPC++
-//        VectorAdd(q, a, b, sum_parallel);
-//    }
-//    catch (exception const& e) {
-//        std::cout << "An exception is caught for vector add.\n";
-//        std::terminate();
-//    }
-//
-//    // Compute the sum of two vectors in sequential for validation.
-//    for (size_t i = 0; i < sum_sequential.size(); i++)
-//        sum_sequential.at(i) = a.at(i) + b.at(i);
-//
-//    // Verify that the two vectors are equal.  
-//    for (size_t i = 0; i < sum_sequential.size(); i++) {
-//        if (sum_parallel.at(i) != sum_sequential.at(i)) {
-//            std::cout << "Vector add failed on device.\n";
-//            return -1;
-//        }
-//    }
-//
-//    int indices[]{ 0, 1, 2, (static_cast<int>(a.size()) - 1) };
-//    constexpr size_t indices_size = sizeof(indices) / sizeof(int);
-//
-//    // Print out the result of vector add.
-//    for (int i = 0; i < indices_size; i++) {
-//        int j = indices[i];
-//        if (i == indices_size - 1) std::cout << "...\n";
-//        std::cout << "[" << j << "]: " << a[j] << " + " << b[j] << " = "
-//            << sum_parallel[j] << "\n";
-//    }
-//
-//    a.clear();
-//    b.clear();
-//    sum_sequential.clear();
-//    sum_parallel.clear();
-//
-//    std::cout << "Vector add successfully completed on device.\n";
-//    return 0;
-//}
+/**
+  * @mainpage O2P2, an object oriented environment for the positional finite element method.
+  * @image html icon2.png width=100
+  * @brief Developed for non-linear coupled thermo-mechanical analyzes with the finite element method based on positions.
+  *
+  * @section first_sec Legal Information
+  * @image html logo_inst.png width=300
+  *
+  * Copyright (C) 2022 Rogério Carrazedo - All Rights Reserved.
+  * Structural Engineering Department / University of São Paulo at São Carlos School of Engineering
+  *
+  * This program comes with ABSOLUTELY NO WARRANTY.
+  * This is free software, and you are welcome to redistribute it under certain conditions.
+  *
+  * You may use, distribute and even modify this code under terms of Creative Commons Attribution-NonCommerical 4.0 International license.
+  * @image html CC-BY-NC.jpg width=150
+  *
+  * @section developers_sec Developers
+  *  @author    Rogério Carrazedo
+  *  @version   1.0.0.1
+  *  @date      2022.08.01
+  *
+  * @subsection citation_sec How to cite:
+  *
+  * Whether it was used in whole or parts, citation is a must!
+  *
+  * O2P2: an object oriented environment for the positional finite element method.
+  * Version: 1.0.0.1. [S.l.]: SET - EESC - USP, 2022. Available at <https://github.com/GEMeCo/O2P2>
+  * DOI:
+  *
+  * @copyright Licensed under Creative Commons Attribution-NonCommerical 4.0 International license
+  *
+  * @section akn_sec Funding and Acknowledgement
+  *
+  * @image html cnpq.png width=150
+  * This software received research support from the Brazilian National Council for Scientific and Technological Development
+  * (CNPq 428762/2018-2 and CNPq 310564/2018-2) which is gratefully acknowledged.
+  *
+  * @section install_sec Install Information
+  *
+  * This program was developed with the following libraries and technologies:
+  *
+  *      - Eigen C++ Libraries, Version 3.4.0
+  *      - Microsoft Visual Studio Community 2022, Version 17.2.1
+  *      - Intel Libraries for oneAPI, Package ID: w_oneAPI_2021.2.0.243
+  *      - Intel C++ Compiler, Package ID: w_oneAPI_2021.2.0.243
+  *
+  * @warning Software under development. Improper use will crash your application.
+  *
+  * @bug     Os dynamic_cast não tem verificação posterior se estão retornando pointeiros nulos (poderiam ser static_cast - mais rápidos).
+  * 
+  * @todo No arquivo O2P2.cpp, incluir fluxogramas no detalhamento dos módulos.
+  *
+  * @defgroup Main_Module O2P2.
+  * @brief An object oriented environment for the positional finite element method.
+  * @details Starts the analysis;
+  *
+  * Requests to read files and populares containers;
+  *
+  * Request to begin the solution process; and
+  *
+  * Request to output solution.
+  *
+  * @defgroup PreProcessor_Module Pre-processor classes.
+  * @ingroup Main_Module
+  * @brief Read files and populate containers.
+  * @details 
+  *
+  * @defgroup Material Material library
+  * @ingroup PreProcessor_Module
+  * @brief Materials Library.
+  * @details
+  *
+  * @defgroup Elements Elements library
+  * @ingroup PreProcessor_Module
+  * @brief Elements Library.
+  * @details
+  *
+  * @defgroup Processor_Module Processor classes.
+  * @ingroup Main_Module
+  * @brief Begin the solution processes.
+  * @details
+  * 
+  * @defgroup TimeStep Avaliable time step integration schemes
+  * @ingroup Processor_Module
+  * @brief Time step integration schemes
+  * @details
+  *
+  * @defgroup NLSolver Avaliable nonlinear solver schemes
+  * @ingroup Processor_Module
+  * @brief Nonlinear schemes
+  * @details
+
+  * @defgroup PostProcessor_Module Post-processor classes.
+  * @ingroup Main_Module
+  * @brief Output solution for visualization files.
+  * @details
+  * 
+  */
