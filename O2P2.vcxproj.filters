@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{97d04130-9fe3-4076-9169-4f7ac8e38ba3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{eab2ed28-cf03-4499-bae1-83e49ad61407}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{286d8c24-7508-4e48-9ed1-1bd85b810447}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Domain Components">
+      <UniqueIdentifier>{25f4af58-46a3-4115-a0ad-1398ac468e41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Domain Components">
+      <UniqueIdentifier>{adb823d1-6490-453d-bb6c-b169d3a9fb6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Domain Components\Elements">
+      <UniqueIdentifier>{2a519fa1-aa17-4c1b-9d59-230b5b615c83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Solution Components">
+      <UniqueIdentifier>{9e277caa-37d2-409b-afa9-11fc338c8a85}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Solution Components">
+      <UniqueIdentifier>{c27dc890-09b1-4261-9380-748557dac0c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Post-Process Components">
+      <UniqueIdentifier>{f97cb2f8-689e-4330-8d1f-980c84d515e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Post-Process Components">
+      <UniqueIdentifier>{e6716c8a-12c5-406e-ba3e-6f6f41878e38}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="O2P2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Common.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Domain.cpp">
+      <Filter>Source Files\Domain Components</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Material.cpp">
+      <Filter>Source Files\Domain Components</Filter>
+    </ClCompile>
+    <ClCompile Include="source\ModelBuilder.cpp">
+      <Filter>Source Files\Domain Components</Filter>
+    </ClCompile>
+    <ClCompile Include="source\SolutionAlgorithm.cpp">
+      <Filter>Source Files\Solution Components</Filter>
+    </ClCompile>
+    <ClCompile Include="source\NonLinearSolver.cpp">
+      <Filter>Source Files\Solution Components</Filter>
+    </ClCompile>
+    <ClCompile Include="source\TimeStepping.cpp">
+      <Filter>Source Files\Solution Components</Filter>
+    </ClCompile>
+    <ClCompile Include="source\ElementComp.cpp">
+      <Filter>Source Files\Solution Components</Filter>
+    </ClCompile>
+    <ClCompile Include="source\OutputSystem.cpp">
+      <Filter>Source Files\Post-Process Components</Filter>
+    </ClCompile>
+    <ClCompile Include="source\PostProcess.cpp">
+      <Filter>Source Files\Post-Process Components</Filter>
+    </ClCompile>
+    <ClCompile Include="source\AnalysisComp.cpp">
+      <Filter>Source Files\Solution Components</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Profiler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FEAnalysis.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Domain.h">
+      <Filter>Header Files\Domain Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Rect4.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Rect8.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Rect9.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Rect12.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Rect16.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Rect20.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Tri3.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Tri6.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Tri10.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IntegrationPoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Element.h">
+      <Filter>Header Files\Domain Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Node.h">
+      <Filter>Header Files\Domain Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Material.h">
+      <Filter>Header Files\Domain Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Section.h">
+      <Filter>Header Files\Domain Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ModelBuilder.h">
+      <Filter>Header Files\Domain Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SolutionAlgorithm.h">
+      <Filter>Header Files\Solution Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\NonLinearSolver.h">
+      <Filter>Header Files\Solution Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AnalysisComp.h">
+      <Filter>Header Files\Solution Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TimeStepping.h">
+      <Filter>Header Files\Solution Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LoadStep.h">
+      <Filter>Header Files\Solution Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Constraints.h">
+      <Filter>Header Files\Solution Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ElementComp.h">
+      <Filter>Header Files\Solution Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MaterialPoint.h">
+      <Filter>Header Files\Solution Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OutputSystem.h">
+      <Filter>Header Files\Post-Process Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PostProcess.h">
+      <Filter>Header Files\Post-Process Components</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

@@ -74,3 +74,6 @@ ipch/
 # Test Files and results
 *.ogl
 /results.json
+
+*.txt
+*.log
