@@ -22,12 +22,16 @@
 //
 // ================================================================================================
 template std::unique_ptr<Domain<2>> ModelBuilder<2>::initMesh(std::istream& fileProj);
+template std::unique_ptr<Domain<3>> ModelBuilder<3>::initMesh(std::istream& fileProj);
 
 template std::unique_ptr<SolutionAlgorithm<2>> ModelBuilder<2>::initAnalyzer(std::istream& fileProj);
+template std::unique_ptr<SolutionAlgorithm<3>> ModelBuilder<3>::initAnalyzer(std::istream& fileProj);
 
 template bool ModelBuilder<2>::populateDomain(Domain<2>* theDomain);
+template bool ModelBuilder<3>::populateDomain(Domain<3>* theDomain);
 
 template int ModelBuilder<2>::readBondaryConditions(Domain<2>* theDomain, SolutionAlgorithm<2>* theAnalyzer);
+template int ModelBuilder<3>::readBondaryConditions(Domain<3>* theDomain, SolutionAlgorithm<3>* theAnalyzer);
 
 
 // ================================================================================================
@@ -56,7 +60,7 @@ template<int nDim> std::unique_ptr<Domain<nDim>> ModelBuilder<nDim>::initMesh(st
         }
     }
 
-    // File 1: Nodes Information - For both elements and inclusions
+    // File 1: Nodes Information - For both elements
     std::getline(fileProj, stLine);
     LOG("ModelBuilder.initMesh: Node file: " << stLine);
     
@@ -66,7 +70,7 @@ template<int nDim> std::unique_ptr<Domain<nDim>> ModelBuilder<nDim>::initMesh(st
         throw std::invalid_argument("\n\n\nError opening file: " + stLine + "\n\n\n");
     }
 
-    // File 2: Elements Information - For both elements and inclusions
+    // File 2: Elements Information - For both elements
     std::getline(fileProj, stLine);
     LOG("ModelBuilder.initMesh: Element file: " << stLine);
 

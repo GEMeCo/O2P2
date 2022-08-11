@@ -244,3 +244,36 @@ public:
 	/** @return a reference to a section object. */
 	Section* getSection() { return m_Section.get(); };
 };
+
+
+/**
+  * @class ElementSolid
+  *
+  * @brief Base geometry class for solid elements.
+  * @details Includes basic definitions for solid elements.
+  *
+  */
+class ElementSolid : public Element<3>
+{
+private:
+	ElementSolid() = delete;
+
+protected:
+
+	/** Constructor for plane solid objects.
+	  * @param Material Pointer to Material class.
+	  */
+	ElementSolid(std::shared_ptr<Material>& Material)
+		: Element<3>(Material) { };
+
+public:
+	// Returns the number of DOF per node of current element.
+	int getNumNdDOF() { return 3; };
+
+	// Returns the dimensionality of current element.
+	int getDIM() { return m_Dim; };
+
+protected:
+	/** @brief Element dimensionality */
+	static inline int const m_Dim{ 3 };
+};

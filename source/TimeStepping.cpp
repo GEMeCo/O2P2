@@ -22,6 +22,7 @@
 //
 // ================================================================================================
 template void TimeStep_QsiStatic::runTimeLooping<2>(Domain<2>* theDomain, AnalysisComp* theFEModel, NonLinearSolver* theSolver);
+template void TimeStep_QsiStatic::runTimeLooping<3>(Domain<3>* theDomain, AnalysisComp* theFEModel, NonLinearSolver* theSolver);
 
 // ================================================================================================
 //

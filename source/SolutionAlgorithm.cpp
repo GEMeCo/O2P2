@@ -22,8 +22,10 @@
 //
 // ================================================================================================
 template bool SolutionAlgorithm<2>::initFEModel(Domain<2>* theDomain, PostProcess* thePost);
+template bool SolutionAlgorithm<3>::initFEModel(Domain<3>* theDomain, PostProcess* thePost);
 
 template void SolutionAlgorithm<2>::runSolutionAlgorithm(Domain<2>* theDomain);
+template void SolutionAlgorithm<3>::runSolutionAlgorithm(Domain<3>* theDomain);
 
 // ================================================================================================
 //

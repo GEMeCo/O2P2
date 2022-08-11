@@ -163,5 +163,38 @@
     <ClInclude Include="include\PostProcess.h">
       <Filter>Header Files\Post-Process Components</Filter>
     </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Hex8.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Hex27.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Hex64.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Pri6.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Pri18.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Pri20.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Pri30.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Pri40.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Tet4.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Tet10.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Tet20.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

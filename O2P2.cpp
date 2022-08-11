@@ -14,6 +14,7 @@
 // 
 // ================================================================================================
 #define EIGEN_USE_MKL_ALL
+#define VERSION 1.2
 
 // Custom Header Files
 #include "FEAnalysis.h"
@@ -21,11 +22,11 @@
 #include "Profiler.h"
 
 /**
- * @brief This main routine creates a single object, FEAnalysis. It manages the entire process.
- * @param argc The number of arguments in the call
- * @param args An array of arguments
- * @return Returns 0 if succeeded
- */
+  * @brief This main routine creates a single object, FEAnalysis. It manages the entire process.
+  * @param argc The number of arguments in the call
+  * @param args An array of arguments
+  * @return Returns 0 if succeeded
+  */
 int main(int argc, char** args)
 {
     std::string stProj;              // Project
@@ -71,7 +72,25 @@ int main(int argc, char** args)
 
         // Line from file
         std::string stLine;
-        std::string stFlag = "#DIM#";
+        std::string stFlag = "#VERSAO#";
+
+        // Output log in debug mode
+        LOG("\nmain: Reading flag " + stFlag);
+
+        while (stLine.compare(0, stFlag.size(), stFlag)) {
+            std::getline(file, stLine);
+            if (file.eof()) {
+                LOG("\n\nModelBuilder.populateElements: Reading Error!\nFlag " << stFlag << " not found\n\n\n");
+                throw std::invalid_argument("\n\n\nReading Error!\nFlag " + stFlag + " not found\n\n\n");
+            }
+        }
+
+        float nVer;
+        file >> nVer;
+
+        if (nVer < VERSION) {
+            throw std::invalid_argument("\n\n\nObsolete version of problem file.\nUpdate input file and check problem input.\nSomething may be missing\n\n");
+        }
 
         // Look up for flags
         stFlag = "#DIM#";
@@ -106,7 +125,7 @@ int main(int argc, char** args)
                 FEAnalysis<2>::drawResults(stProj);
             }
         }
-        /*else if (nDim == 3) {
+        else if (nDim == 3) {
             {
                 Timer timer("FEAnalysis.initComponents");
                 FEAnalysis<3>::initComponents(file);
@@ -120,7 +139,7 @@ int main(int argc, char** args)
                 Timer timer("FEAnalysis.drawResults");
                 FEAnalysis<3>::drawResults(stProj);
             }
-        }*/
+        }
         else {
             LOG("\n\n\nmain: Wrong dimensionality\nCheck problem input file\n\n\n");
             throw std::invalid_argument("\n\n\nWrong dimensionality\nCheck problem input file\n\n\n");
@@ -191,7 +210,7 @@ int main(int argc, char** args)
   *  @version   1.0.0.1
   *  @date      2022.08.01
   *
-  * @subsection citation_sec How to cite:
+  * @section citation_sec How to cite:
   *
   * Whether it was used in whole or parts, citation is a must!
   *
@@ -217,10 +236,12 @@ int main(int argc, char** args)
   *      - Intel C++ Compiler, Package ID: w_oneAPI_2021.2.0.243
   *
   * @warning Software under development. Improper use will crash your application.
+  * @note A  profiler will create a file named "results.json", but only in debug mode. Just open the google chrome in address chrome://tracing and drag/paste the file.
   *
   * @bug     Os dynamic_cast não tem verificação posterior se estão retornando pointeiros nulos (poderiam ser static_cast - mais rápidos).
   * 
-  * @todo No arquivo O2P2.cpp, incluir fluxogramas no detalhamento dos módulos.
+  * @todo 1 - No arquivo O2P2.cpp, incluir fluxogramas no detalhamento dos módulos.
+  * @todo 2 - Complementar documentação dos módulos
   *
   * @defgroup Main_Module O2P2.
   * @brief An object oriented environment for the positional finite element method.
@@ -245,7 +266,39 @@ int main(int argc, char** args)
   * @defgroup Elements Elements library
   * @ingroup PreProcessor_Module
   * @brief Elements Library.
-  * @details
+  * @details The following elements are available:
+  *
+  * @section Bidimensional
+  * @subsection tri Triangular
+  * @image{inline} html Elem_Tri3.png "Triangular linear" height=150
+  * @image{inline} html Elem_Tri6.png "Triangular quadratic" height=150
+  * @image{inline} html Elem_Tri10.png "Triangular cubic" height=150
+  * @subsection quad Quadrangular
+  * @image{inline} html Elem_Quad4.png "Quadrangular linear" height=150
+  * @image{inline} html Elem_Quad9.png "Quadrangular quadratic" height=150
+  * @image{inline} html Elem_Quad16.png "Quadrangular cubic" height=150
+  * @subsection ir_quad Rectangular
+  * @image{inline} html Elem_Quad8.png "Quadrangular cubic/linear" height=150
+  * @image{inline} html Elem_Quad12.png "Quadrangular cubic/quadratic" height=150
+  * @image{inline} html Elem_Quad20png "Quadrangular cubic/quartic" height=150
+  *
+  * 
+  * @section Tridimensional
+  * @subsection tet Tetrahedral
+  * @image{inline} html Elem_Tet4.png "Tetrahedral linear" height=150
+  * @image{inline} html Elem_Tet10.png "Tetrahedral quadratic" height=150
+  * @image{inline} html Elem_Tet20.png "Tetrahedral cubic" height=150
+  * @subsection hexa Hexahedral
+  * @image{inline} html Elem_Hex8.png "Hexahedral linear" height=150
+  * @image{inline} html Elem_Hex27.png "Hexahedral quadratic" height=150
+  * @image{inline} html Elem_Hex64.png "Hexahedral cubic" height=150
+  * @subsection prism Prismatic
+  * @image{inline} html Elem_Pri6.png "Prismatic linear" height=150
+  * @image{inline} html Elem_Pri18.png "Prismatic quadratic" height=150
+  * @image{inline} html Elem_Pri40.png "Prismatic cubic" height=150
+  * @subsection ir_prism Irregular prismatic
+  * @image{inline} html Elem_Pri20.png "Prismatic cubic/linear" height=150
+  * @image{inline} html Elem_Pri30.png "Prismatic cubic/quadratic" height=150
   *
   * @defgroup Processor_Module Processor classes.
   * @ingroup Main_Module

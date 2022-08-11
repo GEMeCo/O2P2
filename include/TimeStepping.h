@@ -45,6 +45,13 @@ public:
       */
     virtual void runTimeLoop(Domain<2>* theDomain, AnalysisComp* theFEModel, NonLinearSolver* theSolver) = 0;
 
+    /** Manages the time stepping integration scheme.
+      * @param theDomain Container with nodal and elements information.
+      * @param theFEModel Container of solution components.
+      * @param theSolver Pointer to the non-linear solver.
+      */
+    virtual void runTimeLoop(Domain<3>* theDomain, AnalysisComp* theFEModel, NonLinearSolver* theSolver) = 0;
+
 protected:
     /** @brief Default construtor. Implemented in derived classes.  */
     TimeStepping( ) { };
@@ -64,6 +71,12 @@ public:
 
     // Work-around to implement Quasi-Static time stepping integration for 2D and 3D problems.
     void runTimeLoop(Domain<2>* theDomain, AnalysisComp* theFEModel, NonLinearSolver* theSolver) override {
+        PROFILE_FUNCTION();
+        this->runTimeLooping(theDomain, theFEModel, theSolver);
+    };
+
+    // Work-around to implement Quasi-Static time stepping integration for 2D and 3D problems.
+    void runTimeLoop(Domain<3>* theDomain, AnalysisComp* theFEModel, NonLinearSolver* theSolver) override {
         PROFILE_FUNCTION();
         this->runTimeLooping(theDomain, theFEModel, theSolver);
     };

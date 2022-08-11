@@ -22,6 +22,10 @@
 //
 // ================================================================================================
 template class ElemComponent<2>;
+template class ElemComponent<3>;
+
+template void ElemComponent<2>::setMaterialPoint();
+template void ElemComponent<3>::setMaterialPoint();
 
 // ================================================================================================
 //
@@ -36,8 +40,6 @@ template<int nDim> void ElemComponent<nDim>::setMaterialPoint()
 	for (int i = 0; i < nIP; ++i) {
 		// Once created, evaluates F0 (Ref. Jacobian)
 		Eigen::MatrixXd F0 = Eigen::MatrixXd::Zero(nDim, nDim);
-		// Once created, evaluates F0 (Ref. Jacobian)
-		//Eigen::MatrixXd F02 = Eigen::MatrixXd::Zero(nDim, nDim);
 
 		// Some pointer arithmetic is required
 		int n = i * m_pElem->getNumNodes() * nDim;
@@ -54,7 +56,7 @@ template<int nDim> void ElemComponent<nDim>::setMaterialPoint()
 			//int m = 0;
 			//for (auto& node : getConectivity()) {
 			//	for (int k = 0; k < nDim; k++) {
-			//		F02(k, j) += node->getInitPos()[j] * *(m_pElem->getShapeDerivative() + n + m);
+			//		F0(k, j) += node->getInitPos()[j] * *(m_pElem->getShapeDerivative() + n + m);
 			//		m++;
 			//	}
 			//}
@@ -132,6 +134,59 @@ Eigen::MatrixXd ElemComponent<2>::getConstitutiveMatrix()
 
 // ================================================================================================
 //
+// Implementation of ElemComp Member Function (3D only): getConstitutiveMatrix
+//
+// ================================================================================================
+template<>
+Eigen::MatrixXd ElemComponent<3>::getConstitutiveMatrix()
+{
+	// Dimensionality of the element
+	auto nDim = m_pElem->getDIM();
+
+	// Downcasting to solid element.
+	ElementSolid* pElem = static_cast<ElementSolid*>(m_pElem.get());
+
+	// Pointer to the material
+	auto pMat = pElem->getMaterial();
+
+	// Should also downcast to SVK material
+	Mat_SVK_ISO* pSVK_Mat = static_cast<Mat_SVK_ISO*>(pMat);
+
+	// Size of Constitutive matrix
+	int nVoigt = 3 * nDim - 3;
+
+	double Yg = pSVK_Mat->getLongitudinalModulus();
+	double nu = pSVK_Mat->getPoisson();
+	double G = pSVK_Mat->getTransversalModulus();
+
+	Eigen::MatrixXd E(nVoigt, nVoigt);
+	E.setZero();
+
+	double Aux = Yg / (1. + nu) / (1. - 2 * nu);
+
+	E(0, 0) = Aux * (1 - nu);
+	E(1, 1) = E(0, 0);
+	E(2, 2) = E(0, 0);
+
+	E(0, 1) = nu * Aux;
+	E(0, 2) = E(0, 1);
+
+	E(1, 0) = E(0, 1);
+	E(1, 2) = E(0, 1);
+
+	E(2, 0) = E(0, 1);
+	E(2, 1) = E(0, 1);
+
+	E(3, 3) = G * 2.;
+	E(4, 4) = G * 2.;
+	E(5, 5) = G * 2.;
+
+	return E;
+};
+
+
+// ================================================================================================
+//
 // Implementation of ElemComp Member Function: getContribution
 //
 // ================================================================================================
@@ -161,8 +216,8 @@ void ElemComponent<nDim>::getContribution_SVK_ISO(Eigen::VectorXd& FInt, Eigen::
 	auto nIP = m_pElem->getNumIP();
 
 	// Matrices sizes
-	int nVoigt = 3 * nDim - 3;
-	int nDof = nNodes * nDim;
+	const int nVoigt = 3 * nDim - 3;
+	const int nDof = nNodes * nDim;
 
 	// Elasticity tensor in material description
 	Eigen::MatrixXd E(nVoigt, nVoigt);
@@ -190,19 +245,9 @@ void ElemComponent<nDim>::getContribution_SVK_ISO(Eigen::VectorXd& FInt, Eigen::
 				auto node = getConectivity(m);
 
 				for (int k = 0; k < nDim; ++k) {
-					F1(j, k) += node->getTrial()[j] * *(pShape + p + m*nDim + k);
-					//F1(k, j) += node->getTrial()[j] * *(pShape + p + m * nDim + k);
+					F1(j, k) += node->getTrial()[j] * *(pShape + p + m * nDim + k);
 				}
 			}
-
-			// m is related to the nDof -> nNodes * nDim
-			//int m = 0;
-			//for (auto& node : getConectivity()) {
-			//	for (int k = 0; k < nDim; ++k) {
-			//		F1(j, k) += node->getTrial()[j] * *(pShape + p + m);
-			//		m++;
-			//	}
-			//}
 		}
 
 		// Deformation gradient
@@ -214,8 +259,6 @@ void ElemComponent<nDim>::getContribution_SVK_ISO(Eigen::VectorXd& FInt, Eigen::
 		// Right Cauchy-Green (or Green deformation tensor)
 		Eigen::MatrixXd C(nDim, nDim);
 		C = F.transpose() * F;
-
-		// Thermal, AAR, Damage and other stuff should be implemented here
 
 		// Green-Lagrange Strain in Voigt notation
 		Eigen::VectorXd L(nVoigt);
@@ -276,7 +319,7 @@ void ElemComponent<nDim>::getContribution_SVK_ISO(Eigen::VectorXd& FInt, Eigen::
 		Eigen::MatrixXd temporary(nVoigt, nDof);
 
 		// The transversal modulus must be multiplied by 2 only here for Hessian
-		// since I am disregarding the last term (thus reducing all vector/matrices sizes).
+		// since I am disregarding the last terms (thus reducing all vector/matrices sizes).
 		for (int j = nDim; j < nVoigt; ++j) {
 			E(j, j) = E(j, j) * 2.;
 		}
@@ -290,43 +333,42 @@ void ElemComponent<nDim>::getContribution_SVK_ISO(Eigen::VectorXd& FInt, Eigen::
 			E(j, j) = E(j, j) * 0.5;
 		}
 
-		// We still have to add the Green-Lagrange strain second derivative to the Hessian Matrix
-		// As it is the same in every direction, only one must be evaluated
-
 		// Green-Lagrange Strain Second Derivative
-		Eigen::VectorXd d2Ldy2(nVoigt);
-
-		for (int r = 0; r < nNodes; ++r) {
-			int curDof_1 = r * nDim;
-
-			for (int s = 0; s < nNodes; ++s) {
-				int curDof_2 = s * nDim;
-
-				d2Ldy2.setZero();
+		for (int j = 0; j < nDof; j = j + nDim) {
+			for (int k = 0; k < nDof; k = k + nDim) {
+				//Eigen::VectorXd d2Ldy2 = Eigen::VectorXd::Zero(nVoigt);
+				double d2Ldy2[nVoigt];
 
 				for (int m = 0; m < nDim; ++m) {
-					for (int l = 0; l < nDim; ++l) {
+					d2Ldy2[m] = 0.;
+
+					for (int n = 0; n < nDim; ++n) {
 						for (int o = 0; o < nDim; ++o) {
-							d2Ldy2(m) += (F0i(l, m) * *(pShape + p + curDof_1 + l)) * (F0i(o, m) * *(pShape + p + curDof_2 + o));
+							d2Ldy2[m] += (F0i(n, m) * *(pShape + p + j + n)) * (F0i(o, m) * *(pShape + p + k + o));
 						}
 					}
 
 					for (int n = m + 1; n < nDim; ++n) {
 						int v = nVoigt - m - n;
+						d2Ldy2[v] = 0.;
 
 						for (int l = 0; l < nDim; ++l) {
 							for (int o = 0; o < nDim; ++o) {
-								d2Ldy2(v) += (F0i(l, m) * *(pShape + p + curDof_1 + l)) * (F0i(o, n) * *(pShape + p + curDof_2 + o));
+								d2Ldy2[v] += (F0i(l, m) * *(pShape + p + j + l)) * (F0i(o, n) * *(pShape + p + k + o));
 							}
 						}
 					}
+				}
 
-					for (int v = 0; v < nDim; ++v) {
-						Hessian(curDof_1 + m, curDof_2 + m) += S(v) * d2Ldy2(v) * numInt;
+				for (int m = 0; m < nDim; ++m) {
+					for (int n = 0; n < nDim; ++n) {
+						Hessian(j + n, k + n) += S(m) * d2Ldy2[m] * numInt;
 					}
+				}
 
-					for (int v = nDim; v < nVoigt; ++v) {
-						Hessian(curDof_1 + m, curDof_2 + m) += 2. * S(v) * d2Ldy2(v) * numInt;
+				for (int m = nDim; m < nVoigt; ++m) {
+					for (int n = 0; n < nDim; ++n) {
+						Hessian(j + n, k + n) += 2. * S(m) * d2Ldy2[m] * numInt;
 					}
 				}
 			}
@@ -335,3 +377,288 @@ void ElemComponent<nDim>::getContribution_SVK_ISO(Eigen::VectorXd& FInt, Eigen::
 
 	return;
 };
+
+
+// ================================================================================================
+//
+// Implementation of ElemComp Member Function (2D only): getContribution
+//
+// ================================================================================================
+/*template<> void ElemComponent<2>::getContribution_SVK_ISO(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian)
+{
+	// Pointer to the first Shape Fuctions Derivative (const static)
+	auto pShape = m_pElem->getShapeDerivative();
+	auto pWeight = m_pElem->getWeight();
+
+	auto nNodes = m_pElem->getNumNodes();
+	auto nIP = m_pElem->getNumIP();
+	auto nDim = m_pElem->getDIM();
+
+	// Matrices sizes
+	int nVoigt = 3 * nDim - 3;
+	int nDof = nNodes * nDim;
+
+	// Elasticity tensor in material description
+	Eigen::MatrixXd E(nVoigt, nVoigt);
+	E = this->getConstitutiveMatrix();
+
+	// Contribution from each material point
+	for (int i = 0; i < nIP; ++i) {
+		// Deformation gradient from undeformed to non-dimensional space
+		Eigen::Matrix2d F0i;
+
+		// The reference jacobian matrix is already inversed in the material point.
+		F0i = m_MatPoint[i]->getJacobianMatrix();
+
+		// Deformation gradient from deformed to non-dimensional space
+		Eigen::Matrix2d F1 = Eigen::Matrix2d::Zero();
+
+		// Some pointer arithmetic is required
+		// p is related to current integration point
+		int p = i * nDof;
+
+		for (int j = 0; j < nDim; ++j) {
+			// m is related to the nDof -> nNodes * nDim
+			int m = 0;
+
+			for (auto& node : getConectivity()) {
+				for (int k = 0; k < nDim; ++k) {
+					F1(j, k) += node->getTrial()[j] * *(pShape + p + m);
+					m++;
+				}
+			}
+		}
+		// Deformation gradient
+		Eigen::Matrix2d F;
+
+		// evaluate F = F1 * F0i (F0i -> inverse of jacobian matrix)
+		F = F1 * F0i;
+
+		// Right Cauchy-Green (or Green deformation tensor)
+		Eigen::Matrix2d C;
+		C = F.transpose() * F;
+
+		// Green-Lagrange Strain in Voigt notation
+		Eigen::Vector3d L;
+
+		for (int j = 0; j < nDim; ++j) {
+			L(j) = 0.5 * (C(j, j) - 1.);
+
+			for (int k = j + 1; k < nDim; ++k) {
+				int l = 3 * nDim - 3 - j - k;
+				L(l) = 0.5 * C(j, k);
+			}
+		}
+
+		// Second Piola-Kirchhoff Stress
+		Eigen::Vector3d S;
+		S = E * L;
+
+		// Green-Lagrange Strain Derivative
+		Eigen::MatrixXd dLdy = Eigen::MatrixXd::Zero(nVoigt, nDof);
+
+		// Specif energy derivative
+		double dUedy[2];
+
+		// Some pointer arithmetic is required
+		for (int j = 0; j < nDof; j = j + nDim) {
+			dLdy(0, j) = 0.5 * (F(0, 0) * (F0i(0, 0) * *(pShape + p + j) + F0i(1, 0) * *(pShape + p + j + 1)) + F(0, 0) * (F0i(0, 0) * *(pShape + p + j) + F0i(1, 0) * *(pShape + p + j + 1)));
+			dLdy(1, j) = 0.5 * (F(0, 1) * (F0i(0, 1) * *(pShape + p + j) + F0i(1, 1) * *(pShape + p + j + 1)) + F(0, 1) * (F0i(0, 1) * *(pShape + p + j) + F0i(1, 1) * *(pShape + p + j + 1)));
+			dLdy(2, j) = 0.5 * (F(0, 0) * (F0i(0, 1) * *(pShape + p + j) + F0i(1, 1) * *(pShape + p + j + 1)) + F(0, 1) * (F0i(0, 0) * *(pShape + p + j) + F0i(1, 0) * *(pShape + p + j + 1)));
+
+			dLdy(0, j + 1) = 0.5 * (F(1, 0) * (F0i(0, 0) * *(pShape + p + j) + F0i(1, 0) * *(pShape + p + j + 1)) + F(1, 0) * (F0i(0, 0) * *(pShape + p + j) + F0i(1, 0) * *(pShape + p + j + 1)));
+			dLdy(1, j + 1) = 0.5 * (F(1, 1) * (F0i(0, 1) * *(pShape + p + j) + F0i(1, 1) * *(pShape + p + j + 1)) + F(1, 1) * (F0i(0, 1) * *(pShape + p + j) + F0i(1, 1) * *(pShape + p + j + 1)));
+			dLdy(2, j + 1) = 0.5 * (F(1, 0) * (F0i(0, 1) * *(pShape + p + j) + F0i(1, 1) * *(pShape + p + j + 1)) + F(1, 1) * (F0i(0, 0) * *(pShape + p + j) + F0i(1, 0) * *(pShape + p + j + 1)));
+
+			dUedy[0] = S(0) * dLdy(0, j) + S(1) * dLdy(1, j) + 2. * (S(2) * dLdy(2, j));
+			dUedy[1] = S(0) * dLdy(0, j + 1) + S(1) * dLdy(1, j + 1) + 2. * (S(2) * dLdy(2, j + 1));
+
+			// Integration of the specific energy derivative = internal force
+			FInt(j) += dUedy[0] * *(pWeight + i) * m_MatPoint[i]->getJacobian();
+			FInt(j + 1) += dUedy[1] * *(pWeight + i) * m_MatPoint[i]->getJacobian();
+		}
+
+		Eigen::MatrixXd temporary(nVoigt, nDof);
+
+		// The transversal modulus must be multiplied by 2 only here for Hessian
+		// since I am disregarding the last term (thus reducing all vector/matrices sizes).
+		for (int i = nDim; i < nVoigt; ++i) {
+			E(i, i) = E(i, i) * 2.;
+		}
+
+		temporary = E * dLdy;
+		temporary *= *(pWeight + i) * m_MatPoint[i]->getJacobian();
+		Hessian += dLdy.transpose() * temporary;
+
+		// Returning the transversal modulus for its original value
+		for (int i = nDim; i < nVoigt; ++i) {
+			E(i, i) = E(i, i) * 0.5;
+		}
+
+		// Green-Lagrange Strain Second Derivative
+		Eigen::MatrixXd d2Ldy2(nVoigt, nDim);
+
+		for (int j = 0; j < nDof; j = j + nDim) {
+			for (int k = 0; k < nDof; k = k + nDim) {
+				d2Ldy2(0, 0) = (F0i(0, 0) * *(pShape + p + j) + F0i(1, 0) * *(pShape + p + j + 1)) * (F0i(0, 0) * *(pShape + p + k) + F0i(1, 0) * *(pShape + p + k + 1));
+				d2Ldy2(1, 0) = (F0i(0, 1) * *(pShape + p + j) + F0i(1, 1) * *(pShape + p + j + 1)) * (F0i(0, 1) * *(pShape + p + k) + F0i(1, 1) * *(pShape + p + k + 1));
+				d2Ldy2(2, 0) = (F0i(0, 0) * *(pShape + p + j) + F0i(1, 0) * *(pShape + p + j + 1)) * (F0i(0, 1) * *(pShape + p + k) + F0i(1, 1) * *(pShape + p + k + 1));
+
+				d2Ldy2(0, 1) = d2Ldy2(0, 0);
+				d2Ldy2(1, 1) = d2Ldy2(1, 0);
+				d2Ldy2(2, 1) = d2Ldy2(2, 0);
+
+				Hessian(j, k) += (S(0) * d2Ldy2(0, 0) + S(1) * d2Ldy2(1, 0) + 2. * S(2) * d2Ldy2(2, 0)) * *(pWeight + i) * m_MatPoint[i]->getJacobian();
+				Hessian(j + 1, k + 1) += (S(0) * d2Ldy2(0, 1) + S(1) * d2Ldy2(1, 1) + 2. * S(2) * d2Ldy2(2, 1)) * *(pWeight + i) * m_MatPoint[i]->getJacobian();
+			}
+		}
+	}
+};*/
+
+// ================================================================================================
+//
+// Implementation of ElemComp Member Function (3D only): getContribution
+//
+// ================================================================================================
+/*template<> void ElemComponent<3>::getContribution_SVK_ISO(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian)
+{
+	// Pointer to the first Shape Fuctions Derivative (const static)
+	auto pShape = m_pElem->getShapeDerivative();
+	auto pWeight = m_pElem->getWeight();
+
+	auto nNodes = m_pElem->getNumNodes();
+	auto nIP = m_pElem->getNumIP();
+	auto nDim = m_pElem->getDIM();
+
+	// Matrices sizes
+	int nVoigt = 3 * nDim - 3;
+	int nDof = nNodes * nDim;
+
+	// Elasticity tensor in material description
+	Eigen::MatrixXd E(nVoigt, nVoigt);
+	E = this->getConstitutiveMatrix();
+
+	// Contribution from each material point
+	for (int i = 0; i < nIP; ++i) {
+		// Deformation gradient from undeformed to non-dimensional space
+		Eigen::MatrixXd F0i(nDim, nDim);
+
+		// The reference jacobian matrix is already inversed in the material point.
+		F0i = m_MatPoint[i]->getJacobianMatrix();
+
+		// Deformation gradient from deformed to non-dimensional space
+		Eigen::MatrixXd F1 = Eigen::MatrixXd::Zero(nDim, nDim);
+
+		// Some pointer arithmetic is required
+		// p and numInt are related to current integration point and weighting numerical integration
+		int p = i * nDof;
+		double numInt = *(pWeight + i) * m_MatPoint[i]->getJacobian();
+
+		for (int j = 0; j < nDim; ++j) {
+			for (int m = 0; m < nNodes; ++m) {
+				auto node = getConectivity(m);
+
+				for (int k = 0; k < nDim; ++k) {
+					F1(j, k) += node->getTrial()[j] * *(pShape + p + m * nDim + k);
+				}
+			}
+		}
+
+		// Deformation gradient
+		Eigen::MatrixXd F(nDim, nDim);
+
+		// evaluate F = F1 * F0i (F0i -> inverse of jacobian matrix)
+		F = F1 * F0i;
+
+		// Right Cauchy-Green (or Green deformation tensor)
+		Eigen::MatrixXd C(nDim, nDim);
+		C = F.transpose() * F;
+
+		// Green-Lagrange Strain in Voigt notation
+		Eigen::VectorXd L(nVoigt);
+		for (int j = 0; j < nDim; ++j) {
+			L(j) = 0.5 * (C(j, j) - 1.);
+
+			for (int k = j + 1; k < nDim; ++k) {
+				int l = nVoigt - j - k;
+				L(l) = 0.5 * C(j, k);
+			}
+		}
+		// Second Piola-Kirchhoff Stress
+		Eigen::VectorXd S(nVoigt);
+		S = E * L;
+
+		// Green-Lagrange Strain Derivative
+		Eigen::MatrixXd dLdy = Eigen::MatrixXd::Zero(nVoigt, nDof);
+
+		// Specif energy derivative
+		double dUedy[3];
+
+		for (int j = 0; j < nDof; j = j + nDim) {
+			dLdy(0, j) = 0.5 * (F(0, 0) * (F0i(0, 0) * *(pShape + p + j) + F0i(1, 0) * *(pShape + p + j + 1) + F0i(2, 0) * *(pShape + p + j + 2)) + F(0, 0) * (F0i(0, 0) * *(pShape + p + j) + F0i(1, 0) * *(pShape + p + j + 1) + F0i(2, 0) * *(pShape + p + j + 2)));
+			dLdy(1, j) = 0.5 * (F(0, 1) * (F0i(0, 1) * *(pShape + p + j) + F0i(1, 1) * *(pShape + p + j + 1) + F0i(2, 1) * *(pShape + p + j + 2)) + F(0, 1) * (F0i(0, 1) * *(pShape + p + j) + F0i(1, 1) * *(pShape + p + j + 1) + F0i(2, 1) * *(pShape + p + j + 2)));
+			dLdy(2, j) = 0.5 * (F(0, 2) * (F0i(0, 2) * *(pShape + p + j) + F0i(1, 2) * *(pShape + p + j + 1) + F0i(2, 2) * *(pShape + p + j + 2)) + F(0, 2) * (F0i(0, 2) * *(pShape + p + j) + F0i(1, 2) * *(pShape + p + j + 1) + F0i(2, 2) * *(pShape + p + j + 2)));
+			dLdy(3, j) = 0.5 * (F(0, 1) * (F0i(0, 2) * *(pShape + p + j) + F0i(1, 2) * *(pShape + p + j + 1) + F0i(2, 2) * *(pShape + p + j + 2)) + F(0, 2) * (F0i(0, 1) * *(pShape + p + j) + F0i(1, 1) * *(pShape + p + j + 1) + F0i(2, 1) * *(pShape + p + j + 2)));
+			dLdy(4, j) = 0.5 * (F(0, 0) * (F0i(0, 2) * *(pShape + p + j) + F0i(1, 2) * *(pShape + p + j + 1) + F0i(2, 2) * *(pShape + p + j + 2)) + F(0, 2) * (F0i(0, 0) * *(pShape + p + j) + F0i(1, 0) * *(pShape + p + j + 1) + F0i(2, 0) * *(pShape + p + j + 2)));
+			dLdy(5, j) = 0.5 * (F(0, 0) * (F0i(0, 1) * *(pShape + p + j) + F0i(1, 1) * *(pShape + p + j + 1) + F0i(2, 1) * *(pShape + p + j + 2)) + F(0, 1) * (F0i(0, 0) * *(pShape + p + j) + F0i(1, 0) * *(pShape + p + j + 1) + F0i(2, 0) * *(pShape + p + j + 2)));
+
+			dLdy(0, j + 1) = 0.5 * (F(1, 0) * (F0i(0, 0) * *(pShape + p + j) + F0i(1, 0) * *(pShape + p + j + 1) + F0i(2, 0) * *(pShape + p + j + 2)) + F(1, 0) * (F0i(0, 0) * *(pShape + p + j) + F0i(1, 0) * *(pShape + p + j + 1) + F0i(2, 0) * *(pShape + p + j + 2)));
+			dLdy(1, j + 1) = 0.5 * (F(1, 1) * (F0i(0, 1) * *(pShape + p + j) + F0i(1, 1) * *(pShape + p + j + 1) + F0i(2, 1) * *(pShape + p + j + 2)) + F(1, 1) * (F0i(0, 1) * *(pShape + p + j) + F0i(1, 1) * *(pShape + p + j + 1) + F0i(2, 1) * *(pShape + p + j + 2)));
+			dLdy(2, j + 1) = 0.5 * (F(1, 2) * (F0i(0, 2) * *(pShape + p + j) + F0i(1, 2) * *(pShape + p + j + 1) + F0i(2, 2) * *(pShape + p + j + 2)) + F(1, 2) * (F0i(0, 2) * *(pShape + p + j) + F0i(1, 2) * *(pShape + p + j + 1) + F0i(2, 2) * *(pShape + p + j + 2)));
+			dLdy(3, j + 1) = 0.5 * (F(1, 1) * (F0i(0, 2) * *(pShape + p + j) + F0i(1, 2) * *(pShape + p + j + 1) + F0i(2, 2) * *(pShape + p + j + 2)) + F(1, 2) * (F0i(0, 1) * *(pShape + p + j) + F0i(1, 1) * *(pShape + p + j + 1) + F0i(2, 1) * *(pShape + p + j + 2)));
+			dLdy(4, j + 1) = 0.5 * (F(1, 0) * (F0i(0, 2) * *(pShape + p + j) + F0i(1, 2) * *(pShape + p + j + 1) + F0i(2, 2) * *(pShape + p + j + 2)) + F(1, 2) * (F0i(0, 0) * *(pShape + p + j) + F0i(1, 0) * *(pShape + p + j + 1) + F0i(2, 0) * *(pShape + p + j + 2)));
+			dLdy(5, j + 1) = 0.5 * (F(1, 0) * (F0i(0, 1) * *(pShape + p + j) + F0i(1, 1) * *(pShape + p + j + 1) + F0i(2, 1) * *(pShape + p + j + 2)) + F(1, 1) * (F0i(0, 0) * *(pShape + p + j) + F0i(1, 0) * *(pShape + p + j + 1) + F0i(2, 0) * *(pShape + p + j + 2)));
+
+			dLdy(0, j + 2) = 0.5 * (F(2, 0) * (F0i(0, 0) * *(pShape + p + j) + F0i(1, 0) * *(pShape + p + j + 1) + F0i(2, 0) * *(pShape + p + j + 2)) + F(2, 0) * (F0i(0, 0) * *(pShape + p + j) + F0i(1, 0) * *(pShape + p + j + 1) + F0i(2, 0) * *(pShape + p + j + 2)));
+			dLdy(1, j + 2) = 0.5 * (F(2, 1) * (F0i(0, 1) * *(pShape + p + j) + F0i(1, 1) * *(pShape + p + j + 1) + F0i(2, 1) * *(pShape + p + j + 2)) + F(2, 1) * (F0i(0, 1) * *(pShape + p + j) + F0i(1, 1) * *(pShape + p + j + 1) + F0i(2, 1) * *(pShape + p + j + 2)));
+			dLdy(2, j + 2) = 0.5 * (F(2, 2) * (F0i(0, 2) * *(pShape + p + j) + F0i(1, 2) * *(pShape + p + j + 1) + F0i(2, 2) * *(pShape + p + j + 2)) + F(2, 2) * (F0i(0, 2) * *(pShape + p + j) + F0i(1, 2) * *(pShape + p + j + 1) + F0i(2, 2) * *(pShape + p + j + 2)));
+			dLdy(3, j + 2) = 0.5 * (F(2, 1) * (F0i(0, 2) * *(pShape + p + j) + F0i(1, 2) * *(pShape + p + j + 1) + F0i(2, 2) * *(pShape + p + j + 2)) + F(2, 2) * (F0i(0, 1) * *(pShape + p + j) + F0i(1, 1) * *(pShape + p + j + 1) + F0i(2, 1) * *(pShape + p + j + 2)));
+			dLdy(4, j + 2) = 0.5 * (F(2, 0) * (F0i(0, 2) * *(pShape + p + j) + F0i(1, 2) * *(pShape + p + j + 1) + F0i(2, 2) * *(pShape + p + j + 2)) + F(2, 2) * (F0i(0, 0) * *(pShape + p + j) + F0i(1, 0) * *(pShape + p + j + 1) + F0i(2, 0) * *(pShape + p + j + 2)));
+			dLdy(5, j + 2) = 0.5 * (F(2, 0) * (F0i(0, 1) * *(pShape + p + j) + F0i(1, 1) * *(pShape + p + j + 1) + F0i(2, 1) * *(pShape + p + j + 2)) + F(2, 1) * (F0i(0, 0) * *(pShape + p + j) + F0i(1, 0) * *(pShape + p + j + 1) + F0i(2, 0) * *(pShape + p + j + 2)));
+
+			dUedy[0] = S(0) * dLdy(0, j) + S(1) * dLdy(1, j) + S(2) * dLdy(2, j) + 2. * (S(3) * dLdy(3, j) + S(4) * dLdy(4, j) + S(5) * dLdy(5, j));
+			dUedy[1] = S(0) * dLdy(0, j + 1) + S(1) * dLdy(1, j + 1) + S(2) * dLdy(2, j + 1) + 2. * (S(3) * dLdy(3, j + 1) + S(4) * dLdy(4, j + 1) + S(5) * dLdy(5, j + 1));
+			dUedy[2] = S(0) * dLdy(0, j + 2) + S(1) * dLdy(1, j + 2) + S(2) * dLdy(2, j + 2) + 2. * (S(3) * dLdy(3, j + 2) + S(4) * dLdy(4, j + 2) + S(5) * dLdy(5, j + 2));
+
+			//	// Integration of the specific energy derivative = internal force
+			FInt(j) += dUedy[0] * *(pWeight + i) * m_MatPoint[i]->getJacobian();
+			FInt(j + 1) += dUedy[1] * *(pWeight + i) * m_MatPoint[i]->getJacobian();
+			FInt(j + 2) += dUedy[2] * *(pWeight + i) * m_MatPoint[i]->getJacobian();
+		}
+
+		Eigen::MatrixXd temporary(nVoigt, nDof);
+
+		// The transversal modulus must be multiplied by 2 only here for Hessian
+		// since I am disregarding the last term (thus reducing all vector/matrices sizes).
+		for (int i = nDim; i < nVoigt; ++i) {
+			E(i, i) = E(i, i) * 2.;
+		}
+
+		temporary = E * dLdy;
+		temporary *= numInt;
+		Hessian += dLdy.transpose() * temporary;
+
+		// Returning the transversal modulus for its original value
+		for (int i = nDim; i < nVoigt; ++i) {
+			E(i, i) = E(i, i) * 0.5;
+		}
+
+		// Green-Lagrange Strain Second Derivative
+		Eigen::VectorXd d2Ldy2(nVoigt);
+		
+		for (int j = 0; j < nDof; j = j + nDim) {
+			for (int k = 0; k < nDof; k = k + nDim) {
+				d2Ldy2(0) = (F0i(0, 0) * *(pShape + p + j) + F0i(1, 0) * *(pShape + p + j + 1) + F0i(2, 0) * *(pShape + p + j + 2)) * (F0i(0, 0) * *(pShape + p + k) + F0i(1, 0) * *(pShape + p + k + 1) + F0i(2, 0) * *(pShape + p + k + 2));
+				d2Ldy2(1) = (F0i(0, 1) * *(pShape + p + j) + F0i(1, 1) * *(pShape + p + j + 1) + F0i(2, 1) * *(pShape + p + j + 2)) * (F0i(0, 1) * *(pShape + p + k) + F0i(1, 1) * *(pShape + p + k + 1) + F0i(2, 1) * *(pShape + p + k + 2));
+				d2Ldy2(2) = (F0i(0, 2) * *(pShape + p + j) + F0i(1, 2) * *(pShape + p + j + 1) + F0i(2, 2) * *(pShape + p + j + 2)) * (F0i(0, 2) * *(pShape + p + k) + F0i(1, 2) * *(pShape + p + k + 1) + F0i(2, 2) * *(pShape + p + k + 2));
+				d2Ldy2(3) = (F0i(0, 1) * *(pShape + p + j) + F0i(1, 1) * *(pShape + p + j + 1) + F0i(2, 1) * *(pShape + p + j + 2)) * (F0i(0, 2) * *(pShape + p + k) + F0i(1, 2) * *(pShape + p + k + 1) + F0i(2, 2) * *(pShape + p + k + 2));
+				d2Ldy2(4) = (F0i(0, 0) * *(pShape + p + j) + F0i(1, 0) * *(pShape + p + j + 1) + F0i(2, 0) * *(pShape + p + j + 2)) * (F0i(0, 2) * *(pShape + p + k) + F0i(1, 2) * *(pShape + p + k + 1) + F0i(2, 2) * *(pShape + p + k + 2));
+				d2Ldy2(5) = (F0i(0, 0) * *(pShape + p + j) + F0i(1, 0) * *(pShape + p + j + 1) + F0i(2, 0) * *(pShape + p + j + 2)) * (F0i(0, 1) * *(pShape + p + k) + F0i(1, 1) * *(pShape + p + k + 1) + F0i(2, 1) * *(pShape + p + k + 2));
+
+				Hessian(j, k) += (S(0) * d2Ldy2(0) + S(1) * d2Ldy2(1) + S(2) * d2Ldy2(2) + 2. * (S(3) * d2Ldy2(3) + S(4) * d2Ldy2(4) + S(5) * d2Ldy2(5))) * numInt;
+				Hessian(j + 1, k + 1) += (S(0) * d2Ldy2(0) + S(1) * d2Ldy2(1) + S(2) * d2Ldy2(2) + 2. * (S(3) * d2Ldy2(3) + S(4) * d2Ldy2(4) + S(5) * d2Ldy2(5))) * numInt;
+				Hessian(j + 2, k + 2) += (S(0) * d2Ldy2(0) + S(1) * d2Ldy2(1) + S(2) * d2Ldy2(2) + 2. * (S(3) * d2Ldy2(3) + S(4) * d2Ldy2(4) + S(5) * d2Ldy2(5))) * numInt;
+			}
+		}
+	}
+};*/

@@ -25,6 +25,7 @@
   * @details Plane element, with linear interpolation functions, triangular shaped.
   * Options for integration points: 1, 3, 4, 6, 7, 12 and 13.
   * @image html Elem_Tri3.png height=300
+  * @note Minimum number of integration points: 1.
   */
 class Elem_Tri3 : public ElementPlane
 {

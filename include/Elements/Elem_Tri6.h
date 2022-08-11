@@ -24,8 +24,9 @@
   *
   * @brief Triangular quadratic element with 6 nodes.
   * @details Plane element, with quadratic interpolation functions, triangular shaped.
-  * Options for integration points: 1, 3, 4, 6, 7, 12 and 13.
+  * Options for integration points: 3, 4, 6, 7, 12 and 13.
   * @image html Elem_Tri6.png height=300
+  * * @note Minimum number of integration points: 3.
   */
 class Elem_Tri6 : public ElementPlane
 {
@@ -110,7 +111,7 @@ protected:
   * @brief Triangular quadratic element with 6 nodes.
   * @details Plane element, with quadratic interpolation functions, triangular shaped.
   *
-  * @tparam nIP Number of integration points. Must be: 1, 3, 4, 6, 7, 12 or 13.
+  * @tparam nIP Number of integration points. Must be: 3, 4, 6, 7, 12 or 13.
   */
 template<int nIP>
 class Elem_Tri6_IP : public Elem_Tri6
@@ -251,7 +252,6 @@ inline void Elem_Tri6::setGeomProperties() {
 // Weights for numerical integration
 //
 // ================================================================================================
-template<> const double* Elem_Tri6_IP<1>::m_weight = &Hammer2D::Wg_1P[0];
 template<> const double* Elem_Tri6_IP<3>::m_weight = &Hammer2D::Wg_3P[0];
 template<> const double* Elem_Tri6_IP<4>::m_weight = &Hammer2D::Wg_4P[0];
 template<> const double* Elem_Tri6_IP<6>::m_weight = &Hammer2D::Wg_6P[0];
@@ -264,14 +264,6 @@ template<> const double* Elem_Tri6_IP<13>::m_weight = &Hammer2D::Wg_13P[0];
 // Shape functions
 //
 // ================================================================================================
-template<> const double Elem_Tri6_IP<1>::m_Psi[1][m_NumNodes] = {
-	{ (2. * Hammer2D::Qsi_1P[0][0] - 1.) * Hammer2D::Qsi_1P[0][0],
-	  (2. * Hammer2D::Qsi_1P[0][1] - 1.) * Hammer2D::Qsi_1P[0][1],
-	  (1. - 2. * Hammer2D::Qsi_1P[0][0] - 2. * Hammer2D::Qsi_1P[0][1]) * (1. - Hammer2D::Qsi_1P[0][0] - Hammer2D::Qsi_1P[0][1]),
-	  4. * Hammer2D::Qsi_1P[0][0] * Hammer2D::Qsi_1P[0][1],
-	  4. * Hammer2D::Qsi_1P[0][1] * (1. - Hammer2D::Qsi_1P[0][0] - Hammer2D::Qsi_1P[0][1]),
-	  4. * Hammer2D::Qsi_1P[0][0] * (1. - Hammer2D::Qsi_1P[0][0] - Hammer2D::Qsi_1P[0][1]) } };
-
 template<> const double Elem_Tri6_IP<3>::m_Psi[3][m_NumNodes] = {
 	{ (2. * Hammer2D::Qsi_3P[0][0] - 1.) * Hammer2D::Qsi_3P[0][0],
 	  (2. * Hammer2D::Qsi_3P[0][1] - 1.) * Hammer2D::Qsi_3P[0][1],
@@ -598,14 +590,6 @@ template<> const double Elem_Tri6_IP<13>::m_Psi[13][m_NumNodes] = {
 // Shape functions derivative
 //
 // ================================================================================================
-template<> const double Elem_Tri6_IP<1>::m_DPsi[1][m_NumNodes][m_Dim] = {
-	{ { 4. * Hammer2D::Qsi_1P[0][0] - 1., 0. },
-	  { 0., 4. * Hammer2D::Qsi_1P[0][1] - 1. },
-	  { -3. + 4. * (Hammer2D::Qsi_1P[0][0] + Hammer2D::Qsi_1P[0][1]) , -3. + 4. * (Hammer2D::Qsi_1P[0][0] + Hammer2D::Qsi_1P[0][1]) },
-	  { 4. * Hammer2D::Qsi_1P[0][1], 4. * Hammer2D::Qsi_1P[0][0] },
-	  { -4. * Hammer2D::Qsi_1P[0][1], 4. - 4. * (Hammer2D::Qsi_1P[0][0] + 2. * Hammer2D::Qsi_1P[0][1]) },
-	  { 4. - 4. * (2. * Hammer2D::Qsi_1P[0][0] + Hammer2D::Qsi_1P[0][1]), -4. * Hammer2D::Qsi_1P[0][0] } } };
-
 template<> const double Elem_Tri6_IP<3>::m_DPsi[3][m_NumNodes][m_Dim] = {
 	{ { 4. * Hammer2D::Qsi_3P[0][0] - 1., 0. },
 	  { 0., 4. * Hammer2D::Qsi_3P[0][1] - 1. },

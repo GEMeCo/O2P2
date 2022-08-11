@@ -29,17 +29,6 @@ template bool NLS_NewtonRaphson::runNonLinearSolver<AnalysisComp>(AnalysisComp* 
 //
 // Implementation of Template Member Function: runNonLinearSolver
 //
-// Newton-Raphson. The concept is as follows:
-//
-// while (||x(i+1)|| / ||x(0)|| >= EPSILON) {
-//    x(i+1) = x(i) - f(x) / f'(x) 
-// }
-// 
-// Obs.:
-// x(i+1) - x(i) -> LHS = Hessian^(-1) . RHS
-// f(x) -> RHS = FExt - FInt
-// f'(x) -> Hessian
-// 
 // ================================================================================================
 template<class T> bool NLS_NewtonRaphson::runNonLinearSolver(T* theModel, const double initialNorm, const bool output)
 {

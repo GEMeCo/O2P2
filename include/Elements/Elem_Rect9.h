@@ -23,7 +23,7 @@
   *
   * @brief Quadrangular quadratic element with 9 nodes.
   * @details Plane element, with quadratic interpolation functions, rectangular shaped.
-  * Options for integration points: 4, 9 and 16.
+  * Options for integration points: 9 and 16.
   * @image html Elem_Quad9.png height=300
   */
 class Elem_Rect9 : public ElementPlane
@@ -93,7 +93,7 @@ protected:
 	static const int m_NumNodes{ 9 };
 
 	/** @brief Number of Faces */
-	static const int m_NumFaces{ 6 };
+	static const int m_NumFaces{ 1 };
 };
 
 /**
@@ -102,7 +102,7 @@ protected:
   * @brief Quadrangular quadratic element with 9 nodes.
   * @details Plane element, with quadratic interpolation functions, rectangular shaped.
   *
-  * @tparam nIP Number of integration points. Must be: 4, 9 or 16.
+  * @tparam nIP Number of integration points. Must be: 9 or 16.
   */
 template<int nIP>
 class Elem_Rect9_IP : public Elem_Rect9
@@ -252,7 +252,6 @@ inline void Elem_Rect9::setGeomProperties() {
 // Weights for numerical integration
 //
 // ================================================================================================
-template<> const double* Elem_Rect9_IP<4>::m_weight = &Gauss2D::Wg_4P[0];
 template<> const double* Elem_Rect9_IP<9>::m_weight = &Gauss2D::Wg_9P[0];
 template<> const double* Elem_Rect9_IP<16>::m_weight = &Gauss2D::Wg_16P[0];
 
@@ -261,47 +260,6 @@ template<> const double* Elem_Rect9_IP<16>::m_weight = &Gauss2D::Wg_16P[0];
 // Shape functions
 //
 // ================================================================================================
-template<> const double Elem_Rect9_IP<4>::m_Psi[4][m_NumNodes] = {
-	{ 0.25 * (Gauss2D::Qsi_4P[0][0] - 1.) * Gauss2D::Qsi_4P[0][0] * (Gauss2D::Qsi_4P[0][1] - 1.) * Gauss2D::Qsi_4P[0][1],
-	  0.25 * (Gauss2D::Qsi_4P[0][0] + 1.) * Gauss2D::Qsi_4P[0][0] * (Gauss2D::Qsi_4P[0][1] - 1.) * Gauss2D::Qsi_4P[0][1],
-	  0.25 * (Gauss2D::Qsi_4P[0][0] + 1.) * Gauss2D::Qsi_4P[0][0] * (Gauss2D::Qsi_4P[0][1] + 1.) * Gauss2D::Qsi_4P[0][1],
-	  0.25 * (Gauss2D::Qsi_4P[0][0] - 1.) * Gauss2D::Qsi_4P[0][0] * (Gauss2D::Qsi_4P[0][1] + 1.) * Gauss2D::Qsi_4P[0][1],
-	  -0.5 * (Gauss2D::Qsi_4P[0][0] - 1.) * (Gauss2D::Qsi_4P[0][0] + 1.) * (Gauss2D::Qsi_4P[0][1] - 1.) * Gauss2D::Qsi_4P[0][1],
-	  -0.5 * (Gauss2D::Qsi_4P[0][0] - 1.) * Gauss2D::Qsi_4P[0][0] * (Gauss2D::Qsi_4P[0][1] - 1.) * (Gauss2D::Qsi_4P[0][1] + 1.),
-	  -0.5 * (Gauss2D::Qsi_4P[0][0] + 1.) * Gauss2D::Qsi_4P[0][0] * (Gauss2D::Qsi_4P[0][1] - 1.) * (Gauss2D::Qsi_4P[0][1] + 1.),
-	  -0.5 * (Gauss2D::Qsi_4P[0][0] - 1.) * (Gauss2D::Qsi_4P[0][0] + 1.) * (Gauss2D::Qsi_4P[0][1] + 1.) * Gauss2D::Qsi_4P[0][1],
-	  (Gauss2D::Qsi_4P[0][0] - 1.) * (Gauss2D::Qsi_4P[0][0] + 1.) * (Gauss2D::Qsi_4P[0][1] - 1.) * (Gauss2D::Qsi_4P[0][1] + 1.) } ,
-
-	{ 0.25 * (Gauss2D::Qsi_4P[1][0] - 1.) * Gauss2D::Qsi_4P[1][0] * (Gauss2D::Qsi_4P[1][1] - 1.) * Gauss2D::Qsi_4P[1][1],
-	  0.25 * (Gauss2D::Qsi_4P[1][0] + 1.) * Gauss2D::Qsi_4P[1][0] * (Gauss2D::Qsi_4P[1][1] - 1.) * Gauss2D::Qsi_4P[1][1],
-	  0.25 * (Gauss2D::Qsi_4P[1][0] + 1.) * Gauss2D::Qsi_4P[1][0] * (Gauss2D::Qsi_4P[1][1] + 1.) * Gauss2D::Qsi_4P[1][1],
-	  0.25 * (Gauss2D::Qsi_4P[1][0] - 1.) * Gauss2D::Qsi_4P[1][0] * (Gauss2D::Qsi_4P[1][1] + 1.) * Gauss2D::Qsi_4P[1][1],
-	  -0.5 * (Gauss2D::Qsi_4P[1][0] - 1.) * (Gauss2D::Qsi_4P[1][0] + 1.) * (Gauss2D::Qsi_4P[1][1] - 1.) * Gauss2D::Qsi_4P[1][1],
-	  -0.5 * (Gauss2D::Qsi_4P[1][0] - 1.) * Gauss2D::Qsi_4P[1][0] * (Gauss2D::Qsi_4P[1][1] - 1.) * (Gauss2D::Qsi_4P[1][1] + 1.),
-	  -0.5 * (Gauss2D::Qsi_4P[1][0] + 1.) * Gauss2D::Qsi_4P[1][0] * (Gauss2D::Qsi_4P[1][1] - 1.) * (Gauss2D::Qsi_4P[1][1] + 1.),
-	  -0.5 * (Gauss2D::Qsi_4P[1][0] - 1.) * (Gauss2D::Qsi_4P[1][0] + 1.) * (Gauss2D::Qsi_4P[1][1] + 1.) * Gauss2D::Qsi_4P[1][1],
-	  (Gauss2D::Qsi_4P[1][0] - 1.) * (Gauss2D::Qsi_4P[1][0] + 1.) * (Gauss2D::Qsi_4P[1][1] - 1.) * (Gauss2D::Qsi_4P[1][1] + 1.) } ,
-
-	{ 0.25 * (Gauss2D::Qsi_4P[2][0] - 1.) * Gauss2D::Qsi_4P[2][0] * (Gauss2D::Qsi_4P[2][1] - 1.) * Gauss2D::Qsi_4P[2][1],
-	  0.25 * (Gauss2D::Qsi_4P[2][0] + 1.) * Gauss2D::Qsi_4P[2][0] * (Gauss2D::Qsi_4P[2][1] - 1.) * Gauss2D::Qsi_4P[2][1],
-	  0.25 * (Gauss2D::Qsi_4P[2][0] + 1.) * Gauss2D::Qsi_4P[2][0] * (Gauss2D::Qsi_4P[2][1] + 1.) * Gauss2D::Qsi_4P[2][1],
-	  0.25 * (Gauss2D::Qsi_4P[2][0] - 1.) * Gauss2D::Qsi_4P[2][0] * (Gauss2D::Qsi_4P[2][1] + 1.) * Gauss2D::Qsi_4P[2][1],
-	  -0.5 * (Gauss2D::Qsi_4P[2][0] - 1.) * (Gauss2D::Qsi_4P[2][0] + 1.) * (Gauss2D::Qsi_4P[2][1] - 1.) * Gauss2D::Qsi_4P[2][1],
-	  -0.5 * (Gauss2D::Qsi_4P[2][0] - 1.) * Gauss2D::Qsi_4P[2][0] * (Gauss2D::Qsi_4P[2][1] - 1.) * (Gauss2D::Qsi_4P[2][1] + 1.),
-	  -0.5 * (Gauss2D::Qsi_4P[2][0] + 1.) * Gauss2D::Qsi_4P[2][0] * (Gauss2D::Qsi_4P[2][1] - 1.) * (Gauss2D::Qsi_4P[2][1] + 1.),
-	  -0.5 * (Gauss2D::Qsi_4P[2][0] - 1.) * (Gauss2D::Qsi_4P[2][0] + 1.) * (Gauss2D::Qsi_4P[2][1] + 1.) * Gauss2D::Qsi_4P[2][1],
-	  (Gauss2D::Qsi_4P[2][0] - 1.) * (Gauss2D::Qsi_4P[2][0] + 1.) * (Gauss2D::Qsi_4P[2][1] - 1.) * (Gauss2D::Qsi_4P[2][1] + 1.) } ,
-
-	{ 0.25 * (Gauss2D::Qsi_4P[3][0] - 1.) * Gauss2D::Qsi_4P[3][0] * (Gauss2D::Qsi_4P[3][1] - 1.) * Gauss2D::Qsi_4P[3][1],
-	  0.25 * (Gauss2D::Qsi_4P[3][0] + 1.) * Gauss2D::Qsi_4P[3][0] * (Gauss2D::Qsi_4P[3][1] - 1.) * Gauss2D::Qsi_4P[3][1],
-	  0.25 * (Gauss2D::Qsi_4P[3][0] + 1.) * Gauss2D::Qsi_4P[3][0] * (Gauss2D::Qsi_4P[3][1] + 1.) * Gauss2D::Qsi_4P[3][1],
-	  0.25 * (Gauss2D::Qsi_4P[3][0] - 1.) * Gauss2D::Qsi_4P[3][0] * (Gauss2D::Qsi_4P[3][1] + 1.) * Gauss2D::Qsi_4P[3][1],
-	  -0.5 * (Gauss2D::Qsi_4P[3][0] - 1.) * (Gauss2D::Qsi_4P[3][0] + 1.) * (Gauss2D::Qsi_4P[3][1] - 1.) * Gauss2D::Qsi_4P[3][1],
-	  -0.5 * (Gauss2D::Qsi_4P[3][0] - 1.) * Gauss2D::Qsi_4P[3][0] * (Gauss2D::Qsi_4P[3][1] - 1.) * (Gauss2D::Qsi_4P[3][1] + 1.),
-	  -0.5 * (Gauss2D::Qsi_4P[3][0] + 1.) * Gauss2D::Qsi_4P[3][0] * (Gauss2D::Qsi_4P[3][1] - 1.) * (Gauss2D::Qsi_4P[3][1] + 1.),
-	  -0.5 * (Gauss2D::Qsi_4P[3][0] - 1.) * (Gauss2D::Qsi_4P[3][0] + 1.) * (Gauss2D::Qsi_4P[3][1] + 1.) * Gauss2D::Qsi_4P[3][1],
-	  (Gauss2D::Qsi_4P[3][0] - 1.) * (Gauss2D::Qsi_4P[3][0] + 1.) * (Gauss2D::Qsi_4P[3][1] - 1.) * (Gauss2D::Qsi_4P[3][1] + 1.) } };
-
 template<> const double Elem_Rect9_IP<9>::m_Psi[9][m_NumNodes] = {
 	{ 0.25 * (Gauss2D::Qsi_9P[0][0] - 1.) * Gauss2D::Qsi_9P[0][0] * (Gauss2D::Qsi_9P[0][1] - 1.) * Gauss2D::Qsi_9P[0][1],
 	  0.25 * (Gauss2D::Qsi_9P[0][0] + 1.) * Gauss2D::Qsi_9P[0][0] * (Gauss2D::Qsi_9P[0][1] - 1.) * Gauss2D::Qsi_9P[0][1],
@@ -559,47 +517,6 @@ template<> const double Elem_Rect9_IP<16>::m_Psi[16][m_NumNodes] = {
 // Shape functions derivative
 // 
 // ================================================================================================
-template<> const double Elem_Rect9_IP<4>::m_DPsi[4][m_NumNodes][m_Dim] = {
-	{ { 0.25 * (Gauss2D::Qsi_4P[0][1] - 1.) * Gauss2D::Qsi_4P[0][1] * (2. * Gauss2D::Qsi_4P[0][0] - 1.), 0.25 * (Gauss2D::Qsi_4P[0][0] - 1.) * Gauss2D::Qsi_4P[0][0] * (2. * Gauss2D::Qsi_4P[0][1] - 1.) },
-	  { 0.25 * (Gauss2D::Qsi_4P[0][1] - 1.) * Gauss2D::Qsi_4P[0][1] * (2. * Gauss2D::Qsi_4P[0][0] + 1.), 0.25 * (Gauss2D::Qsi_4P[0][0] + 1.) * Gauss2D::Qsi_4P[0][0] * (2. * Gauss2D::Qsi_4P[0][1] - 1.) },
-	  { 0.25 * (Gauss2D::Qsi_4P[0][1] + 1.) * Gauss2D::Qsi_4P[0][1] * (2. * Gauss2D::Qsi_4P[0][0] + 1.), 0.25 * (Gauss2D::Qsi_4P[0][0] + 1.) * Gauss2D::Qsi_4P[0][0] * (2. * Gauss2D::Qsi_4P[0][1] + 1.) },
-	  { 0.25 * (Gauss2D::Qsi_4P[0][1] + 1.) * Gauss2D::Qsi_4P[0][1] * (2. * Gauss2D::Qsi_4P[0][0] - 1.), 0.25 * (Gauss2D::Qsi_4P[0][0] - 1.) * Gauss2D::Qsi_4P[0][0] * (2. * Gauss2D::Qsi_4P[0][1] + 1.) },
-	  { -0.5 * (Gauss2D::Qsi_4P[0][1] - 1.) * Gauss2D::Qsi_4P[0][1] * (2. * Gauss2D::Qsi_4P[0][0]) ,  -0.5 * (Gauss2D::Qsi_4P[0][0] - 1.) * (Gauss2D::Qsi_4P[0][0] + 1.) * (2. * Gauss2D::Qsi_4P[0][1] - 1.) },
-	  { -0.5 * (Gauss2D::Qsi_4P[0][1] - 1.) * (Gauss2D::Qsi_4P[0][1] + 1.) * (2. * Gauss2D::Qsi_4P[0][0] - 1.), -0.5 * (Gauss2D::Qsi_4P[0][0] - 1.) * Gauss2D::Qsi_4P[0][0] * (2. * Gauss2D::Qsi_4P[0][1]) },
-	  { -0.5 * (Gauss2D::Qsi_4P[0][1] - 1.) * (Gauss2D::Qsi_4P[0][1] + 1.) * (2. * Gauss2D::Qsi_4P[0][0] + 1.), -0.5 * (Gauss2D::Qsi_4P[0][0] + 1.) * Gauss2D::Qsi_4P[0][0] * (2. * Gauss2D::Qsi_4P[0][1]) },
-	  { -0.5 * (Gauss2D::Qsi_4P[0][1] + 1.) * Gauss2D::Qsi_4P[0][1] * (2. * Gauss2D::Qsi_4P[0][0]), -0.5 * (Gauss2D::Qsi_4P[0][0] - 1.) * (Gauss2D::Qsi_4P[0][0] + 1.) * (2. * Gauss2D::Qsi_4P[0][1] + 1.) },
-	  { (Gauss2D::Qsi_4P[0][1] - 1.) * (Gauss2D::Qsi_4P[0][1] + 1.) * (2. * Gauss2D::Qsi_4P[0][0]), (Gauss2D::Qsi_4P[0][0] - 1.) * (Gauss2D::Qsi_4P[0][0] + 1.) * (2. * Gauss2D::Qsi_4P[0][1]) } },
-
-	{ { 0.25 * (Gauss2D::Qsi_4P[1][1] - 1.) * Gauss2D::Qsi_4P[1][1] * (2. * Gauss2D::Qsi_4P[1][0] - 1.), 0.25 * (Gauss2D::Qsi_4P[1][0] - 1.) * Gauss2D::Qsi_4P[1][0] * (2. * Gauss2D::Qsi_4P[1][1] - 1.) },
-	  { 0.25 * (Gauss2D::Qsi_4P[1][1] - 1.) * Gauss2D::Qsi_4P[1][1] * (2. * Gauss2D::Qsi_4P[1][0] + 1.), 0.25 * (Gauss2D::Qsi_4P[1][0] + 1.) * Gauss2D::Qsi_4P[1][0] * (2. * Gauss2D::Qsi_4P[1][1] - 1.) },
-	  { 0.25 * (Gauss2D::Qsi_4P[1][1] + 1.) * Gauss2D::Qsi_4P[1][1] * (2. * Gauss2D::Qsi_4P[1][0] + 1.), 0.25 * (Gauss2D::Qsi_4P[1][0] + 1.) * Gauss2D::Qsi_4P[1][0] * (2. * Gauss2D::Qsi_4P[1][1] + 1.) },
-	  { 0.25 * (Gauss2D::Qsi_4P[1][1] + 1.) * Gauss2D::Qsi_4P[1][1] * (2. * Gauss2D::Qsi_4P[1][0] - 1.), 0.25 * (Gauss2D::Qsi_4P[1][0] - 1.) * Gauss2D::Qsi_4P[1][0] * (2. * Gauss2D::Qsi_4P[1][1] + 1.) },
-	  { -0.5 * (Gauss2D::Qsi_4P[1][1] - 1.) * Gauss2D::Qsi_4P[1][1] * (2. * Gauss2D::Qsi_4P[1][0]) ,  -0.5 * (Gauss2D::Qsi_4P[1][0] - 1.) * (Gauss2D::Qsi_4P[1][0] + 1.) * (2. * Gauss2D::Qsi_4P[1][1] - 1.) },
-	  { -0.5 * (Gauss2D::Qsi_4P[1][1] - 1.) * (Gauss2D::Qsi_4P[1][1] + 1.) * (2. * Gauss2D::Qsi_4P[1][0] - 1.), -0.5 * (Gauss2D::Qsi_4P[1][0] - 1.) * Gauss2D::Qsi_4P[1][0] * (2. * Gauss2D::Qsi_4P[1][1]) },
-	  { -0.5 * (Gauss2D::Qsi_4P[1][1] - 1.) * (Gauss2D::Qsi_4P[1][1] + 1.) * (2. * Gauss2D::Qsi_4P[1][0] + 1.), -0.5 * (Gauss2D::Qsi_4P[1][0] + 1.) * Gauss2D::Qsi_4P[1][0] * (2. * Gauss2D::Qsi_4P[1][1]) },
-	  { -0.5 * (Gauss2D::Qsi_4P[1][1] + 1.) * Gauss2D::Qsi_4P[1][1] * (2. * Gauss2D::Qsi_4P[1][0]), -0.5 * (Gauss2D::Qsi_4P[1][0] - 1.) * (Gauss2D::Qsi_4P[1][0] + 1.) * (2. * Gauss2D::Qsi_4P[1][1] + 1.) },
-	  { (Gauss2D::Qsi_4P[1][1] - 1.) * (Gauss2D::Qsi_4P[1][1] + 1.) * (2. * Gauss2D::Qsi_4P[1][0]), (Gauss2D::Qsi_4P[1][0] - 1.) * (Gauss2D::Qsi_4P[1][0] + 1.) * (2. * Gauss2D::Qsi_4P[1][1]) } },
-
-	{ { 0.25 * (Gauss2D::Qsi_4P[2][1] - 1.) * Gauss2D::Qsi_4P[2][1] * (2. * Gauss2D::Qsi_4P[2][0] - 1.), 0.25 * (Gauss2D::Qsi_4P[2][0] - 1.) * Gauss2D::Qsi_4P[2][0] * (2. * Gauss2D::Qsi_4P[2][1] - 1.) },
-	  { 0.25 * (Gauss2D::Qsi_4P[2][1] - 1.) * Gauss2D::Qsi_4P[2][1] * (2. * Gauss2D::Qsi_4P[2][0] + 1.), 0.25 * (Gauss2D::Qsi_4P[2][0] + 1.) * Gauss2D::Qsi_4P[2][0] * (2. * Gauss2D::Qsi_4P[2][1] - 1.) },
-	  { 0.25 * (Gauss2D::Qsi_4P[2][1] + 1.) * Gauss2D::Qsi_4P[2][1] * (2. * Gauss2D::Qsi_4P[2][0] + 1.), 0.25 * (Gauss2D::Qsi_4P[2][0] + 1.) * Gauss2D::Qsi_4P[2][0] * (2. * Gauss2D::Qsi_4P[2][1] + 1.) },
-	  { 0.25 * (Gauss2D::Qsi_4P[2][1] + 1.) * Gauss2D::Qsi_4P[2][1] * (2. * Gauss2D::Qsi_4P[2][0] - 1.), 0.25 * (Gauss2D::Qsi_4P[2][0] - 1.) * Gauss2D::Qsi_4P[2][0] * (2. * Gauss2D::Qsi_4P[2][1] + 1.) },
-	  { -0.5 * (Gauss2D::Qsi_4P[2][1] - 1.) * Gauss2D::Qsi_4P[2][1] * (2. * Gauss2D::Qsi_4P[2][0]) ,  -0.5 * (Gauss2D::Qsi_4P[2][0] - 1.) * (Gauss2D::Qsi_4P[2][0] + 1.) * (2. * Gauss2D::Qsi_4P[2][1] - 1.) },
-	  { -0.5 * (Gauss2D::Qsi_4P[2][1] - 1.) * (Gauss2D::Qsi_4P[2][1] + 1.) * (2. * Gauss2D::Qsi_4P[2][0] - 1.), -0.5 * (Gauss2D::Qsi_4P[2][0] - 1.) * Gauss2D::Qsi_4P[2][0] * (2. * Gauss2D::Qsi_4P[2][1]) },
-	  { -0.5 * (Gauss2D::Qsi_4P[2][1] - 1.) * (Gauss2D::Qsi_4P[2][1] + 1.) * (2. * Gauss2D::Qsi_4P[2][0] + 1.), -0.5 * (Gauss2D::Qsi_4P[2][0] + 1.) * Gauss2D::Qsi_4P[2][0] * (2. * Gauss2D::Qsi_4P[2][1]) },
-	  { -0.5 * (Gauss2D::Qsi_4P[2][1] + 1.) * Gauss2D::Qsi_4P[2][1] * (2. * Gauss2D::Qsi_4P[2][0]), -0.5 * (Gauss2D::Qsi_4P[2][0] - 1.) * (Gauss2D::Qsi_4P[2][0] + 1.) * (2. * Gauss2D::Qsi_4P[2][1] + 1.) },
-	  { (Gauss2D::Qsi_4P[2][1] - 1.) * (Gauss2D::Qsi_4P[2][1] + 1.) * (2. * Gauss2D::Qsi_4P[2][0]), (Gauss2D::Qsi_4P[2][0] - 1.) * (Gauss2D::Qsi_4P[2][0] + 1.) * (2. * Gauss2D::Qsi_4P[2][1]) } },
-
-	{ { 0.25 * (Gauss2D::Qsi_4P[3][1] - 1.) * Gauss2D::Qsi_4P[3][1] * (2. * Gauss2D::Qsi_4P[3][0] - 1.), 0.25 * (Gauss2D::Qsi_4P[3][0] - 1.) * Gauss2D::Qsi_4P[3][0] * (2. * Gauss2D::Qsi_4P[3][1] - 1.) },
-	  { 0.25 * (Gauss2D::Qsi_4P[3][1] - 1.) * Gauss2D::Qsi_4P[3][1] * (2. * Gauss2D::Qsi_4P[3][0] + 1.), 0.25 * (Gauss2D::Qsi_4P[3][0] + 1.) * Gauss2D::Qsi_4P[3][0] * (2. * Gauss2D::Qsi_4P[3][1] - 1.) },
-	  { 0.25 * (Gauss2D::Qsi_4P[3][1] + 1.) * Gauss2D::Qsi_4P[3][1] * (2. * Gauss2D::Qsi_4P[3][0] + 1.), 0.25 * (Gauss2D::Qsi_4P[3][0] + 1.) * Gauss2D::Qsi_4P[3][0] * (2. * Gauss2D::Qsi_4P[3][1] + 1.) },
-	  { 0.25 * (Gauss2D::Qsi_4P[3][1] + 1.) * Gauss2D::Qsi_4P[3][1] * (2. * Gauss2D::Qsi_4P[3][0] - 1.), 0.25 * (Gauss2D::Qsi_4P[3][0] - 1.) * Gauss2D::Qsi_4P[3][0] * (2. * Gauss2D::Qsi_4P[3][1] + 1.) },
-	  { -0.5 * (Gauss2D::Qsi_4P[3][1] - 1.) * Gauss2D::Qsi_4P[3][1] * (2. * Gauss2D::Qsi_4P[3][0]) ,  -0.5 * (Gauss2D::Qsi_4P[3][0] - 1.) * (Gauss2D::Qsi_4P[3][0] + 1.) * (2. * Gauss2D::Qsi_4P[3][1] - 1.) },
-	  { -0.5 * (Gauss2D::Qsi_4P[3][1] - 1.) * (Gauss2D::Qsi_4P[3][1] + 1.) * (2. * Gauss2D::Qsi_4P[3][0] - 1.), -0.5 * (Gauss2D::Qsi_4P[3][0] - 1.) * Gauss2D::Qsi_4P[3][0] * (2. * Gauss2D::Qsi_4P[3][1]) },
-	  { -0.5 * (Gauss2D::Qsi_4P[3][1] - 1.) * (Gauss2D::Qsi_4P[3][1] + 1.) * (2. * Gauss2D::Qsi_4P[3][0] + 1.), -0.5 * (Gauss2D::Qsi_4P[3][0] + 1.) * Gauss2D::Qsi_4P[3][0] * (2. * Gauss2D::Qsi_4P[3][1]) },
-	  { -0.5 * (Gauss2D::Qsi_4P[3][1] + 1.) * Gauss2D::Qsi_4P[3][1] * (2. * Gauss2D::Qsi_4P[3][0]), -0.5 * (Gauss2D::Qsi_4P[3][0] - 1.) * (Gauss2D::Qsi_4P[3][0] + 1.) * (2. * Gauss2D::Qsi_4P[3][1] + 1.) },
-	  { (Gauss2D::Qsi_4P[3][1] - 1.) * (Gauss2D::Qsi_4P[3][1] + 1.) * (2. * Gauss2D::Qsi_4P[3][0]), (Gauss2D::Qsi_4P[3][0] - 1.) * (Gauss2D::Qsi_4P[3][0] + 1.) * (2. * Gauss2D::Qsi_4P[3][1]) } } };
-
 template<> const double Elem_Rect9_IP<9>::m_DPsi[9][m_NumNodes][m_Dim] = {
 	{ { 0.25 * (Gauss2D::Qsi_9P[0][1] - 1.) * Gauss2D::Qsi_9P[0][1] * (2. * Gauss2D::Qsi_9P[0][0] - 1.), 0.25 * (Gauss2D::Qsi_9P[0][0] - 1.) * Gauss2D::Qsi_9P[0][0] * (2. * Gauss2D::Qsi_9P[0][1] - 1.) },
 	  { 0.25 * (Gauss2D::Qsi_9P[0][1] - 1.) * Gauss2D::Qsi_9P[0][1] * (2. * Gauss2D::Qsi_9P[0][0] + 1.), 0.25 * (Gauss2D::Qsi_9P[0][0] + 1.) * Gauss2D::Qsi_9P[0][0] * (2. * Gauss2D::Qsi_9P[0][1] - 1.) },

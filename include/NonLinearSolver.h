@@ -97,6 +97,16 @@ protected:
   *
   * @brief Newton-Raphson
   * @details Iterative process to approach root of a nonlinear function.
+  * The concept is as follows:
+  * @code
+  * while (||x(i+1)|| / ||x(0)|| >= EPSILON) {
+  *     x(i+1) = x(i) - f(x) / f'(x) 
+  * }
+  * @endcode
+  * 
+  * @note x(i+1) - x(i) -> LHS = Hessian^(-1) . RHS
+  * @note f(x) -> RHS = FExt - FInt
+  * @note f'(x) -> Hessian
   *
   * @todo 1 - Funcionalidade para algorítmo BFGS.
   * @todo 2 - Funcionalidade para Newton with Line Search.

@@ -22,8 +22,10 @@
 //
 // ================================================================================================
 template class OutputSystem<2>;
+template class OutputSystem<3>;
 
 template void OutputSystem<2>::draw_AcadView_Node(std::ofstream& file, Domain<2>* theDomain, PostProcess* thePost);
+template void OutputSystem<3>::draw_AcadView_Node(std::ofstream& file, Domain<3>* theDomain, PostProcess* thePost);
 
 // ================================================================================================
 //

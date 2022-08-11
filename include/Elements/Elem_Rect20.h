@@ -40,14 +40,76 @@ public:
 	// Output function for AcadView, based on element index.
 	const std::string printByIndex_AV(const size_t add) const override {
 		std::stringstream msg;
-		msg << "Not done yet!";
+
+		msg << "3 1 " << this->v_Conect[0]->m_index + add << " " << this->v_Conect[1]->m_index + add << " "
+			<< this->v_Conect[8]->m_index + add << " " << this->v_Conect[9]->m_index + add << " "
+			<< this->m_Mat->m_index << "\n";
+		msg << "3 1 " << this->v_Conect[1]->m_index + add << " " << this->v_Conect[2]->m_index + add << " "
+			<< this->v_Conect[9]->m_index + add << " " << this->v_Conect[10]->m_index + add << " "
+			<< this->m_Mat->m_index << "\n";
+		msg << "3 1 " << this->v_Conect[2]->m_index + add << " " << this->v_Conect[3]->m_index + add << " "
+			<< this->v_Conect[10]->m_index + add << " " << this->v_Conect[11]->m_index + add << " "
+			<< this->m_Mat->m_index << "\n";
+		msg << "3 1 " << this->v_Conect[8]->m_index + add << " " << this->v_Conect[9]->m_index + add << " "
+			<< this->v_Conect[12]->m_index + add << " " << this->v_Conect[13]->m_index + add << " "
+			<< this->m_Mat->m_index << "\n";
+		msg << "3 1 " << this->v_Conect[9]->m_index + add << " " << this->v_Conect[10]->m_index + add << " "
+			<< this->v_Conect[13]->m_index + add << " " << this->v_Conect[14]->m_index + add << " "
+			<< this->m_Mat->m_index << "\n";
+		msg << "3 1 " << this->v_Conect[10]->m_index + add << " " << this->v_Conect[11]->m_index + add << " "
+			<< this->v_Conect[14]->m_index + add << " " << this->v_Conect[15]->m_index + add << " "
+			<< this->m_Mat->m_index << "\n";
+		msg << "3 1 " << this->v_Conect[12]->m_index + add << " " << this->v_Conect[13]->m_index + add << " "
+			<< this->v_Conect[16]->m_index + add << " " << this->v_Conect[17]->m_index + add << " "
+			<< this->m_Mat->m_index << "\n";
+		msg << "3 1 " << this->v_Conect[13]->m_index + add << " " << this->v_Conect[14]->m_index + add << " "
+			<< this->v_Conect[17]->m_index + add << " " << this->v_Conect[18]->m_index + add << " "
+			<< this->m_Mat->m_index << "\n";
+		msg << "3 1 " << this->v_Conect[14]->m_index + add << " " << this->v_Conect[15]->m_index + add << " "
+			<< this->v_Conect[18]->m_index + add << " " << this->v_Conect[19]->m_index + add << " "
+			<< this->m_Mat->m_index << "\n";
+		msg << "3 1 " << this->v_Conect[16]->m_index + add << " " << this->v_Conect[17]->m_index + add << " "
+			<< this->v_Conect[4]->m_index + add << " " << this->v_Conect[5]->m_index + add << " "
+			<< this->m_Mat->m_index << "\n";
+		msg << "3 1 " << this->v_Conect[17]->m_index + add << " " << this->v_Conect[18]->m_index + add << " "
+			<< this->v_Conect[5]->m_index + add << " " << this->v_Conect[6]->m_index + add << " "
+			<< this->m_Mat->m_index << "\n";
+		msg << "3 1 " << this->v_Conect[18]->m_index + add << " " << this->v_Conect[19]->m_index + add << " "
+			<< this->v_Conect[6]->m_index + add << " " << this->v_Conect[7]->m_index + add << " "
+			<< this->m_Mat->m_index << "\n";
+
 		return msg.str();
 	};
 
 	// Output function for AcadView, based on element node number.
 	const std::string printByAdder_AV(const size_t add) const override {
 		std::stringstream msg;
-		msg << "Not done yet!";
+
+		msg << "3 1 " << (1  + add) << " " << (2  + add) << " " << (9  + add) << " " << (10 + add)
+			<< " " << this->m_Mat->m_index << "\n";
+		msg << "3 1 " << (2  + add) << " " << (3  + add) << " " << (10 + add) << " " << (11 + add)
+			<< " " << this->m_Mat->m_index << "\n";
+		msg << "3 1 " << (3  + add) << " " << (4  + add) << " " << (11 + add) << " " << (12 + add)
+			<< " " << this->m_Mat->m_index << "\n";
+		msg << "3 1 " << (9  + add) << " " << (10 + add) << " " << (13 + add) << " " << (14 + add)
+			<< " " << this->m_Mat->m_index << "\n";
+		msg << "3 1 " << (10 + add) << " " << (11 + add) << " " << (14 + add) << " " << (15 + add)
+			<< " " << this->m_Mat->m_index << "\n";
+		msg << "3 1 " << (11 + add) << " " << (12 + add) << " " << (15 + add) << " " << (16 + add)
+			<< " " << this->m_Mat->m_index << "\n";
+		msg << "3 1 " << (13 + add) << " " << (14 + add) << " " << (17 + add) << " " << (18 + add)
+			<< " " << this->m_Mat->m_index << "\n";
+		msg << "3 1 " << (14 + add) << " " << (15 + add) << " " << (18 + add) << " " << (19 + add)
+			<< " " << this->m_Mat->m_index << "\n";
+		msg << "3 1 " << (15 + add) << " " << (16 + add) << " " << (19 + add) << " " << (20 + add)
+			<< " " << this->m_Mat->m_index << "\n";
+		msg << "3 1 " << (17 + add) << " " << (18 + add) << " " << (5  + add) << " " << (6  + add)
+			<< " " << this->m_Mat->m_index << "\n";
+		msg << "3 1 " << (18 + add) << " " << (19 + add) << " " << (6  + add) << " " << (7  + add)
+			<< " " << this->m_Mat->m_index << "\n";
+		msg << "3 1 " << (19 + add) << " " << (20 + add) << " " << (7  + add) << " " << (8  + add)
+			<< " " << this->m_Mat->m_index << "\n";
+
 		return msg.str();
 	};
 
@@ -96,8 +158,8 @@ private:
 	/** @brief Number of Integration Points */
 	static const int m_NumIP{ 20 };
 
-	/** @brief Number of Faces */
-	static const int m_NumFaces{ 1 };
+	/** @brief Number of Faces  (for output purposes) */
+	static const int m_NumFaces{ 12 };
 
 	/** @brief Weights for numerical integration */
 	static const double m_weight[m_NumIP];

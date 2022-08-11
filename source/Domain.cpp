@@ -26,6 +26,20 @@
 #include "Elements/Elem_Rect16.h"
 #include "Elements/Elem_Rect20.h"
 
+#include "Elements/Elem_Tet4.h"
+#include "Elements/Elem_Tet10.h"
+#include "Elements/Elem_Tet20.h"
+
+#include "Elements/Elem_Hex8.h"
+#include "Elements/Elem_Hex27.h"
+#include "Elements/Elem_Hex64.h"
+
+#include "Elements/Elem_Pri6.h"
+#include "Elements/Elem_Pri18.h"
+#include "Elements/Elem_Pri20.h"
+#include "Elements/Elem_Pri30.h"
+#include "Elements/Elem_Pri40.h"
+
 
 // ================================================================================================
 //
@@ -33,12 +47,16 @@
 //
 // ================================================================================================
 template void Domain<2>::addMatrixNode(const size_t& index, const AnalysisType& AnType, const ProblemType& PrType, const std::array<double, 2>& x0);
+template void Domain<3>::addMatrixNode(const size_t& index, const AnalysisType& AnType, const ProblemType& PrType, const std::array<double, 3>& x0);
 
 template void Domain<2>::addMaterial(const size_t& index, const MaterialType& matType, const std::vector<double> matParam);
+template void Domain<3>::addMaterial(const size_t& index, const MaterialType& matType, const std::vector<double> matParam);
 
 template void Domain<2>::addSection(std::istringstream& data);
+template void Domain<3>::addSection(std::istringstream& data);
 
 template void Domain<2>::addElementConect(const size_t& index, const std::vector<size_t>& Conectivity);
+template void Domain<3>::addElementConect(const size_t& index, const std::vector<size_t>& Conectivity);
 
 // ================================================================================================
 //
@@ -177,7 +195,6 @@ template<> int Domain<2>::addElement(const size_t& index, const int& Type, const
 		{
 			//2	- Quadratic interpolation (6 nodes)
 			switch (numIP) {
-			case 1:  { v_Elem.emplace_back(std::make_shared<Elem_Tri6_IP<1>>(v_Mat[Material], v_Sect[Section])); break; }
 			case 3:  { v_Elem.emplace_back(std::make_shared<Elem_Tri6_IP<3>>(v_Mat[Material], v_Sect[Section])); break; }
 			case 4:  { v_Elem.emplace_back(std::make_shared<Elem_Tri6_IP<4>>(v_Mat[Material], v_Sect[Section])); break; }
 			case 6:  { v_Elem.emplace_back(std::make_shared<Elem_Tri6_IP<6>>(v_Mat[Material], v_Sect[Section])); break; }
@@ -195,9 +212,6 @@ template<> int Domain<2>::addElement(const size_t& index, const int& Type, const
 		{
 			//3	- Cubic interpolation (10 nodes)
 			switch (numIP) {
-			case 1:  { v_Elem.emplace_back(std::make_shared<Elem_Tri10_IP<1>>(v_Mat[Material], v_Sect[Section])); break; }
-			case 3:  { v_Elem.emplace_back(std::make_shared<Elem_Tri10_IP<3>>(v_Mat[Material], v_Sect[Section])); break; }
-			case 4:  { v_Elem.emplace_back(std::make_shared<Elem_Tri10_IP<4>>(v_Mat[Material], v_Sect[Section])); break; }
 			case 6:  { v_Elem.emplace_back(std::make_shared<Elem_Tri10_IP<6>>(v_Mat[Material], v_Sect[Section])); break; }
 			case 7:  { v_Elem.emplace_back(std::make_shared<Elem_Tri10_IP<7>>(v_Mat[Material], v_Sect[Section])); break; }
 			case 12: { v_Elem.emplace_back(std::make_shared<Elem_Tri10_IP<12>>(v_Mat[Material], v_Sect[Section])); break; }
@@ -250,7 +264,6 @@ template<> int Domain<2>::addElement(const size_t& index, const int& Type, const
 		{
 			//2	- Quadratic interpolation (9 nodes)
 			switch (numIP) {
-			case 4: { v_Elem.emplace_back(std::make_shared<Elem_Rect9_IP<4>>(v_Mat[Material], v_Sect[Section])); break; }
 			case 9: { v_Elem.emplace_back(std::make_shared<Elem_Rect9_IP<9>>(v_Mat[Material], v_Sect[Section])); break; }
 			case 16: { v_Elem.emplace_back(std::make_shared<Elem_Rect9_IP<16>>(v_Mat[Material], v_Sect[Section])); break; }
 			default:
@@ -264,7 +277,6 @@ template<> int Domain<2>::addElement(const size_t& index, const int& Type, const
 		{
 			//3	- Cubic interpolation (16 nodes)
 			switch (numIP) {
-			case 4: { v_Elem.emplace_back(std::make_shared<Elem_Rect16_IP<4>>(v_Mat[Material], v_Sect[Section])); break; }
 			case 9: { v_Elem.emplace_back(std::make_shared<Elem_Rect16_IP<9>>(v_Mat[Material], v_Sect[Section])); break; }
 			case 16: { v_Elem.emplace_back(std::make_shared<Elem_Rect16_IP<16>>(v_Mat[Material], v_Sect[Section])); break; }
 			default:
@@ -303,6 +315,227 @@ template<> int Domain<2>::addElement(const size_t& index, const int& Type, const
 	default:
 		LOG("\n\nDomain.addElement: Element " << std::to_string(index) << " creation error. Invalid element type.\n\n\n");
 		throw std::invalid_argument("\n\n\nElement " + std::to_string(index) + " creation error. Invalid Element Type\n\n\n");
+		break;
+	}
+
+	return Param;
+}
+
+
+// ================================================================================================
+//
+// Specialized implementation of Template Member Function (only 3D): addElement
+//
+// ================================================================================================
+template<> int Domain<3>::addElement(const size_t& index, const int& Type, const int& Order, const int& numIP, const size_t& Material, const size_t& Section)
+{
+	// Return value - number of incidence elements
+	int Param = 0;
+
+	// The type of element defines which class Element
+	switch (Type)
+	{
+	case 1:
+	{
+		//1 - Bar / Truss element
+		LOG("\n\nDomain.addElement: Element " << std::to_string(index) << " creation error. There is no implementation for Trusses. Element used only as immersed fibers.\n\n\n");
+		throw std::invalid_argument("\n\n\nThere is no implementation for Trusses so far. Linear element used only as immersed fibers.\n\n\n");
+		break;
+	}
+	case 2:
+		//2 - Triangular element
+	case 3:
+	{
+		//3 - Rectangular element
+		LOG("\n\nDomain.addElement: Element " << std::to_string(index) << " creation error. Invalid 2D element in 3D domain.\n\n\n");
+		throw std::invalid_argument("\n\n\nElement " + std::to_string(index) + " creation error. Invalid 2D Element\n\n\n");
+		break;
+	}
+	case 4:
+	{
+		//4 - Tetrahedral Element
+
+		// Number of nodes for incidence
+		Param = (Order + 1) * (Order + 2) * (Order + 3) / 6;
+
+		switch (Order)
+		{
+		case 1:
+		{
+			//1	- Linear interpolation (4 nodes)
+			switch (numIP) {
+			case  1: { v_Elem.emplace_back(std::make_shared<Elem_Tet4_IP< 1>>(v_Mat[Material])); break; }
+			case  4: { v_Elem.emplace_back(std::make_shared<Elem_Tet4_IP< 4>>(v_Mat[Material])); break; }
+			case  5: { v_Elem.emplace_back(std::make_shared<Elem_Tet4_IP< 5>>(v_Mat[Material])); break; }
+			case 10: { v_Elem.emplace_back(std::make_shared<Elem_Tet4_IP<10>>(v_Mat[Material])); break; }
+			case 11: { v_Elem.emplace_back(std::make_shared<Elem_Tet4_IP<11>>(v_Mat[Material])); break; }
+			case 14: { v_Elem.emplace_back(std::make_shared<Elem_Tet4_IP<14>>(v_Mat[Material])); break; }
+			case 15: { v_Elem.emplace_back(std::make_shared<Elem_Tet4_IP<15>>(v_Mat[Material])); break; }
+			case 24: { v_Elem.emplace_back(std::make_shared<Elem_Tet4_IP<24>>(v_Mat[Material])); break; }
+			default:
+				LOG("\n\nDomain.addElement: Element " << std::to_string(index) << " creation error. Wrong number of integration points.\n\n\n");
+				throw std::invalid_argument("\n\n\nElement " + std::to_string(index) + " creation error. Wrong number of integration points.\n\n\n");
+				break;
+			}
+			break;
+		}
+		case 2:
+		{
+			//2	- Quadratic interpolation (10 nodes)
+			switch (numIP) {
+			case  1: { v_Elem.emplace_back(std::make_shared<Elem_Tet10_IP< 1>>(v_Mat[Material])); break; }
+			case  4: { v_Elem.emplace_back(std::make_shared<Elem_Tet10_IP< 4>>(v_Mat[Material])); break; }
+			case  5: { v_Elem.emplace_back(std::make_shared<Elem_Tet10_IP< 5>>(v_Mat[Material])); break; }
+			case 10: { v_Elem.emplace_back(std::make_shared<Elem_Tet10_IP<10>>(v_Mat[Material])); break; }
+			case 11: { v_Elem.emplace_back(std::make_shared<Elem_Tet10_IP<11>>(v_Mat[Material])); break; }
+			case 14: { v_Elem.emplace_back(std::make_shared<Elem_Tet10_IP<14>>(v_Mat[Material])); break; }
+			case 15: { v_Elem.emplace_back(std::make_shared<Elem_Tet10_IP<15>>(v_Mat[Material])); break; }
+			case 24: { v_Elem.emplace_back(std::make_shared<Elem_Tet10_IP<24>>(v_Mat[Material])); break; }
+			default:
+				LOG("\n\nDomain.addElement: Element " << std::to_string(index) << " creation error. Wrong number of integration points.\n\n\n");
+				throw std::invalid_argument("\n\n\nElement " + std::to_string(index) + " creation error. Wrong number of integration points.\n\n\n");
+				break;
+			}
+			break;
+		}
+		case 3:
+		{
+			//3	- Cubic interpolation (20 nodes)
+			switch (numIP) {
+			case  1: { v_Elem.emplace_back(std::make_shared<Elem_Tet20_IP< 1>>(v_Mat[Material])); break; }
+			case  4: { v_Elem.emplace_back(std::make_shared<Elem_Tet20_IP< 4>>(v_Mat[Material])); break; }
+			case  5: { v_Elem.emplace_back(std::make_shared<Elem_Tet20_IP< 5>>(v_Mat[Material])); break; }
+			case 10: { v_Elem.emplace_back(std::make_shared<Elem_Tet20_IP<10>>(v_Mat[Material])); break; }
+			case 11: { v_Elem.emplace_back(std::make_shared<Elem_Tet20_IP<11>>(v_Mat[Material])); break; }
+			case 14: { v_Elem.emplace_back(std::make_shared<Elem_Tet20_IP<14>>(v_Mat[Material])); break; }
+			case 15: { v_Elem.emplace_back(std::make_shared<Elem_Tet20_IP<15>>(v_Mat[Material])); break; }
+			case 24: { v_Elem.emplace_back(std::make_shared<Elem_Tet20_IP<24>>(v_Mat[Material])); break; }
+			default:
+				LOG("\n\nDomain.addElement: Element " << std::to_string(index) << " creation error. Wrong number of integration points.\n\n\n");
+				throw std::invalid_argument("\n\n\nElement " + std::to_string(index) + " creation error. Wrong number of integration points.\n\n\n");
+				break;
+			}
+			break;
+		}
+		default:
+			// Higher order
+			LOG("\n\nDomain.addElement: Element " << std::to_string(index) << " creation error. Only up to cubic order is provided.\n\n\n");
+			throw std::invalid_argument("\n\n\nElement " + std::to_string(index) + " creation error. Only up to cubic order is provided\n\n\n");
+			break;
+		}
+		break;
+	}
+	case 5:
+	{
+		//5 - Hexahedral Element
+
+		// Number of nodes for incidence
+		Param = (Order + 1) * (Order + 1) * (Order + 1);
+
+		switch (Order)
+		{
+		case 1:
+		{
+			//1	- Linear interpolation (8 nodes)
+			switch (numIP) {
+			case  8: { v_Elem.emplace_back(std::make_shared<Elem_Hex8_IP< 8>>(v_Mat[Material])); break; }
+			case 27: { v_Elem.emplace_back(std::make_shared<Elem_Hex8_IP<27>>(v_Mat[Material])); break; }
+			case 64: { v_Elem.emplace_back(std::make_shared<Elem_Hex8_IP<64>>(v_Mat[Material])); break; }
+			default:
+				LOG("\n\nDomain.addElement: Element " << std::to_string(index) << " creation error. Wrong number of integration points.\n\n\n");
+				throw std::invalid_argument("\n\n\nElement " + std::to_string(index) + " creation error. Wrong number of integration points.\n\n\n");
+				break;
+			}
+			break;
+		}
+		case 2:
+		{
+			//2	- Quadratic interpolation (27 nodes)
+			switch (numIP) {
+			case  8: { v_Elem.emplace_back(std::make_shared<Elem_Hex27_IP< 8>>(v_Mat[Material])); break; }
+			case 27: { v_Elem.emplace_back(std::make_shared<Elem_Hex27_IP<27>>(v_Mat[Material])); break; }
+			case 64: { v_Elem.emplace_back(std::make_shared<Elem_Hex27_IP<64>>(v_Mat[Material])); break; }
+			default:
+				LOG("\n\nDomain.addElement: Element " << std::to_string(index) << " creation error. Wrong number of integration points.\n\n\n");
+				throw std::invalid_argument("\n\n\nElement " + std::to_string(index) + " creation error. Wrong number of integration points.\n\n\n");
+				break;
+			}
+			break;
+		}
+		case 3:
+		{
+			//3	- Cubic interpolation (64 nodes)
+			switch (numIP) {
+			case  8: { v_Elem.emplace_back(std::make_shared<Elem_Hex64_IP< 8>>(v_Mat[Material])); break; }
+			case 27: { v_Elem.emplace_back(std::make_shared<Elem_Hex64_IP<27>>(v_Mat[Material])); break; }
+			case 64: { v_Elem.emplace_back(std::make_shared<Elem_Hex64_IP<64>>(v_Mat[Material])); break; }
+			default:
+				LOG("\n\nDomain.addElement: Element " << std::to_string(index) << " creation error. Wrong number of integration points.\n\n\n");
+				throw std::invalid_argument("\n\n\nElement " + std::to_string(index) + " creation error. Wrong number of integration points.\n\n\n");
+				break;
+			}
+			break;
+		}
+		default:
+			// Higher order
+			LOG("\n\nDomain.addElement: Element " << std::to_string(index) << " creation error. Only up to cubic order is provided.\n\n\n");
+			throw std::invalid_argument("\n\n\nElement " + std::to_string(index) + " creation error. Only up to cubic order is provided\n\n\n");
+			break;
+		}
+		break;
+	}
+	case 6:
+	{
+		//6 - Prism Element
+
+		// Number of nodes for incidence
+		Param = ((Order + 1) * (Order + 2) / 2) * (Order + 1);
+
+		switch (Order)
+		{
+		case 1:
+		{
+			//1	- Linear interpolation (6 nodes)
+			v_Elem.emplace_back(std::make_shared<Elem_Pri6>(v_Mat[Material]));
+			break;
+		}
+		case 2:
+		{
+			//2	- Quadratic interpolation (18 nodes)
+			v_Elem.emplace_back(std::make_shared<Elem_Pri18>(v_Mat[Material]));
+			break;
+		}
+		case 3:
+		{
+			//3	- Cubic interpolation (40 nodes)
+			v_Elem.emplace_back(std::make_shared<Elem_Pri40>(v_Mat[Material]));
+			break;
+		}
+		case 4:
+		{
+			//4	- Cubic / Linear interpolation (20 nodes)
+			Param = 20;
+			v_Elem.emplace_back(std::make_shared<Elem_Pri20>(v_Mat[Material]));
+			break;
+		}
+		case 5:
+		{
+			//5	- Cubic / Quadratic interpolation (30 nodes)
+			Param = 30;
+			v_Elem.emplace_back(std::make_shared<Elem_Pri30>(v_Mat[Material]));
+			break;
+		}
+		default:
+			// Higher order
+			LOG("\n\nDomain.addElement: Element " << std::to_string(index) << " creation error. Only up to cubic order is provided.\n\n\n");
+			throw std::invalid_argument("\n\n\nElement " + std::to_string(index) + " creation error. Only up to cubic order is provided\n\n\n");
+			break;
+		}
+		break;
+	}
+	default:
+		LOG("\n\nDomain.addElement: Element " << std::to_string(index) << " creation error.\nCheck type: " << std::to_string(Type) << ", order: " << std::to_string(Order) << " and number of IP: " << std::to_string(numIP) << "\n\n\n");
+		throw std::invalid_argument("\n\n\nElement " + std::to_string(index) + " creation error. Invalid Element\n\n\n");
 		break;
 	}
 

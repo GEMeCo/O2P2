@@ -28,9 +28,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>Intel(R) oneAPI DPC++ Compiler 2022</PlatformToolset>
+    <PlatformToolset>Intel C++ Compiler 2022</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <UseInteloneMKL>Parallel</UseInteloneMKL>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -74,10 +75,10 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <SYCLWarningLevel>Level3</SYCLWarningLevel>
-      <PreprocessorDefinitions>_DEBUG;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(SolutionDir)$include;$(EIGEN_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(EIGEN_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -110,12 +111,23 @@
     <ClInclude Include="include\Domain.h" />
     <ClInclude Include="include\Element.h" />
     <ClInclude Include="include\ElementComp.h" />
+    <ClInclude Include="include\Elements\Elem_Hex27.h" />
+    <ClInclude Include="include\Elements\Elem_Hex64.h" />
+    <ClInclude Include="include\Elements\Elem_Hex8.h" />
+    <ClInclude Include="include\Elements\Elem_Pri18.h" />
+    <ClInclude Include="include\Elements\Elem_Pri20.h" />
+    <ClInclude Include="include\Elements\Elem_Pri30.h" />
+    <ClInclude Include="include\Elements\Elem_Pri40.h" />
+    <ClInclude Include="include\Elements\Elem_Pri6.h" />
     <ClInclude Include="include\Elements\Elem_Rect12.h" />
     <ClInclude Include="include\Elements\Elem_Rect16.h" />
     <ClInclude Include="include\Elements\Elem_Rect20.h" />
     <ClInclude Include="include\Elements\Elem_Rect4.h" />
     <ClInclude Include="include\Elements\Elem_Rect8.h" />
     <ClInclude Include="include\Elements\Elem_Rect9.h" />
+    <ClInclude Include="include\Elements\Elem_Tet10.h" />
+    <ClInclude Include="include\Elements\Elem_Tet20.h" />
+    <ClInclude Include="include\Elements\Elem_Tet4.h" />
     <ClInclude Include="include\Elements\Elem_Tri10.h" />
     <ClInclude Include="include\Elements\Elem_Tri3.h" />
     <ClInclude Include="include\Elements\Elem_Tri6.h" />
