@@ -41,18 +41,18 @@ public:
 	const std::string printByIndex_AV(const size_t add) const override {
 		std::stringstream msg;
 
-		msg << "2 3 " << this->v_Conect[0]->m_index + add << " " << this->v_Conect[1]->m_index + add << " "	<< this->v_Conect[2]->m_index + add << " " << this->v_Conect[4]->m_index + add << " "
-			<< this->v_Conect[5]->m_index + add << " " << this->v_Conect[6]->m_index + add << " " << this->v_Conect[7]->m_index + add << " " << this->v_Conect[8]->m_index + add << " "
-			<< this->v_Conect[9]->m_index + add << " " << this->m_Mat->m_index << "\n";
-		//msg << "2 3 " << this->v_Conect[10]->m_index + add << " " << this->v_Conect[11]->m_index + add << " " << this->v_Conect[12]->m_index + add << " " << this->v_Conect[14]->m_index + add << " "
-		//	<< this->v_Conect[15]->m_index + add << " " << this->v_Conect[16]->m_index + add << " " << this->v_Conect[17]->m_index + add << " " << this->v_Conect[18]->m_index + add << " "
-		//	<< this->v_Conect[19]->m_index + add << " " << this->m_Mat->m_index << "\n";
-		//msg << "2 3 " << this->v_Conect[20]->m_index + add << " " << this->v_Conect[21]->m_index + add << " " << this->v_Conect[22]->m_index + add << " " << this->v_Conect[24]->m_index + add << " "
-		//	<< this->v_Conect[25]->m_index + add << " " << this->v_Conect[26]->m_index + add << " " << this->v_Conect[27]->m_index + add << " " << this->v_Conect[28]->m_index + add << " "
-		//	<< this->v_Conect[29]->m_index + add << " " << this->m_Mat->m_index << "\n";
-		msg << "2 3 " << this->v_Conect[30]->m_index + add << " " << this->v_Conect[31]->m_index + add << " " << this->v_Conect[32]->m_index + add << " " << this->v_Conect[34]->m_index + add << " "
-			<< this->v_Conect[35]->m_index + add << " " << this->v_Conect[36]->m_index + add << " " << this->v_Conect[37]->m_index + add << " " << this->v_Conect[38]->m_index + add << " "
-			<< this->v_Conect[39]->m_index + add << " " << this->m_Mat->m_index << "\n";
+		msg << "2 3 " << this->v_Conect[0]->m_index + add << " " << this->v_Conect[1]->m_index + add << " "	<< this->v_Conect[2]->m_index + add << " " << this->v_Conect[3]->m_index + add << " "
+			<< this->v_Conect[4]->m_index + add << " " << this->v_Conect[5]->m_index + add << " " << this->v_Conect[6]->m_index + add << " " << this->v_Conect[7]->m_index + add << " "
+			<< this->v_Conect[8]->m_index + add << " " << this->v_Conect[9]->m_index + add << " " << this->m_Mat->m_index << "\n";
+		//msg << "2 3 " << this->v_Conect[10]->m_index + add << " " << this->v_Conect[11]->m_index + add << " " << this->v_Conect[12]->m_index + add << " " << this->v_Conect[13]->m_index + add << " "
+		//	<< this->v_Conect[14]->m_index + add << " " << this->v_Conect[15]->m_index + add << " " << this->v_Conect[16]->m_index + add << " " << this->v_Conect[17]->m_index + add << " "
+		//	<< this->v_Conect[18]->m_index + add << " " << this->v_Conect[19]->m_index + add << " " << this->m_Mat->m_index << "\n";
+		//msg << "2 3 " << this->v_Conect[20]->m_index + add << " " << this->v_Conect[21]->m_index + add << " " << this->v_Conect[22]->m_index + add << " " << this->v_Conect[23]->m_index + add << " "
+		//	<< this->v_Conect[24]->m_index + add << " " << this->v_Conect[25]->m_index + add << " " << this->v_Conect[26]->m_index + add << " " << this->v_Conect[27]->m_index + add << " "
+		//	<< this->v_Conect[28]->m_index + add << " " << this->v_Conect[29]->m_index + add << " " << this->m_Mat->m_index << "\n";
+		msg << "2 3 " << this->v_Conect[30]->m_index + add << " " << this->v_Conect[31]->m_index + add << " " << this->v_Conect[32]->m_index + add << " " << this->v_Conect[33]->m_index + add << " "
+			<< this->v_Conect[34]->m_index + add << " " << this->v_Conect[35]->m_index + add << " " << this->v_Conect[36]->m_index + add << " " << this->v_Conect[37]->m_index + add << " "
+			<< this->v_Conect[38]->m_index + add << " " << this->v_Conect[39]->m_index + add << " " << this->m_Mat->m_index << "\n";
 		msg << "3 3 " << this->v_Conect[0]->m_index + add << " " << this->v_Conect[1]->m_index + add << " " << this->v_Conect[2]->m_index + add << " " << this->v_Conect[3]->m_index + add << " "
 			<< this->v_Conect[10]->m_index + add << " " << this->v_Conect[11]->m_index + add << " " << this->v_Conect[12]->m_index + add << " " << this->v_Conect[13]->m_index + add << " "
 			<< this->v_Conect[20]->m_index + add << " " << this->v_Conect[21]->m_index + add << " " << this->v_Conect[22]->m_index + add << " " << this->v_Conect[23]->m_index + add << " "

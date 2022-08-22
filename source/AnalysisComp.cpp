@@ -125,10 +125,10 @@ template<int nDim> void AnalysisComp_Mec<nDim>::assembleSOE(Eigen::SparseMatrix<
         // Add element contribution to global system
         for (int i = 0; i < elemMat.cols(); ++i) {
             for (int j = 0; j < elemMat.rows(); ++j) {
-                if (std::abs(elemMat(j, i)) > 1.e-4) {
+                //if (std::abs(elemMat(j, i)) > 1.e-4) {
                     triplets.push_back(Eigen::Triplet<double>(static_cast<int>(elem->m_ElemDofIndex.at(j)), static_cast<int>(elem->m_ElemDofIndex.at(i)), elemMat(j, i)));
                     //triplets.push_back(Eigen::Triplet<double>(static_cast<int>(elem->m_ElemDofIndex.at(i)), static_cast<int>(elem->m_ElemDofIndex.at(j)), elemMat(i, j)));
-                }
+                //}
             }
         }
 

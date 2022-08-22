@@ -23,7 +23,7 @@
   *
   * @brief Tetrahedral quadratic element with 10 nodes.
   * @details Solid element, with quadratic interpolation functions, tetrahedral shape.
-  * Options for integration points: 1, 4, 5, 10, 11, 14, 15 and 24.
+  * Options for integration points: 4, 10, 11, 14, 15 and 24.
   * @image html Elem_Tet10.png height=300
   */
 class Elem_Tet10 : public ElementSolid
@@ -129,7 +129,7 @@ protected:
   * @brief Tetrahedral quadratic element with 10 nodes.
   * @details Solid element, with quadratic interpolation functions, tetrahedral shape.
   *
-  * @tparam nIP Number of integration points. Must be: 1, 4, 5, 10, 11, 14, 15 or 24.
+  * @tparam nIP Number of integration points. Must be: 4, 10, 11, 14, 15 or 24.
   */
 template<int nIP>
 class Elem_Tet10_IP : public Elem_Tet10
@@ -293,9 +293,7 @@ inline void Elem_Tet10::setGeomProperties() {
 // Weights for numerical integration
 //
 // ================================================================================================
-template<> const double* Elem_Tet10_IP<1>::m_weight = &Hammer3D::Wg_1P[0];
 template<> const double* Elem_Tet10_IP<4>::m_weight = &Hammer3D::Wg_4P[0];
-template<> const double* Elem_Tet10_IP<5>::m_weight = &Hammer3D::Wg_5P[0];
 template<> const double* Elem_Tet10_IP<10>::m_weight = &Hammer3D::Wg_10P[0];
 template<> const double* Elem_Tet10_IP<11>::m_weight = &Hammer3D::Wg_11P[0];
 template<> const double* Elem_Tet10_IP<14>::m_weight = &Hammer3D::Wg_14P[0];
@@ -307,18 +305,6 @@ template<> const double* Elem_Tet10_IP<24>::m_weight = &Hammer3D::Wg_24P[0];
 // Shape functions
 //
 // ================================================================================================
-template<> const double Elem_Tet10_IP<1>::m_Psi[1][m_NumNodes] = {
-	{ (1. - 2. * Hammer3D::Qsi_1P[0][0] - 2. * Hammer3D::Qsi_1P[0][1] - 2. * Hammer3D::Qsi_1P[0][2]) * (1. - Hammer3D::Qsi_1P[0][0] - Hammer3D::Qsi_1P[0][1] - Hammer3D::Qsi_1P[0][2]),
-	  4. * Hammer3D::Qsi_1P[0][0] * (1. - Hammer3D::Qsi_1P[0][0] - Hammer3D::Qsi_1P[0][1] - Hammer3D::Qsi_1P[0][2]),
-	  (2. * Hammer3D::Qsi_1P[0][0] - 1.) * Hammer3D::Qsi_1P[0][0],
-	  4. * Hammer3D::Qsi_1P[0][1] * (1. - Hammer3D::Qsi_1P[0][0] - Hammer3D::Qsi_1P[0][1] - Hammer3D::Qsi_1P[0][2]),
-	  4. * Hammer3D::Qsi_1P[0][0] * Hammer3D::Qsi_1P[0][1],
-	  (2. * Hammer3D::Qsi_1P[0][1] - 1.) * Hammer3D::Qsi_1P[0][1],
-	  4. * Hammer3D::Qsi_1P[0][2] * (1. - Hammer3D::Qsi_1P[0][0] - Hammer3D::Qsi_1P[0][1] - Hammer3D::Qsi_1P[0][2]),
-	  4. * Hammer3D::Qsi_1P[0][0] * Hammer3D::Qsi_1P[0][2],
-	  4. * Hammer3D::Qsi_1P[0][1] * Hammer3D::Qsi_1P[0][2],
-	  (2. * Hammer3D::Qsi_1P[0][2] - 1.) * Hammer3D::Qsi_1P[0][2] } };
-
 template<> const double Elem_Tet10_IP<4>::m_Psi[4][m_NumNodes] = {
 	{ (1. - 2. * Hammer3D::Qsi_4P[0][0] - 2. * Hammer3D::Qsi_4P[0][1] - 2. * Hammer3D::Qsi_4P[0][2]) * (1. - Hammer3D::Qsi_4P[0][0] - Hammer3D::Qsi_4P[0][1] - Hammer3D::Qsi_4P[0][2]),
 	  4. * Hammer3D::Qsi_4P[0][0] * (1. - Hammer3D::Qsi_4P[0][0] - Hammer3D::Qsi_4P[0][1] - Hammer3D::Qsi_4P[0][2]),
@@ -363,62 +349,6 @@ template<> const double Elem_Tet10_IP<4>::m_Psi[4][m_NumNodes] = {
 	  4. * Hammer3D::Qsi_4P[3][0] * Hammer3D::Qsi_4P[3][2],
 	  4. * Hammer3D::Qsi_4P[3][1] * Hammer3D::Qsi_4P[3][2],
 	  (2. * Hammer3D::Qsi_4P[3][2] - 1.) * Hammer3D::Qsi_4P[3][2] } };
-
-template<> const double Elem_Tet10_IP<5>::m_Psi[5][m_NumNodes] = {
-	{ (1. - 2. * Hammer3D::Qsi_5P[0][0] - 2. * Hammer3D::Qsi_5P[0][1] - 2. * Hammer3D::Qsi_5P[0][2]) * (1. - Hammer3D::Qsi_5P[0][0] - Hammer3D::Qsi_5P[0][1] - Hammer3D::Qsi_5P[0][2]),
-	  4. * Hammer3D::Qsi_5P[0][0] * (1. - Hammer3D::Qsi_5P[0][0] - Hammer3D::Qsi_5P[0][1] - Hammer3D::Qsi_5P[0][2]),
-	  (2. * Hammer3D::Qsi_5P[0][0] - 1.) * Hammer3D::Qsi_5P[0][0],
-	  4. * Hammer3D::Qsi_5P[0][1] * (1. - Hammer3D::Qsi_5P[0][0] - Hammer3D::Qsi_5P[0][1] - Hammer3D::Qsi_5P[0][2]),
-	  4. * Hammer3D::Qsi_5P[0][0] * Hammer3D::Qsi_5P[0][1],
-	  (2. * Hammer3D::Qsi_5P[0][1] - 1.) * Hammer3D::Qsi_5P[0][1],
-	  4. * Hammer3D::Qsi_5P[0][2] * (1. - Hammer3D::Qsi_5P[0][0] - Hammer3D::Qsi_5P[0][1] - Hammer3D::Qsi_5P[0][2]),
-	  4. * Hammer3D::Qsi_5P[0][0] * Hammer3D::Qsi_5P[0][2],
-	  4. * Hammer3D::Qsi_5P[0][1] * Hammer3D::Qsi_5P[0][2],
-	  (2. * Hammer3D::Qsi_5P[0][2] - 1.) * Hammer3D::Qsi_5P[0][2] },
-
-	{ (1. - 2. * Hammer3D::Qsi_5P[1][0] - 2. * Hammer3D::Qsi_5P[1][1] - 2. * Hammer3D::Qsi_5P[1][2]) * (1. - Hammer3D::Qsi_5P[1][0] - Hammer3D::Qsi_5P[1][1] - Hammer3D::Qsi_5P[1][2]),
-	  4. * Hammer3D::Qsi_5P[1][0] * (1. - Hammer3D::Qsi_5P[1][0] - Hammer3D::Qsi_5P[1][1] - Hammer3D::Qsi_5P[1][2]),
-	  (2. * Hammer3D::Qsi_5P[1][0] - 1.) * Hammer3D::Qsi_5P[1][0],
-	  4. * Hammer3D::Qsi_5P[1][1] * (1. - Hammer3D::Qsi_5P[1][0] - Hammer3D::Qsi_5P[1][1] - Hammer3D::Qsi_5P[1][2]),
-	  4. * Hammer3D::Qsi_5P[1][0] * Hammer3D::Qsi_5P[1][1],
-	  (2. * Hammer3D::Qsi_5P[1][1] - 1.) * Hammer3D::Qsi_5P[1][1],
-	  4. * Hammer3D::Qsi_5P[1][2] * (1. - Hammer3D::Qsi_5P[1][0] - Hammer3D::Qsi_5P[1][1] - Hammer3D::Qsi_5P[1][2]),
-	  4. * Hammer3D::Qsi_5P[1][0] * Hammer3D::Qsi_5P[1][2],
-	  4. * Hammer3D::Qsi_5P[1][1] * Hammer3D::Qsi_5P[1][2],
-	  (2. * Hammer3D::Qsi_5P[1][2] - 1.) * Hammer3D::Qsi_5P[1][2] },
-
-	{ (1. - 2. * Hammer3D::Qsi_5P[2][0] - 2. * Hammer3D::Qsi_5P[2][1] - 2. * Hammer3D::Qsi_5P[2][2]) * (1. - Hammer3D::Qsi_5P[2][0] - Hammer3D::Qsi_5P[2][1] - Hammer3D::Qsi_5P[2][2]),
-	  4. * Hammer3D::Qsi_5P[2][0] * (1. - Hammer3D::Qsi_5P[2][0] - Hammer3D::Qsi_5P[2][1] - Hammer3D::Qsi_5P[2][2]),
-	  (2. * Hammer3D::Qsi_5P[2][0] - 1.) * Hammer3D::Qsi_5P[2][0],
-	  4. * Hammer3D::Qsi_5P[2][1] * (1. - Hammer3D::Qsi_5P[2][0] - Hammer3D::Qsi_5P[2][1] - Hammer3D::Qsi_5P[2][2]),
-	  4. * Hammer3D::Qsi_5P[2][0] * Hammer3D::Qsi_5P[2][1],
-	  (2. * Hammer3D::Qsi_5P[2][1] - 1.) * Hammer3D::Qsi_5P[2][1],
-	  4. * Hammer3D::Qsi_5P[2][2] * (1. - Hammer3D::Qsi_5P[2][0] - Hammer3D::Qsi_5P[2][1] - Hammer3D::Qsi_5P[2][2]),
-	  4. * Hammer3D::Qsi_5P[2][0] * Hammer3D::Qsi_5P[2][2],
-	  4. * Hammer3D::Qsi_5P[2][1] * Hammer3D::Qsi_5P[2][2],
-	  (2. * Hammer3D::Qsi_5P[2][2] - 1.) * Hammer3D::Qsi_5P[2][2] },
-
-	{ (1. - 2. * Hammer3D::Qsi_5P[3][0] - 2. * Hammer3D::Qsi_5P[3][1] - 2. * Hammer3D::Qsi_5P[3][2]) * (1. - Hammer3D::Qsi_5P[3][0] - Hammer3D::Qsi_5P[3][1] - Hammer3D::Qsi_5P[3][2]),
-	  4. * Hammer3D::Qsi_5P[3][0] * (1. - Hammer3D::Qsi_5P[3][0] - Hammer3D::Qsi_5P[3][1] - Hammer3D::Qsi_5P[3][2]),
-	  (2. * Hammer3D::Qsi_5P[3][0] - 1.) * Hammer3D::Qsi_5P[3][0],
-	  4. * Hammer3D::Qsi_5P[3][1] * (1. - Hammer3D::Qsi_5P[3][0] - Hammer3D::Qsi_5P[3][1] - Hammer3D::Qsi_5P[3][2]),
-	  4. * Hammer3D::Qsi_5P[3][0] * Hammer3D::Qsi_5P[3][1],
-	  (2. * Hammer3D::Qsi_5P[3][1] - 1.) * Hammer3D::Qsi_5P[3][1],
-	  4. * Hammer3D::Qsi_5P[3][2] * (1. - Hammer3D::Qsi_5P[3][0] - Hammer3D::Qsi_5P[3][1] - Hammer3D::Qsi_5P[3][2]),
-	  4. * Hammer3D::Qsi_5P[3][0] * Hammer3D::Qsi_5P[3][2],
-	  4. * Hammer3D::Qsi_5P[3][1] * Hammer3D::Qsi_5P[3][2],
-	  (2. * Hammer3D::Qsi_5P[3][2] - 1.) * Hammer3D::Qsi_5P[3][2] },
-
-	{ (1. - 2. * Hammer3D::Qsi_5P[4][0] - 2. * Hammer3D::Qsi_5P[4][1] - 2. * Hammer3D::Qsi_5P[4][2]) * (1. - Hammer3D::Qsi_5P[4][0] - Hammer3D::Qsi_5P[4][1] - Hammer3D::Qsi_5P[4][2]),
-	  4. * Hammer3D::Qsi_5P[4][0] * (1. - Hammer3D::Qsi_5P[4][0] - Hammer3D::Qsi_5P[4][1] - Hammer3D::Qsi_5P[4][2]),
-	  (2. * Hammer3D::Qsi_5P[4][0] - 1.) * Hammer3D::Qsi_5P[4][0],
-	  4. * Hammer3D::Qsi_5P[4][1] * (1. - Hammer3D::Qsi_5P[4][0] - Hammer3D::Qsi_5P[4][1] - Hammer3D::Qsi_5P[4][2]),
-	  4. * Hammer3D::Qsi_5P[4][0] * Hammer3D::Qsi_5P[4][1],
-	  (2. * Hammer3D::Qsi_5P[4][1] - 1.) * Hammer3D::Qsi_5P[4][1],
-	  4. * Hammer3D::Qsi_5P[4][2] * (1. - Hammer3D::Qsi_5P[4][0] - Hammer3D::Qsi_5P[4][1] - Hammer3D::Qsi_5P[4][2]),
-	  4. * Hammer3D::Qsi_5P[4][0] * Hammer3D::Qsi_5P[4][2],
-	  4. * Hammer3D::Qsi_5P[4][1] * Hammer3D::Qsi_5P[4][2],
-	  (2. * Hammer3D::Qsi_5P[4][2] - 1.) * Hammer3D::Qsi_5P[4][2] } };
 
 template<> const double Elem_Tet10_IP<10>::m_Psi[10][m_NumNodes] = {
 	{ (1. - 2. * Hammer3D::Qsi_10P[0][0] - 2. * Hammer3D::Qsi_10P[0][1] - 2. * Hammer3D::Qsi_10P[0][2]) * (1. - Hammer3D::Qsi_10P[0][0] - Hammer3D::Qsi_10P[0][1] - Hammer3D::Qsi_10P[0][2]),
@@ -1244,18 +1174,6 @@ template<> const double Elem_Tet10_IP<24>::m_Psi[24][m_NumNodes] = {
 // Shape functions derivative
 //
 // ================================================================================================
-template<> const double Elem_Tet10_IP<1>::m_DPsi[1][m_NumNodes][m_Dim] = {
-	{ { -3. + 4. * (Hammer3D::Qsi_1P[0][0] + Hammer3D::Qsi_1P[0][1] + Hammer3D::Qsi_1P[0][2]), -3. + 4. * (Hammer3D::Qsi_1P[0][0] + Hammer3D::Qsi_1P[0][1] + Hammer3D::Qsi_1P[0][2]), -3. + 4. * (Hammer3D::Qsi_1P[0][0] + Hammer3D::Qsi_1P[0][1] + Hammer3D::Qsi_1P[0][2]) },
-	  { 4. - 4. * (2. * Hammer3D::Qsi_1P[0][0] + Hammer3D::Qsi_1P[0][1] + Hammer3D::Qsi_1P[0][2]), -4. * Hammer3D::Qsi_1P[0][0], -4. * Hammer3D::Qsi_1P[0][0] },
-	  { 4. * Hammer3D::Qsi_1P[0][0] - 1., 0., 0. },
-	  { -4. * Hammer3D::Qsi_1P[0][1], 4. - 4. * (Hammer3D::Qsi_1P[0][0] + 2. * Hammer3D::Qsi_1P[0][1] + Hammer3D::Qsi_1P[0][2]), -4. * Hammer3D::Qsi_1P[0][1] },
-	  { 4. * Hammer3D::Qsi_1P[0][1], 4. * Hammer3D::Qsi_1P[0][0], 0. },
-	  { 0., 4. * Hammer3D::Qsi_1P[0][1] - 1., 0. },
-	  { -4. * Hammer3D::Qsi_1P[0][2], -4. * Hammer3D::Qsi_1P[0][2], 4. - 4. * (Hammer3D::Qsi_1P[0][0] + Hammer3D::Qsi_1P[0][1] + 2. * Hammer3D::Qsi_1P[0][2]) },
-	  { 4. * Hammer3D::Qsi_1P[0][2], 0., 4. * Hammer3D::Qsi_1P[0][0] },
-	  { 0., 4. * Hammer3D::Qsi_1P[0][2], 4. * Hammer3D::Qsi_1P[0][1] },
-	  { 0., 0., 4. * Hammer3D::Qsi_1P[0][2] - 1.} } };
-
 template<> const double Elem_Tet10_IP<4>::m_DPsi[4][m_NumNodes][m_Dim] = {
 	{ { -3. + 4. * (Hammer3D::Qsi_4P[0][0] + Hammer3D::Qsi_4P[0][1] + Hammer3D::Qsi_4P[0][2]), -3. + 4. * (Hammer3D::Qsi_4P[0][0] + Hammer3D::Qsi_4P[0][1] + Hammer3D::Qsi_4P[0][2]), -3. + 4. * (Hammer3D::Qsi_4P[0][0] + Hammer3D::Qsi_4P[0][1] + Hammer3D::Qsi_4P[0][2]) },
 	  { 4. - 4. * (2. * Hammer3D::Qsi_4P[0][0] + Hammer3D::Qsi_4P[0][1] + Hammer3D::Qsi_4P[0][2]), -4. * Hammer3D::Qsi_4P[0][0], -4. * Hammer3D::Qsi_4P[0][0] },
@@ -1300,62 +1218,6 @@ template<> const double Elem_Tet10_IP<4>::m_DPsi[4][m_NumNodes][m_Dim] = {
 	  { 4. * Hammer3D::Qsi_4P[3][2], 0., 4. * Hammer3D::Qsi_4P[3][0] },
 	  { 0., 4. * Hammer3D::Qsi_4P[3][2], 4. * Hammer3D::Qsi_4P[3][1] },
 	  { 0., 0., 4. * Hammer3D::Qsi_4P[3][2] - 1.} } };
-
-template<> const double Elem_Tet10_IP<5>::m_DPsi[5][m_NumNodes][m_Dim] = {
-	{ { -3. + 4. * (Hammer3D::Qsi_5P[0][0] + Hammer3D::Qsi_5P[0][1] + Hammer3D::Qsi_5P[0][2]), -3. + 4. * (Hammer3D::Qsi_5P[0][0] + Hammer3D::Qsi_5P[0][1] + Hammer3D::Qsi_5P[0][2]), -3. + 4. * (Hammer3D::Qsi_5P[0][0] + Hammer3D::Qsi_5P[0][1] + Hammer3D::Qsi_5P[0][2]) },
-	  { 4. - 4. * (2. * Hammer3D::Qsi_5P[0][0] + Hammer3D::Qsi_5P[0][1] + Hammer3D::Qsi_5P[0][2]), -4. * Hammer3D::Qsi_5P[0][0], -4. * Hammer3D::Qsi_5P[0][0] },
-	  { 4. * Hammer3D::Qsi_5P[0][0] - 1., 0., 0. },
-	  { -4. * Hammer3D::Qsi_5P[0][1], 4. - 4. * (Hammer3D::Qsi_5P[0][0] + 2. * Hammer3D::Qsi_5P[0][1] + Hammer3D::Qsi_5P[0][2]), -4. * Hammer3D::Qsi_5P[0][1] },
-	  { 4. * Hammer3D::Qsi_5P[0][1], 4. * Hammer3D::Qsi_5P[0][0], 0. },
-	  { 0., 4. * Hammer3D::Qsi_5P[0][1] - 1., 0. },
-	  { -4. * Hammer3D::Qsi_5P[0][2], -4. * Hammer3D::Qsi_5P[0][2], 4. - 4. * (Hammer3D::Qsi_5P[0][0] + Hammer3D::Qsi_5P[0][1] + 2. * Hammer3D::Qsi_5P[0][2]) },
-	  { 4. * Hammer3D::Qsi_5P[0][2], 0., 4. * Hammer3D::Qsi_5P[0][0] },
-	  { 0., 4. * Hammer3D::Qsi_5P[0][2], 4. * Hammer3D::Qsi_5P[0][1] },
-	  { 0., 0., 4. * Hammer3D::Qsi_5P[0][2] - 1.} },
-
-	{ { -3. + 4. * (Hammer3D::Qsi_5P[1][0] + Hammer3D::Qsi_5P[1][1] + Hammer3D::Qsi_5P[1][2]), -3. + 4. * (Hammer3D::Qsi_5P[1][0] + Hammer3D::Qsi_5P[1][1] + Hammer3D::Qsi_5P[1][2]), -3. + 4. * (Hammer3D::Qsi_5P[1][0] + Hammer3D::Qsi_5P[1][1] + Hammer3D::Qsi_5P[1][2]) },
-	  { 4. - 4. * (2. * Hammer3D::Qsi_5P[1][0] + Hammer3D::Qsi_5P[1][1] + Hammer3D::Qsi_5P[1][2]), -4. * Hammer3D::Qsi_5P[1][0], -4. * Hammer3D::Qsi_5P[1][0] },
-	  { 4. * Hammer3D::Qsi_5P[1][0] - 1., 0., 0. },
-	  { -4. * Hammer3D::Qsi_5P[1][1], 4. - 4. * (Hammer3D::Qsi_5P[1][0] + 2. * Hammer3D::Qsi_5P[1][1] + Hammer3D::Qsi_5P[1][2]), -4. * Hammer3D::Qsi_5P[1][1] },
-	  { 4. * Hammer3D::Qsi_5P[1][1], 4. * Hammer3D::Qsi_5P[1][0], 0. },
-	  { 0., 4. * Hammer3D::Qsi_5P[1][1] - 1., 0. },
-	  { -4. * Hammer3D::Qsi_5P[1][2], -4. * Hammer3D::Qsi_5P[1][2], 4. - 4. * (Hammer3D::Qsi_5P[1][0] + Hammer3D::Qsi_5P[1][1] + 2. * Hammer3D::Qsi_5P[1][2]) },
-	  { 4. * Hammer3D::Qsi_5P[1][2], 0., 4. * Hammer3D::Qsi_5P[1][0] },
-	  { 0., 4. * Hammer3D::Qsi_5P[1][2], 4. * Hammer3D::Qsi_5P[1][1] },
-	  { 0., 0., 4. * Hammer3D::Qsi_5P[1][2] - 1.} },
-
-	{ { -3. + 4. * (Hammer3D::Qsi_5P[2][0] + Hammer3D::Qsi_5P[2][1] + Hammer3D::Qsi_5P[2][2]), -3. + 4. * (Hammer3D::Qsi_5P[2][0] + Hammer3D::Qsi_5P[2][1] + Hammer3D::Qsi_5P[2][2]), -3. + 4. * (Hammer3D::Qsi_5P[2][0] + Hammer3D::Qsi_5P[2][1] + Hammer3D::Qsi_5P[2][2]) },
-	  { 4. - 4. * (2. * Hammer3D::Qsi_5P[2][0] + Hammer3D::Qsi_5P[2][1] + Hammer3D::Qsi_5P[2][2]), -4. * Hammer3D::Qsi_5P[2][0], -4. * Hammer3D::Qsi_5P[2][0] },
-	  { 4. * Hammer3D::Qsi_5P[2][0] - 1., 0., 0. },
-	  { -4. * Hammer3D::Qsi_5P[2][1], 4. - 4. * (Hammer3D::Qsi_5P[2][0] + 2. * Hammer3D::Qsi_5P[2][1] + Hammer3D::Qsi_5P[2][2]), -4. * Hammer3D::Qsi_5P[2][1] },
-	  { 4. * Hammer3D::Qsi_5P[2][1], 4. * Hammer3D::Qsi_5P[2][0], 0. },
-	  { 0., 4. * Hammer3D::Qsi_5P[2][1] - 1., 0. },
-	  { -4. * Hammer3D::Qsi_5P[2][2], -4. * Hammer3D::Qsi_5P[2][2], 4. - 4. * (Hammer3D::Qsi_5P[2][0] + Hammer3D::Qsi_5P[2][1] + 2. * Hammer3D::Qsi_5P[2][2]) },
-	  { 4. * Hammer3D::Qsi_5P[2][2], 0., 4. * Hammer3D::Qsi_5P[2][0] },
-	  { 0., 4. * Hammer3D::Qsi_5P[2][2], 4. * Hammer3D::Qsi_5P[2][1] },
-	  { 0., 0., 4. * Hammer3D::Qsi_5P[2][2] - 1.} },
-
-	{ { -3. + 4. * (Hammer3D::Qsi_5P[3][0] + Hammer3D::Qsi_5P[3][1] + Hammer3D::Qsi_5P[3][2]), -3. + 4. * (Hammer3D::Qsi_5P[3][0] + Hammer3D::Qsi_5P[3][1] + Hammer3D::Qsi_5P[3][2]), -3. + 4. * (Hammer3D::Qsi_5P[3][0] + Hammer3D::Qsi_5P[3][1] + Hammer3D::Qsi_5P[3][2]) },
-	  { 4. - 4. * (2. * Hammer3D::Qsi_5P[3][0] + Hammer3D::Qsi_5P[3][1] + Hammer3D::Qsi_5P[3][2]), -4. * Hammer3D::Qsi_5P[3][0], -4. * Hammer3D::Qsi_5P[3][0] },
-	  { 4. * Hammer3D::Qsi_5P[3][0] - 1., 0., 0. },
-	  { -4. * Hammer3D::Qsi_5P[3][1], 4. - 4. * (Hammer3D::Qsi_5P[3][0] + 2. * Hammer3D::Qsi_5P[3][1] + Hammer3D::Qsi_5P[3][2]), -4. * Hammer3D::Qsi_5P[3][1] },
-	  { 4. * Hammer3D::Qsi_5P[3][1], 4. * Hammer3D::Qsi_5P[3][0], 0. },
-	  { 0., 4. * Hammer3D::Qsi_5P[3][1] - 1., 0. },
-	  { -4. * Hammer3D::Qsi_5P[3][2], -4. * Hammer3D::Qsi_5P[3][2], 4. - 4. * (Hammer3D::Qsi_5P[3][0] + Hammer3D::Qsi_5P[3][1] + 2. * Hammer3D::Qsi_5P[3][2]) },
-	  { 4. * Hammer3D::Qsi_5P[3][2], 0., 4. * Hammer3D::Qsi_5P[3][0] },
-	  { 0., 4. * Hammer3D::Qsi_5P[3][2], 4. * Hammer3D::Qsi_5P[3][1] },
-	  { 0., 0., 4. * Hammer3D::Qsi_5P[3][2] - 1.} },
-
-	{ { -3. + 4. * (Hammer3D::Qsi_5P[4][0] + Hammer3D::Qsi_5P[4][1] + Hammer3D::Qsi_5P[4][2]), -3. + 4. * (Hammer3D::Qsi_5P[4][0] + Hammer3D::Qsi_5P[4][1] + Hammer3D::Qsi_5P[4][2]), -3. + 4. * (Hammer3D::Qsi_5P[4][0] + Hammer3D::Qsi_5P[4][1] + Hammer3D::Qsi_5P[4][2]) },
-	  { 4. - 4. * (2. * Hammer3D::Qsi_5P[4][0] + Hammer3D::Qsi_5P[4][1] + Hammer3D::Qsi_5P[4][2]), -4. * Hammer3D::Qsi_5P[4][0], -4. * Hammer3D::Qsi_5P[4][0] },
-	  { 4. * Hammer3D::Qsi_5P[4][0] - 1., 0., 0. },
-	  { -4. * Hammer3D::Qsi_5P[4][1], 4. - 4. * (Hammer3D::Qsi_5P[4][0] + 2. * Hammer3D::Qsi_5P[4][1] + Hammer3D::Qsi_5P[4][2]), -4. * Hammer3D::Qsi_5P[4][1] },
-	  { 4. * Hammer3D::Qsi_5P[4][1], 4. * Hammer3D::Qsi_5P[4][0], 0. },
-	  { 0., 4. * Hammer3D::Qsi_5P[4][1] - 1., 0. },
-	  { -4. * Hammer3D::Qsi_5P[4][2], -4. * Hammer3D::Qsi_5P[4][2], 4. - 4. * (Hammer3D::Qsi_5P[4][0] + Hammer3D::Qsi_5P[4][1] + 2. * Hammer3D::Qsi_5P[4][2]) },
-	  { 4. * Hammer3D::Qsi_5P[4][2], 0., 4. * Hammer3D::Qsi_5P[4][0] },
-	  { 0., 4. * Hammer3D::Qsi_5P[4][2], 4. * Hammer3D::Qsi_5P[4][1] },
-	  { 0., 0., 4. * Hammer3D::Qsi_5P[4][2] - 1.} } };
 
 template<> const double Elem_Tet10_IP<10>::m_DPsi[10][m_NumNodes][m_Dim] = {
 	{ { -3. + 4. * (Hammer3D::Qsi_10P[0][0] + Hammer3D::Qsi_10P[0][1] + Hammer3D::Qsi_10P[0][2]), -3. + 4. * (Hammer3D::Qsi_10P[0][0] + Hammer3D::Qsi_10P[0][1] + Hammer3D::Qsi_10P[0][2]), -3. + 4. * (Hammer3D::Qsi_10P[0][0] + Hammer3D::Qsi_10P[0][1] + Hammer3D::Qsi_10P[0][2]) },

@@ -45,7 +45,7 @@ public:
 			<< this->v_Conect[3]->m_index + add << " " << this->v_Conect[4]->m_index + add << " " << this->v_Conect[5]->m_index + add << " " << this->m_Mat->m_index << "\n";
 		msg << "2 2 " << this->v_Conect[12]->m_index + add << " " << this->v_Conect[13]->m_index + add << " " << this->v_Conect[14]->m_index + add << " "
 			<< this->v_Conect[15]->m_index + add << " " << this->v_Conect[16]->m_index + add << " " << this->v_Conect[17]->m_index + add << " " << this->m_Mat->m_index << "\n";
-		msg << "3 2 " << this->v_Conect[0]->m_index + add << " " << this->v_Conect[1]->m_index + add << " " << this->v_Conect[3]->m_index + add << " "
+		msg << "3 2 " << this->v_Conect[0]->m_index + add << " " << this->v_Conect[1]->m_index + add << " " << this->v_Conect[2]->m_index + add << " "
 			<< this->v_Conect[6]->m_index + add << " " << this->v_Conect[7]->m_index + add << " " << this->v_Conect[8]->m_index + add << " "
 			<< this->v_Conect[12]->m_index + add << " " << this->v_Conect[13]->m_index + add << " " << this->v_Conect[14]->m_index + add << " " << this->m_Mat->m_index << "\n";
 		msg << "3 2 " << this->v_Conect[2]->m_index + add << " " << this->v_Conect[4]->m_index + add << " " << this->v_Conect[5]->m_index + add << " "

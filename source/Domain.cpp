@@ -366,7 +366,6 @@ template<> int Domain<3>::addElement(const size_t& index, const int& Type, const
 			switch (numIP) {
 			case  1: { v_Elem.emplace_back(std::make_shared<Elem_Tet4_IP< 1>>(v_Mat[Material])); break; }
 			case  4: { v_Elem.emplace_back(std::make_shared<Elem_Tet4_IP< 4>>(v_Mat[Material])); break; }
-			case  5: { v_Elem.emplace_back(std::make_shared<Elem_Tet4_IP< 5>>(v_Mat[Material])); break; }
 			case 10: { v_Elem.emplace_back(std::make_shared<Elem_Tet4_IP<10>>(v_Mat[Material])); break; }
 			case 11: { v_Elem.emplace_back(std::make_shared<Elem_Tet4_IP<11>>(v_Mat[Material])); break; }
 			case 14: { v_Elem.emplace_back(std::make_shared<Elem_Tet4_IP<14>>(v_Mat[Material])); break; }
@@ -383,9 +382,7 @@ template<> int Domain<3>::addElement(const size_t& index, const int& Type, const
 		{
 			//2	- Quadratic interpolation (10 nodes)
 			switch (numIP) {
-			case  1: { v_Elem.emplace_back(std::make_shared<Elem_Tet10_IP< 1>>(v_Mat[Material])); break; }
 			case  4: { v_Elem.emplace_back(std::make_shared<Elem_Tet10_IP< 4>>(v_Mat[Material])); break; }
-			case  5: { v_Elem.emplace_back(std::make_shared<Elem_Tet10_IP< 5>>(v_Mat[Material])); break; }
 			case 10: { v_Elem.emplace_back(std::make_shared<Elem_Tet10_IP<10>>(v_Mat[Material])); break; }
 			case 11: { v_Elem.emplace_back(std::make_shared<Elem_Tet10_IP<11>>(v_Mat[Material])); break; }
 			case 14: { v_Elem.emplace_back(std::make_shared<Elem_Tet10_IP<14>>(v_Mat[Material])); break; }
@@ -402,9 +399,6 @@ template<> int Domain<3>::addElement(const size_t& index, const int& Type, const
 		{
 			//3	- Cubic interpolation (20 nodes)
 			switch (numIP) {
-			case  1: { v_Elem.emplace_back(std::make_shared<Elem_Tet20_IP< 1>>(v_Mat[Material])); break; }
-			case  4: { v_Elem.emplace_back(std::make_shared<Elem_Tet20_IP< 4>>(v_Mat[Material])); break; }
-			case  5: { v_Elem.emplace_back(std::make_shared<Elem_Tet20_IP< 5>>(v_Mat[Material])); break; }
 			case 10: { v_Elem.emplace_back(std::make_shared<Elem_Tet20_IP<10>>(v_Mat[Material])); break; }
 			case 11: { v_Elem.emplace_back(std::make_shared<Elem_Tet20_IP<11>>(v_Mat[Material])); break; }
 			case 14: { v_Elem.emplace_back(std::make_shared<Elem_Tet20_IP<14>>(v_Mat[Material])); break; }
@@ -452,7 +446,6 @@ template<> int Domain<3>::addElement(const size_t& index, const int& Type, const
 		{
 			//2	- Quadratic interpolation (27 nodes)
 			switch (numIP) {
-			case  8: { v_Elem.emplace_back(std::make_shared<Elem_Hex27_IP< 8>>(v_Mat[Material])); break; }
 			case 27: { v_Elem.emplace_back(std::make_shared<Elem_Hex27_IP<27>>(v_Mat[Material])); break; }
 			case 64: { v_Elem.emplace_back(std::make_shared<Elem_Hex27_IP<64>>(v_Mat[Material])); break; }
 			default:
@@ -465,15 +458,7 @@ template<> int Domain<3>::addElement(const size_t& index, const int& Type, const
 		case 3:
 		{
 			//3	- Cubic interpolation (64 nodes)
-			switch (numIP) {
-			case  8: { v_Elem.emplace_back(std::make_shared<Elem_Hex64_IP< 8>>(v_Mat[Material])); break; }
-			case 27: { v_Elem.emplace_back(std::make_shared<Elem_Hex64_IP<27>>(v_Mat[Material])); break; }
-			case 64: { v_Elem.emplace_back(std::make_shared<Elem_Hex64_IP<64>>(v_Mat[Material])); break; }
-			default:
-				LOG("\n\nDomain.addElement: Element " << std::to_string(index) << " creation error. Wrong number of integration points.\n\n\n");
-				throw std::invalid_argument("\n\n\nElement " + std::to_string(index) + " creation error. Wrong number of integration points.\n\n\n");
-				break;
-			}
+			v_Elem.emplace_back(std::make_shared<Elem_Hex64>(v_Mat[Material]));
 			break;
 		}
 		default:

@@ -41,15 +41,17 @@ int main(int argc, char** args)
 
     // --------------------------------------------------------------------------------------------
     // Check if program call has the project name
-    if (argc >= 1)
-    {
-        std::cout << "Project Name: ";
-        std::cin >> stProj;
-    }
-    else
+    if (argc > 1)
     {
         std::cout << "The following input project was submitted: " << args[1];
         stProj = args[1];
+    }
+    else
+    {
+        std::cout << "Project Name: ";
+        std::cin >> stProj;
+
+        if (stProj.compare("exit") == 0) return 0;
     }
     stArquivo = stProj + ".txt";
 

@@ -59,14 +59,8 @@ bool SolutionAlgorithm<nDim>::initFEModel(Domain<nDim>* theDomain, PostProcess* 
 		m_theFEModel->addDOF(nDim);
 	}
 
-	// Downcasting, since m_ElemComp is member of derived class only
-	AnalysisComp_Mec<nDim>* pModel = dynamic_cast<AnalysisComp_Mec<nDim>*>(m_theFEModel.get());
-
-	// If downcasting was successful, pModel is not a null pointer.
-	//if (pModel)
-
 	// Now assemble the elemental dof
-	for (size_t i = 0; i < pModel->m_ElemComp.size(); i++) {
+	for (size_t i = 0; i < m_theFEModel->m_ElemComp.size(); i++) {
 
 		// Domain element associated to the current element component
 		Element<nDim>* pElem = theDomain->getElem(i);
@@ -81,8 +75,8 @@ bool SolutionAlgorithm<nDim>::initFEModel(Domain<nDim>* theDomain, PostProcess* 
 		}
 
 		// Transfer the elemental dof to the element component
-		pModel->m_ElemComp[i]->m_ElemDofIndex = std::move(elemDofIndex);
-		pModel->m_ElemComp[i]->m_nDof = elemDofIndex.size();
+		m_theFEModel->m_ElemComp[i]->m_ElemDofIndex = std::move(elemDofIndex);
+		m_theFEModel->m_ElemComp[i]->m_nDof = elemDofIndex.size();
 	}
 
 	LOG("SolutionAlgorithm.initFEModel: Total number of DOF: " << std::to_string(m_theFEModel->getNumDof()));
