@@ -1,0 +1,23 @@
+--------------------------------------- 
+Número de materiais
+--------------------------------------- 
+
+#MATERIAIS#
+1
+
+--------------------------------------- 
+Dados dos Materiais
+
+- Tipo de material e modelo constitutivo (relacionado com a análise)
+  * 1 - elástico Saint-Venant-Kirchhoff / isotrópico
+    > Módulo de Elasticidade Longitudinal; Coef. de Poisson; Densidade; Amortecimento
+---------------------------------------
+
+Indice | Tipo
+Parâmetros
+* O fim de lista de parâmetros de cada material deve ser indicada por #
+
+#PARAMETROS#
+1	1
+1.  0.4  0.  0.
+#

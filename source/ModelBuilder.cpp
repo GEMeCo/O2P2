@@ -101,7 +101,7 @@ template<int nDim> std::unique_ptr<Domain<nDim>> ModelBuilder<nDim>::initMesh(st
     }
 
     // Basic definitions from node file
-    stFlag = "#DADOS#";
+    stFlag = "#DADOS_ND#";
     LOG("\nModelBuilder.initMesh: Reading flag " + stFlag);
 
     while (stLine.compare(0, stFlag.size(), stFlag)) {
@@ -133,7 +133,7 @@ template<int nDim> std::unique_ptr<Domain<nDim>> ModelBuilder<nDim>::initMesh(st
     LOG("ModelBuilder.initMesh: Number of Materials: " << std::to_string(nMat));
 
     // Basic definitions from elements file
-    stFlag = "#DADOS#";
+    stFlag = "#DADOS_EL#";
     LOG("\nModelBuilder.initMesh: Reading flag " << stFlag);
 
     while (stLine.compare(0, stFlag.size(), stFlag)) {

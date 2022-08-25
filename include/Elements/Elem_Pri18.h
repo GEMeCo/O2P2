@@ -165,7 +165,7 @@ inline Eigen::VectorXd Elem_Pri18::getShapeFcOnPoint(const double* Point) {
 	Psi(6) = (-1. + Point[0] + Point[1]) * (1. - 2. * Point[0] - 2. * Point[1]) * (-1. + Point[2] * Point[2]);
 	Psi(7) = 4. * Point[0] * (-1. + Point[0] + Point[1]) * (-1. + Point[2] * Point[2]);
 	Psi(8) = Point[0] * (2. * Point[0] - 1.) * (1. - Point[2] * Point[2]);
-	Psi(9) = 4. * Point[1] * (-1. + Point[0] + Point[1]) * (-1. + Point[2] * Point[2]);
+	Psi(9)  = 4. * Point[1] * (-1. + Point[0] + Point[1]) * (-1. + Point[2] * Point[2]);
 	Psi(10) = -4. * Point[0] * Point[1] * (-1. + Point[2] * Point[2]);
 	Psi(11) = Point[1] * (2. * Point[1] - 1.) * (1. - Point[2] * Point[2]);
 	Psi(12) = -0.5 * (-1. + Point[0] + Point[1]) * (1. - 2. * Point[0] - 2. * Point[1]) * (1. + Point[2]) * Point[2];
@@ -196,7 +196,7 @@ inline Eigen::MatrixXd Elem_Pri18::getShapeDerivOnPoint(const double* Point) {
 	DPsi(6, 0) = (3. - 4. * Point[0] - 4. * Point[1]) * (-1. + Point[2] * Point[2]);
 	DPsi(7, 0) = (-4. + 8. * Point[0] + 4. * Point[1]) * (-1. + Point[2] * Point[2]);
 	DPsi(8, 0) = (1. - 4. * Point[0]) * (-1. + Point[2] * Point[2]);
-	DPsi(9, 0) = 4. * Point[1] * (-1. + Point[2] * Point[2]);
+	DPsi(9, 0) =  4. * Point[1] * (-1. + Point[2] * Point[2]);
 	DPsi(10, 0) = -4. * Point[1] * (-1. + Point[2] * Point[2]);
 	DPsi(11, 0) = 0.;
 	DPsi(12, 0) = -0.5 * (3. - 4. * Point[0] - 4. * Point[1]) * (1. + Point[2]) * Point[2];
@@ -215,7 +215,7 @@ inline Eigen::MatrixXd Elem_Pri18::getShapeDerivOnPoint(const double* Point) {
 	DPsi(6, 1) = (3. - 4. * Point[0] - 4. * Point[1]) * (-1. + Point[2] * Point[2]);
 	DPsi(7, 1) = 4. * Point[0] * (-1. + Point[2] * Point[2]);
 	DPsi(8, 1) = 0.;
-	DPsi(9, 1) = (-4. + 4. * Point[0] + 8. * Point[1]) * (-1. + Point[2] * Point[2]);
+	DPsi(9, 1) =  (-4. + 4. * Point[0] + 8. * Point[1]) * (-1. + Point[2] * Point[2]);
 	DPsi(10, 1) = -4. * Point[0] * (-1. + Point[2] * Point[2]);
 	DPsi(11, 1) = (1. - 4. * Point[1]) * (-1. + Point[2] * Point[2]);
 	DPsi(12, 1) = -0.5 * (3. - 4. * Point[0] - 4. * Point[1]) * (1. + Point[2]) * Point[2];
@@ -234,7 +234,7 @@ inline Eigen::MatrixXd Elem_Pri18::getShapeDerivOnPoint(const double* Point) {
 	DPsi(6, 2) = (-1. + Point[0] + Point[1]) * (1. - 2. * Point[0] - 2. * Point[1]) * (2. * Point[2]);
 	DPsi(7, 2) = 4. * Point[0] * (-1. + Point[0] + Point[1]) * (2. * Point[2]);
 	DPsi(8, 2) = Point[0] * (2. * Point[0] - 1.) * (-2. * Point[2]);
-	DPsi(9, 2) = 4. * Point[1] * (-1. + Point[0] + Point[1]) * (2. * Point[2]);
+	DPsi(9, 2) =  4. * Point[1] * (-1. + Point[0] + Point[1]) * (2. * Point[2]);
 	DPsi(10, 2) = -4. * Point[0] * Point[1] * (2. * Point[2]);
 	DPsi(11, 2) = Point[1] * (2. * Point[1] - 1.) * (-2. * Point[2]);
 	DPsi(12, 2) = -0.5 * (-1. + Point[0] + Point[1]) * (1. - 2. * Point[0] - 2. * Point[1]) * (1. + 2. * Point[2]);
@@ -332,6 +332,7 @@ inline const double Elem_Pri18::m_xsi[m_NumIP][m_Dim] =
 //
 // ================================================================================================
 inline const double Elem_Pri18::m_weight[m_NumIP] = { 0.03054215101536722222222, 0.03054215101536722222222, 0.03054215101536722222222, 0.03054215101536722222222, 0.03054215101536722222222, 0.03054215101536722222222, 0.06205044157722527777778, 0.06205044157722527777778, 0.06205044157722527777778, 0.04886744162458755555556, 0.04886744162458755555556, 0.04886744162458755555556, 0.06205044157722527777778, 0.06205044157722527777778, 0.06205044157722527777778, 0.09928070652356044444444, 0.09928070652356044444444, 0.09928070652356044444444 };
+
 
 // ================================================================================================
 //

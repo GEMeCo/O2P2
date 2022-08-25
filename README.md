@@ -23,20 +23,35 @@ Table of Contents
 =================
 <!--ts-->
    * [About](#about)
-   * [Features](#features)
+   * [Citation](#citation)
+   * [Current Features](#features)
    * [Resources](#resources)
+   * [Author](#author)
    * [Contributors](#contributors)
    * [How to contribute](#how-to-contribute)
-   * [Author](#author)
 <!--te-->
 
 About
 -----
 Object oriented platform for the Positional Finite Element Method applied to Thermomechanical Problems, an object oriented framework for the finite element method based on positions. Developed for non-linear coupled thermo-mechanical analyzes.
 
+Citation
+________
+  Whether it was used in whole or parts, citation is a must! Our software is under development, and a proper presentation paper is underway.
+  For now, if you may, cite the following papers (since it was used for validations):
+  - Version 1: CARRAZEDO, R.; CODA, H. B. Triangular based prismatic finite element for the analysis of orthotropic laminated beams, plates and shells. Composite Structures, v. 168, p. 234-246, 2017.
+  DOI: <10.1016/j.compstruct.2017.02.027>
+  - Version 2: CARRAZEDO, R.; PACCOLA, R. R.; CODA, H. B. Active face prismatic positional finite element for linear and geometrically nonlinear analysis of honeycomb sandwich plates and shells. Composite Structures, v. 200, p. 849-863, 2018.
+  DOI: <10.1016/j.compstruct.2018.06.009>
+  - Version 3: CARRAZEDO, R.; PACCOLA, R. R.; CODA, H. B.; SALOMÃO, R. C. Vibration and stress analysis of orthotropic laminated panels by active face prismatic finite element. Composite Structures, v. 244, n. 112254, 2020.
+  DOI: <10.1016/j.compstruct.2020.112254>
+
+
 Features
 --------
 - v1: Geometric nonlinear analysis with SVK constitutive model.
+	- v1.1: only 2D elements;
+	- v1.2: 2D and 3D elements;
 
 Resources
 ---------
@@ -45,19 +60,6 @@ The following libraries have to be pre-instaled:
 - [Eigen C++ Libraries, version 1.76.0](https://eigen.tuxfamily.org/)
 - [Microsoft Visual Studio Community 2019, Version 16.11.14](https://visualstudio.microsoft.com/)
 - [Intel C++ Compiler, Package ID: w_oneAPI_2021.2.0.243](https://software.intel.com/content/www/us/en/develop/tools/oneapi.html)
-
-Contributors
-------------
-- 
-
-How to contribute
------------------
-```bash
-Fork the project.
-Create a new branch with your changes: git checkout -b my-feature
-Save your changes and create a commit message telling you what you did: git commit -m" feature: My new feature "
-Submit your changes: git push origin my-feature
-```
 
 Author
 ------
@@ -71,6 +73,20 @@ Joined the University of Sao Paulo at Sao Carlos School of Engineering, in the S
 
 Associate Professor since 2020. Has worked on several research projects dealing with static and dynamic behaviour of composite structures using an alternative version of the Finite Element Method, based on Positions.
 
+Contributors
+------------
+ - [Rafael Correa Salomão](http://lattes.cnpq.br/4408319800130401)
+ - [Emerson Felipe Felix](http://lattes.cnpq.br/8352527462118419)
+ - [Alexandre Ten Cate Matté](https://lattes.cnpq.br/8144116395864291)
+ - [Chiara Pinheiro Teodoro](http://lattes.cnpq.br/6999948388655115)
+ - [Thiago da Silva Costa Santos](http://lattes.cnpq.br/6048758348229035)
+
+
+How to contribute
+-----------------
+```bash
+We are not yet accepting external contributions. For now, only students supervised by the head of this project may contribute. Nevertheless, you may use it as seen fit.
+```
 
 Acknowledgement
 ---------------

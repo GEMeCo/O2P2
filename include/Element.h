@@ -206,6 +206,45 @@ protected:
 };
 
 
+/** @class ElementLinear
+  * 
+  * @brief Base geometry class for linear elements.
+  * @details Holds basic definitios for geometry linear elements.
+  * 
+  */
+template<int nDim>
+class ElementLinear : public Element<nDim>
+{
+private:
+	ElementLinear() = delete;
+
+protected:
+	/** Constructor for linear element objects.
+	  * @param Material Pointer to Material class.
+	  * @param Section Pointer to Section class.
+	  */
+	ElementLinear(std::shared_ptr<Material>& Material, std::shared_ptr<Section>& Section)
+		: Element<nDim>(Material), m_Section(Section) { };
+
+protected:
+	/** @brief Pointer to the Section. */
+	std::shared_ptr<Section> m_Section;
+
+	/** @brief Element dimensionality */
+	static inline int const m_Dim{ 1 };
+
+public:
+	// Returns the number of DOF per node of current element.
+	int getNumNdDOF() override { return nDim; };
+
+	// Returns the dimensionality of current element.
+	int getDIM() override { return m_Dim; };
+
+	/** @return a reference to a section object. */
+	Section* getSection() { return m_Section.get(); };
+};
+
+
 /**
   * @class ElementPlane
   *

@@ -192,8 +192,8 @@ int main(int argc, char** args)
 
 /**
   * @mainpage O2P2, an object oriented environment for the positional finite element method.
-  * @image html icon2.png width=100
-  * @brief Developed for non-linear coupled thermo-mechanical analyzes with the finite element method based on positions.
+  * @image html icon2.png width=50
+  * @brief O2P2 is an C++ environment developed for non-linear coupled thermo-mechanical analyzes with the finite element method based on positions.
   *
   * @section first_sec Legal Information
   * @image html logo_inst.png width=300
@@ -208,16 +208,28 @@ int main(int argc, char** args)
   * @image html CC-BY-NC.jpg width=150
   *
   * @section developers_sec Developers
-  *  @author    Rogério Carrazedo
-  *  @version   1.0.0.1
-  *  @date      2022.08.01
+  *  @author    [Rogério Carrazedo](http://lattes.cnpq.br/9715974030451423)
+  *  @author    [Rafael Correa Salomão](http://lattes.cnpq.br/4408319800130401)
+  *  @author    [Emerson Felipe Felix](http://lattes.cnpq.br/8352527462118419)
+  *  @author    [Alexandre Ten Cate Matté](https://lattes.cnpq.br/8144116395864291)
+  *  @author    [Chiara Pinheiro Teodoro](http://lattes.cnpq.br/6999948388655115)
+  *  @author    [Thiago da Silva Costa Santos](http://lattes.cnpq.br/6048758348229035)
+  *  @version   1.3.0.1
+  *  @date      2022.09.01
   *
   * @section citation_sec How to cite:
   *
-  * Whether it was used in whole or parts, citation is a must!
+  * Whether it was used in whole or parts, citation is a must! Our software is under development, and a proper presentation paper is underway.
+  * For now, if you may, cite the following papers (since it was used for validations):
+  * - Version 1: CARRAZEDO, R.; CODA, H. B. Triangular based prismatic finite element for the analysis of orthotropic laminated beams, plates and shells. Composite Structures, v. 168, p. 234-246, 2017.
+  * DOI: <10.1016/j.compstruct.2017.02.027>
+  * - Version 2: CARRAZEDO, R.; PACCOLA, R. R.; CODA, H. B. Active face prismatic positional finite element for linear and geometrically nonlinear analysis of honeycomb sandwich plates and shells. Composite Structures, v. 200, p. 849-863, 2018.
+  * DOI: <10.1016/j.compstruct.2018.06.009>
+  * - Version 3: CARRAZEDO, R.; PACCOLA, R. R.; CODA, H. B.; SALOMÃO, R. C. Vibration and stress analysis of orthotropic laminated panels by active face prismatic finite element. Composite Structures, v. 244, n. 112254, 2020.
+  * DOI: <10.1016/j.compstruct.2020.112254>
   *
   * O2P2: an object oriented environment for the positional finite element method.
-  * Version: 1.0.0.1. [S.l.]: SET - EESC - USP, 2022. Available at <https://github.com/GEMeCo/O2P2>
+  * Current Version: 1.3.0.1 [S.l.]: SET - EESC - USP, 2022. Available at <https://github.com/GEMeCo/O2P2>
   * DOI:
   *
   * @copyright Licensed under Creative Commons Attribution-NonCommerical 4.0 International license
@@ -233,27 +245,23 @@ int main(int argc, char** args)
   * This program was developed with the following libraries and technologies:
   *
   *      - Eigen C++ Libraries, Version 3.4.0
-  *      - Microsoft Visual Studio Community 2022, Version 17.2.1
-  *      - Intel Libraries for oneAPI, Package ID: w_oneAPI_2021.2.0.243
-  *      - Intel C++ Compiler, Package ID: w_oneAPI_2021.2.0.243
+  *      - Microsoft Visual Studio Community 2022, Version 17.2.6
+  *      - Intel Libraries for oneAPI, Package ID: w_oneAPI_2021.2.0.256
+  *      - Intel C++ Compiler, Package ID: w_oneAPI_2021.2.0.256
   *
   * @warning Software under development. Improper use will crash your application.
   * @note A  profiler will create a file named "results.json", but only in debug mode. Just open the google chrome in address chrome://tracing and drag/paste the file.
   *
-  * @bug     Os dynamic_cast não tem verificação posterior se estão retornando pointeiros nulos (poderiam ser static_cast - mais rápidos).
-  * 
-  * @todo 1 - No arquivo O2P2.cpp, incluir fluxogramas no detalhamento dos módulos.
+  * @todo 1 - Incluir fluxogramas no detalhamento dos módulos (arquivo O2P2.cpp).
   * @todo 2 - Complementar documentação dos módulos
   *
   * @defgroup Main_Module O2P2.
   * @brief An object oriented environment for the positional finite element method.
-  * @details Starts the analysis;
-  *
-  * Requests to read files and populares containers;
-  *
-  * Request to begin the solution process; and
-  *
-  * Request to output solution.
+  * @details
+  * - Starts the analysis;
+  * - Requests to read files and populares containers;
+  * - Request to begin the solution process; and
+  * - Request to output solution.
   *
   * @defgroup PreProcessor_Module Pre-processor classes.
   * @ingroup Main_Module
