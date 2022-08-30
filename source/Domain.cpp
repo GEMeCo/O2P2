@@ -15,6 +15,8 @@
 // 
 // ================================================================================================
 #include "Domain.h"
+#include "Elements/Elem_Lin.h"
+
 #include "Elements/Elem_Tri3.h"
 #include "Elements/Elem_Tri6.h"
 #include "Elements/Elem_Tri10.h"
@@ -160,8 +162,59 @@ template<> int Domain<2>::addElement(const size_t& index, const int& Type, const
 	case 1:
 	{
 		//1 - Bar / Truss element
-		LOG("\n\nDomain.addElement: Element " << std::to_string(index) << " creation error. There is no implementation for Trusses. Element used only as immersed fibers.\n\n\n");
-		throw std::invalid_argument("\n\n\nThere is no implementation for Trusses so far. Linear element used only as immersed fibers.\n\n\n");
+		
+		// Number of nodes for incidence
+		Param = (Order + 1);
+
+		switch (Order)
+		{
+		case 1:
+		{
+			//1	- Linear interpolation (2 nodes)
+			switch (numIP) {
+			case 2: { v_Elem.emplace_back(std::make_shared<Elem_Lin<2, 2, 2>>(v_Mat[Material], v_Sect[Section])); break; }
+			case 3: { v_Elem.emplace_back(std::make_shared<Elem_Lin<2, 2, 3>>(v_Mat[Material], v_Sect[Section])); break; }
+			case 4: { v_Elem.emplace_back(std::make_shared<Elem_Lin<2, 2, 4>>(v_Mat[Material], v_Sect[Section])); break; }
+			default:
+				LOG("\n\nDomain.addElement: Element " << std::to_string(index) << " creation error. Wrong number of integration points.\n\n\n");
+				throw std::invalid_argument("\n\n\nElement " + std::to_string(index) + " creation error. Wrong number of integration points.\n\n\n");
+				break;
+			}
+			break;
+		}
+		case 2:
+		{
+			//2	- Quadratic interpolation (3 nodes)
+			switch (numIP) {
+			case 2: { v_Elem.emplace_back(std::make_shared<Elem_Lin<2, 3, 2>>(v_Mat[Material], v_Sect[Section])); break; }
+			case 3: { v_Elem.emplace_back(std::make_shared<Elem_Lin<2, 3, 3>>(v_Mat[Material], v_Sect[Section])); break; }
+			case 4: { v_Elem.emplace_back(std::make_shared<Elem_Lin<2, 3, 4>>(v_Mat[Material], v_Sect[Section])); break; }
+			default:
+				LOG("\n\nDomain.addElement: Element " << std::to_string(index) << " creation error. Wrong number of integration points.\n\n\n");
+				throw std::invalid_argument("\n\n\nElement " + std::to_string(index) + " creation error. Wrong number of integration points.\n\n\n");
+				break;
+			}
+			break;
+		}
+		case 3:
+		{
+			//3	- Cubic interpolation (4 nodes)
+			switch (numIP) {
+			case 2: { v_Elem.emplace_back(std::make_shared<Elem_Lin<2, 4, 2>>(v_Mat[Material], v_Sect[Section])); break; }
+			case 3: { v_Elem.emplace_back(std::make_shared<Elem_Lin<2, 4, 3>>(v_Mat[Material], v_Sect[Section])); break; }
+			case 4: { v_Elem.emplace_back(std::make_shared<Elem_Lin<2, 4, 4>>(v_Mat[Material], v_Sect[Section])); break; }
+			default:
+				LOG("\n\nDomain.addElement: Element " << std::to_string(index) << " creation error. Wrong number of integration points.\n\n\n");
+				throw std::invalid_argument("\n\n\nElement " + std::to_string(index) + " creation error. Wrong number of integration points.\n\n\n");
+				break;
+			}
+			break;
+		}
+		default:
+			LOG("\n\nDomain.addElement: Element " << std::to_string(index) << " creation error. Only up to cubic order is provided.\n\n\n");
+			throw std::invalid_argument("\n\n\nElement " + std::to_string(index) + " creation error. Only up to cubic order is provided.\n\n\n");
+			break;
+		}
 		break;
 	}
 	case 2:
@@ -338,8 +391,59 @@ template<> int Domain<3>::addElement(const size_t& index, const int& Type, const
 	case 1:
 	{
 		//1 - Bar / Truss element
-		LOG("\n\nDomain.addElement: Element " << std::to_string(index) << " creation error. There is no implementation for Trusses. Element used only as immersed fibers.\n\n\n");
-		throw std::invalid_argument("\n\n\nThere is no implementation for Trusses so far. Linear element used only as immersed fibers.\n\n\n");
+
+		// Number of nodes for incidence
+		Param = (Order + 1);
+
+		switch (Order)
+		{
+		case 1:
+		{
+			//1	- Linear interpolation (2 nodes)
+			switch (numIP) {
+			case 2: { v_Elem.emplace_back(std::make_shared<Elem_Lin<3, 2, 2>>(v_Mat[Material], v_Sect[Section])); break; }
+			case 3: { v_Elem.emplace_back(std::make_shared<Elem_Lin<3, 2, 3>>(v_Mat[Material], v_Sect[Section])); break; }
+			case 4: { v_Elem.emplace_back(std::make_shared<Elem_Lin<3, 2, 4>>(v_Mat[Material], v_Sect[Section])); break; }
+			default:
+				LOG("\n\nDomain.addElement: Element " << std::to_string(index) << " creation error. Wrong number of integration points.\n\n\n");
+				throw std::invalid_argument("\n\n\nElement " + std::to_string(index) + " creation error. Wrong number of integration points.\n\n\n");
+				break;
+			}
+			break;
+		}
+		case 2:
+		{
+			//2	- Quadratic interpolation (3 nodes)
+			switch (numIP) {
+			case 2: { v_Elem.emplace_back(std::make_shared<Elem_Lin<3, 3, 2>>(v_Mat[Material], v_Sect[Section])); break; }
+			case 3: { v_Elem.emplace_back(std::make_shared<Elem_Lin<3, 3, 3>>(v_Mat[Material], v_Sect[Section])); break; }
+			case 4: { v_Elem.emplace_back(std::make_shared<Elem_Lin<3, 3, 4>>(v_Mat[Material], v_Sect[Section])); break; }
+			default:
+				LOG("\n\nDomain.addElement: Element " << std::to_string(index) << " creation error. Wrong number of integration points.\n\n\n");
+				throw std::invalid_argument("\n\n\nElement " + std::to_string(index) + " creation error. Wrong number of integration points.\n\n\n");
+				break;
+			}
+			break;
+		}
+		case 3:
+		{
+			//3	- Cubic interpolation (4 nodes)
+			switch (numIP) {
+			case 2: { v_Elem.emplace_back(std::make_shared<Elem_Lin<3, 4, 2>>(v_Mat[Material], v_Sect[Section])); break; }
+			case 3: { v_Elem.emplace_back(std::make_shared<Elem_Lin<3, 4, 3>>(v_Mat[Material], v_Sect[Section])); break; }
+			case 4: { v_Elem.emplace_back(std::make_shared<Elem_Lin<3, 4, 4>>(v_Mat[Material], v_Sect[Section])); break; }
+			default:
+				LOG("\n\nDomain.addElement: Element " << std::to_string(index) << " creation error. Wrong number of integration points.\n\n\n");
+				throw std::invalid_argument("\n\n\nElement " + std::to_string(index) + " creation error. Wrong number of integration points.\n\n\n");
+				break;
+			}
+			break;
+		}
+		default:
+			LOG("\n\nDomain.addElement: Element " << std::to_string(index) << " creation error. Only up to cubic order is provided.\n\n\n");
+			throw std::invalid_argument("\n\n\nElement " + std::to_string(index) + " creation error. Only up to cubic order is provided.\n\n\n");
+			break;
+		}
 		break;
 	}
 	case 2:

@@ -48,7 +48,6 @@ template<class T> bool NLS_NewtonRaphson::runNonLinearSolver(T* theModel, const 
     Eigen::VectorXd FExt(theModel->getNumDof());
 
     // Sparse solver
-    //Eigen::SparseLU<Eigen::SparseMatrix<double>> solver;
     Eigen::PardisoLU<Eigen::SparseMatrix<double>> solver;
 
     // Assembly load vector (from input)
@@ -100,7 +99,7 @@ template<class T> bool NLS_NewtonRaphson::runNonLinearSolver(T* theModel, const 
         theModel->assembleSOE(Hessian, RHS);
 
         // Solve the system of equation
-        solver.analyzePattern(Hessian);
+        //solver.analyzePattern(Hessian);
         solver.factorize(Hessian);
         if (solver.info() != Eigen::Success) {
             LOG("Decomposition failed in iteration " + std::to_string(m_iteration));

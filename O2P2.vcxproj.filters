@@ -196,5 +196,8 @@
     <ClInclude Include="include\Elements\Elem_Tet20.h">
       <Filter>Header Files\Domain Components\Elements</Filter>
     </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Lin.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

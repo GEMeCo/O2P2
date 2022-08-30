@@ -17,6 +17,8 @@ This program is free software: you can redistribute it and/or modify it under th
 
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See License for more details.
 
+Also, this is a research software. There are neither pre-processor nor post-processor. For now, output was made only for displacements, using AcadView.
+
 ## Under development - Use at your own risk.
 
 Table of Contents

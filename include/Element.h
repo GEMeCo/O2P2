@@ -31,9 +31,6 @@
   * @brief Base geometry element, a Domain component.
   * @details Contains the basic definitions for geometry elements (Domain).
   * It is also a container for the integration points, weights and functions.
-  * 
-  * @todo Na documentação, incluir figura do elemento, contendo conectividade.
-  * @todo Verificar setGeomProperties: Os vértices estão corretos para os elementos 2D?
   */
 class BaseElement
 {

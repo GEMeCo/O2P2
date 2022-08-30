@@ -75,8 +75,11 @@ bool SolutionAlgorithm<nDim>::initFEModel(Domain<nDim>* theDomain, PostProcess* 
 		}
 
 		// Transfer the elemental dof to the element component
-		m_theFEModel->m_ElemComp[i]->m_ElemDofIndex = std::move(elemDofIndex);
 		m_theFEModel->m_ElemComp[i]->m_nDof = elemDofIndex.size();
+		m_theFEModel->m_ElemComp[i]->m_ElemDofIndex = std::move(elemDofIndex);
+
+		// Set the size for the internal force vector
+		m_theFEModel->m_ElemComp[i]->m_elFor.resize(m_theFEModel->m_ElemComp[i]->m_nDof);
 	}
 
 	LOG("SolutionAlgorithm.initFEModel: Total number of DOF: " << std::to_string(m_theFEModel->getNumDof()));

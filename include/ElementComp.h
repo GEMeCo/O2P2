@@ -21,6 +21,7 @@
 
 // Eigen libraries
 #include <Eigen/Dense>
+#include <Eigen/Sparse>		// required by Triplets
 #include <Eigen/Geometry>	// required by .cross (Cross product)
 
 
@@ -78,6 +79,12 @@ public:
 
 	/** @brief Vector with element DOF index. */
 	std::vector<size_t> m_ElemDofIndex;
+
+	/** @brief Vector with element contribution to Hessian matrix (used for parallelism). */
+	std::vector<Eigen::Triplet<double>> m_elHes;
+
+	/** @brief Vector with element contribution to internal force (used for parallelism). */
+	Eigen::VectorXd m_elFor;
 };
 
 

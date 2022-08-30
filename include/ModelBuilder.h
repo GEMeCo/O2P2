@@ -23,12 +23,11 @@
   * @details This class manages the entire reading process, holding project files and asking Domain to create all components.
   * Once reading is finished, it can be safely destroyed.
   *
-  * @todo Verificar se os elementos lidos são compatíveis com a dimensionalidade do problema (2D ou 3D).
-  * @todo Verificar se os dados são consistentes e existentes (conectividade, seções, etc). Tem que arrumar Section (tipos derivados) antes.
-  * @todo Ao apontar material ou seção, tem que verificar se corresponde ao tipo de elemento.
-  * @todo Verificar se na criação de novos dados, não poderia utilizar std::move (Ou seja, se está criando temporários).
-  * @todo Modificar entrada de elementos para incluir pontos de integração.
-  * @todo Verificar compatibilidade entre materiais (i.e., SVK e RSD na mesma entrada).
+  * @todo 1 - Verificar se os elementos lidos são compatíveis com a dimensionalidade do problema (2D ou 3D).
+  * @todo 2 - Verificar se os dados são consistentes e existentes (conectividade, seções, etc). Tem que arrumar Section (tipos derivados) antes.
+  * @todo 3 - Ao apontar material ou seção, tem que verificar se corresponde ao tipo de elemento.
+  * @todo 4 - Verificar se na criação de novos dados, não poderia utilizar std::move (Ou seja, se está criando temporários).
+  * @todo 5 - Verificar compatibilidade entre materiais (i.e., SVK e RSD na mesma entrada).
   * 
   * @tparam nDim The dimensionality of the problem. It is either 2 or 3 (bidimensional or tridimensional).
   */

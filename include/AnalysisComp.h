@@ -13,7 +13,6 @@
 // Eigen libraries
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
-//#include <Eigen/SparseLU>
 #include <Eigen/PardisoSupport>
 
 // Custom Header Files
@@ -31,10 +30,9 @@
   * @details This class holds vectors of solution and analysis components: Load Steps, DOF, System of equation, and such.
   *
   * @todo 1 - A seção transversal não está sendo utilizada em lugar algum.
-  * @todo 2 - assembleSOE - verificar se há ganho em criar triplets com verificação de valor (zeradas).
-  * @todo 3 - Funcionalidade para problemas térmicos.
-  * @todo 4 - Geração de elemComp não está associada ao problema (térmico, mecânico, etc), afinal só há uma implementação de elemComp.
-  * @todo 5 - Não seria mais interessante levar os container de elementos e nós para classe base (atualmente na derivada _MEC)?
+  * @todo 2 - Funcionalidade para problemas térmicos.
+  * @todo 3 - Geração de elemComp não está associada ao problema (térmico, mecânico, etc), afinal só há uma implementação de elemComp.
+  * @todo 4 - Não seria mais interessante levar os container de elementos e nós para classe base (atualmente na derivada _MEC)?
   * Desta forma, as classes derivadas conteriam apenas implementações específicas, sem novos dados...
   */
 class AnalysisComp

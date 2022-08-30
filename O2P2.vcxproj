@@ -62,6 +62,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>$(SolutionDir)include;$(EIGEN_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OpenMP>GenerateParallelCode</OpenMP>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -79,6 +80,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>$(SolutionDir)include;$(EIGEN_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OpenMP>GenerateParallelCode</OpenMP>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -114,6 +116,7 @@
     <ClInclude Include="include\Elements\Elem_Hex27.h" />
     <ClInclude Include="include\Elements\Elem_Hex64.h" />
     <ClInclude Include="include\Elements\Elem_Hex8.h" />
+    <ClInclude Include="include\Elements\Elem_Lin.h" />
     <ClInclude Include="include\Elements\Elem_Pri18.h" />
     <ClInclude Include="include\Elements\Elem_Pri20.h" />
     <ClInclude Include="include\Elements\Elem_Pri30.h" />

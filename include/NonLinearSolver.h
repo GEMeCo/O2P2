@@ -107,10 +107,6 @@ protected:
   * @note x(i+1) - x(i) -> LHS = Hessian^(-1) . RHS
   * @note f(x) -> RHS = FExt - FInt
   * @note f'(x) -> Hessian
-  *
-  * @todo 1 - Funcionalidade para algorítmo BFGS.
-  * @todo 2 - Funcionalidade para Newton with Line Search.
-  * @todo 3 - Funcionalidade para Newton with Trust Region.
   */
 class NLS_NewtonRaphson : public NonLinearSolver
 {

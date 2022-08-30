@@ -16,6 +16,9 @@
 // ================================================================================================
 #include "AnalysisComp.h"
 
+#include <algorithm>            // for_each
+#include <execution>            // parallel for_each
+
 // ================================================================================================
 //
 // Implementation of AnalysisComp Member Function: initDirichletBC
@@ -92,53 +95,106 @@ template<int nDim> void AnalysisComp_Mec<nDim>::assembleSOE(Eigen::SparseMatrix<
     // Every new iteration requires Hessian to be populated
     Hessian.setZero();
 
-    // Add element contribution to global system
-    std::vector<Eigen::Triplet<double>> triplets;
-
     // Fourth nested loop - Elements
+    std::for_each(std::execution::par, m_ElemComp.begin(), m_ElemComp.end(), [this](auto& elem)
+        {
+            // Matrices sizes
+            int nDof = elem->m_ElemDofIndex.size();
+
+            // Element Internal force and Hessian matrix
+            Eigen::VectorXd elemVec = Eigen::VectorXd::Zero(nDof);
+            Eigen::MatrixXd elemMat = Eigen::MatrixXd::Zero(nDof, nDof);
+
+            // Get element contributions for internal force and hessian matrix
+            elem->getContribution(elemVec, elemMat);
+
+            // Impose Dirichlet boundary conditions on current element
+            // Eigen matrices are stored in column-major order
+            for (int i = 0; i < elemMat.rows(); ++i) {
+                size_t dof = elem->m_ElemDofIndex.at(i);
+
+                for (int j = 0; j < elemMat.cols(); ++j) {
+                    elemMat(j, i) *= this->m_BCIndex.at(dof);
+                    elemMat(i, j) *= this->m_BCIndex.at(dof);
+                }
+
+                elemMat(i, i) += (static_cast<size_t>(1) - this->m_BCIndex.at(dof));
+                elemVec(i) *= this->m_BCIndex.at(dof);
+            }
+
+            // Register element contribution to local triplet
+            for (int i = 0; i < elemMat.cols(); ++i) {
+                for (int j = 0; j < elemMat.rows(); ++j) {
+                    elem->m_elHes.push_back(Eigen::Triplet<double>(static_cast<int>(elem->m_ElemDofIndex.at(j)), static_cast<int>(elem->m_ElemDofIndex.at(i)), elemMat(j, i)));
+                }
+            }
+
+            // Register element contribution to the right hand side vector
+            elemVec.swap(elem->m_elFor);
+        }
+    );
+
+    // Add element contribution to global system
+    std::vector<Eigen::Triplet<double>> gl_triplets;
+
     for (auto& elem : m_ElemComp) {
-
-        // Matrices sizes
-        int nDof = elem->m_ElemDofIndex.size();
-
-        // Element Internal force and Hessian matrix
-        Eigen::VectorXd elemVec = Eigen::VectorXd::Zero(nDof);
-        Eigen::MatrixXd elemMat = Eigen::MatrixXd::Zero(nDof, nDof);
-
-        // Get element contributions for internal force and hessian matrix
-        elem->getContribution(elemVec, elemMat);
-
-        // Impose Dirichlet boundary conditions on current element
-        // Eigen matrices are stored in column-major order
-        for (int i = 0; i < elemMat.rows(); ++i) {
-            size_t dof = elem->m_ElemDofIndex.at(i);
-
-            for (int j = 0; j < elemMat.cols(); ++j) {
-                elemMat(j, i) *= this->m_BCIndex.at(dof);
-                elemMat(i, j) *= this->m_BCIndex.at(dof);
-            }
-
-            elemMat(i, i) += (static_cast<size_t>(1) - this->m_BCIndex.at(dof));
-            elemVec(i) *= this->m_BCIndex.at(dof);
-        }
-
-        // Add element contribution to global system
-        for (int i = 0; i < elemMat.cols(); ++i) {
-            for (int j = 0; j < elemMat.rows(); ++j) {
-                //if (std::abs(elemMat(j, i)) > 1.e-4) {
-                    triplets.push_back(Eigen::Triplet<double>(static_cast<int>(elem->m_ElemDofIndex.at(j)), static_cast<int>(elem->m_ElemDofIndex.at(i)), elemMat(j, i)));
-                    //triplets.push_back(Eigen::Triplet<double>(static_cast<int>(elem->m_ElemDofIndex.at(i)), static_cast<int>(elem->m_ElemDofIndex.at(j)), elemMat(i, j)));
-                //}
-            }
-        }
+        std::move(elem->m_elHes.begin(), elem->m_elHes.end(), std::back_inserter(gl_triplets));
+        elem->m_elHes.erase(elem->m_elHes.begin(), elem->m_elHes.end());
 
         // Add element contribution to the right hand side vector
-        for (int i = 0; i < elemVec.size(); ++i) {
-            RHS(elem->m_ElemDofIndex.at(i)) -= elemVec(i);
+        for (int i = 0; i < elem->m_elFor.size(); ++i) {
+            RHS(elem->m_ElemDofIndex.at(i)) -= elem->m_elFor(i);
         }
     }
 
-    Hessian.setFromTriplets(triplets.begin(), triplets.end());
+
+// I'm getting this way slower than for_each
+//#pragma omp parallel for
+//    //for (auto& elem : m_ElemComp) {
+//    for (std::vector<std::unique_ptr<ElemComp>>::size_type i = 0; i != m_ElemComp.size(); i++)
+//    {
+//        auto& elem = m_ElemComp[i];
+//
+//        // Matrices sizes
+//        int nDof = elem->m_ElemDofIndex.size();
+//
+//        // Element Internal force and Hessian matrix
+//        Eigen::VectorXd elemVec = Eigen::VectorXd::Zero(nDof);
+//        Eigen::MatrixXd elemMat = Eigen::MatrixXd::Zero(nDof, nDof);
+//
+//        // Get element contributions for internal force and hessian matrix
+//        elem->getContribution(elemVec, elemMat);
+//
+//        // Impose Dirichlet boundary conditions on current element
+//        // Eigen matrices are stored in column-major order
+//        for (int i = 0; i < elemMat.rows(); ++i) {
+//            size_t dof = elem->m_ElemDofIndex.at(i);
+//
+//            for (int j = 0; j < elemMat.cols(); ++j) {
+//                elemMat(j, i) *= this->m_BCIndex.at(dof);
+//                elemMat(i, j) *= this->m_BCIndex.at(dof);
+//            }
+//
+//            elemMat(i, i) += (static_cast<size_t>(1) - this->m_BCIndex.at(dof));
+//            elemVec(i) *= this->m_BCIndex.at(dof);
+//        }
+//
+//        // Add element contribution to global system
+//        for (int i = 0; i < elemMat.cols(); ++i) {
+//            for (int j = 0; j < elemMat.rows(); ++j) {
+//#pragma omp critical
+//                gl_triplets.push_back(Eigen::Triplet<double>(static_cast<int>(elem->m_ElemDofIndex.at(j)), static_cast<int>(elem->m_ElemDofIndex.at(i)), elemMat(j, i)));
+//            }
+//        }
+//
+//        // Add element contribution to the right hand side vector
+//        for (int i = 0; i < elemVec.size(); ++i) {
+//#pragma omp critical
+//            RHS(elem->m_ElemDofIndex.at(i)) -= elemVec(i);
+//        }
+//    }
+
+    Hessian.setFromTriplets(gl_triplets.begin(), gl_triplets.end());
 }
 
 

@@ -248,9 +248,11 @@ int main(int argc, char** args)
   *      - Microsoft Visual Studio Community 2022, Version 17.2.6
   *      - Intel Libraries for oneAPI, Package ID: w_oneAPI_2021.2.0.256
   *      - Intel C++ Compiler, Package ID: w_oneAPI_2021.2.0.256
+  *      - [AcadView](https://set.eesc.usp.br/?page_id=237)
   *
   * @warning Software under development. Improper use will crash your application.
-  * @note A  profiler will create a file named "results.json", but only in debug mode. Just open the google chrome in address chrome://tracing and drag/paste the file.
+  * @warning This is a research software. There are neither pre-processor nor post-processor. For now, output was made only for displacements, using AcadView.
+  * @note A profiler will create a file named "results.json", but only in debug mode. Just open the google chrome in address chrome://tracing and drag/paste the file.
   *
   * @todo 1 - Incluir fluxogramas no detalhamento dos módulos (arquivo O2P2.cpp).
   * @todo 2 - Complementar documentação dos módulos

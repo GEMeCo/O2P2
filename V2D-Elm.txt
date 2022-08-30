@@ -23,6 +23,8 @@ Tipo (1-linear; 2-plano); Dados
 Dados relacionados aos elementos
 ---------------------------------------
 Tipos de Elemento:
+1 - Elemento linear
+  - Aproximações linear, quadrática e cúbica (2 a 4 nós), com integração de 2 a 4 pontos de Gauss
 2 - Elemento triangular
   - Aproximações linear (3 nós, com 1, 3, 4, 6, 7, 12 ou 13 pontos de Hammer)
                  quadrática (6 nós, com 3, 4, 6, 7, 12 ou 13 pontos de Hammer)
