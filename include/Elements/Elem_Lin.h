@@ -27,6 +27,8 @@
   * @tparam nDim The dimensionality of the problem. It is either 2 or 3 (bidimensional or tridimensional).
   * @tparam nNodes Number of nodes. Must be: 2, 3 or 4.
   * @tparam nIP Number of integration points. Must be: 2, 3 or 4.
+  * 
+  * @todo setGeomProperties of line elements
   */
 template<int nDim, int nNodes, int nIP>
 class Elem_Lin : public ElementLinear<nDim>
@@ -70,6 +72,9 @@ public:
 	// Evaluates the derivative of shape function in the point.
 	Eigen::MatrixXd getShapeDerivOnPoint(const double* Point) override;
 
+	// Return a vector with values on the integration points currently known in the element' nodes.
+	Eigen::VectorXd getValueOnIPs(const double* value) override;
+
 	// Returns a pointer to the first element of the shape functions (with size [nIP][nNodes]).
 	double const* getShapeFc() const override { return &m_Psi[0][0]; };
 
@@ -89,6 +94,10 @@ public:
 	int getNumIP() override { return nIP; };
 
 private:
+	// Evaluate Length (saving in . Must be called after setting the conectivity.
+	void setGeomProperties() override;
+
+private:
 	/** @brief Weights for numerical integration */
 	static const double* m_weight;
 
@@ -97,8 +106,8 @@ private:
 
 	/** @brief Shape functions derivative */
 	static const double m_DPsi[nIP][nNodes];
-
 };
+
 
 // ================================================================================================
 //
@@ -472,6 +481,46 @@ template<> inline Eigen::MatrixXd Elem_Lin<3, 4, 4>::getShapeDerivOnPoint(const 
 
 	return DPsi;
 };
+
+
+// ================================================================================================
+//
+// Implementation of Member Function: setGeomProperties
+// Evaluate initial properties
+// 
+// ================================================================================================
+template<int nDim, int nNodes, int nIP>
+inline void Elem_Lin<nDim, nNodes, nIP>::setGeomProperties() {
+
+	// Allocate an array with size m_Dim to which m_Centroid points to.
+	this->m_Centroid = std::make_unique<double[]>(nDim);
+
+	// Memory requested by make_unique is not empty
+	for (int i = 0; i < nDim; ++i) this->m_Centroid[i] = 0.;
+};
+
+
+// ================================================================================================
+//
+// Implementation of Member Function: getValueOnIPs
+// Return the values on the integration points currently known in the element' nodes
+// 
+// ================================================================================================
+template<int nDim, int nNodes, int nIP>
+inline Eigen::VectorXd Elem_Lin<nDim, nNodes, nIP>::getValueOnIPs(const double* value) {
+
+	// return value
+	Eigen::VectorXd valueOnIp = Eigen::VectorXd::Zero(nNodes);
+
+	for (int i = 0; i < nIP; i++) {
+		for (int j = 0; j < nNodes; j++) {
+			valueOnIp(i) += value[i] * m_Psi[i][j];
+		}
+	}
+
+	return valueOnIp;
+};
+
 
 // ================================================================================================
 //

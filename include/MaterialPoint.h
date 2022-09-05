@@ -48,8 +48,24 @@ public:
 	* @param Jacobian Reference jacobian matrix - A0 / F0.
 	*/
 	MaterialPoint(const Eigen::MatrixXd& Jacobian) {
-		m_RefJacobian = Jacobian.inverse();
-		m_Jacobian = Jacobian.determinant();
+		if (Jacobian.rows() == Jacobian.cols())
+		{
+			// Plane element in 2D, or solid elements in 3D
+			m_RefJacobian = Jacobian.inverse();
+			m_Jacobian = Jacobian.determinant();
+		}
+		else
+		{
+			// Linear element
+			// m_RefJacobian should be the initial length in each direction
+			m_RefJacobian = Jacobian;
+
+			// and m_Jacobian is dA0
+			for (int i = 0; i < Jacobian.rows(); ++i) {
+				m_Jacobian += Jacobian(i, 0) * Jacobian(i, 0);
+			}
+			m_Jacobian = 1. / m_Jacobian;
+		}
 	};
 
 	/**

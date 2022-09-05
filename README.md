@@ -38,7 +38,7 @@ About
 Object oriented platform for the Positional Finite Element Method applied to Thermomechanical Problems, an object oriented framework for the finite element method based on positions. Developed for non-linear coupled thermo-mechanical analyzes.
 
 Citation
-________
+--------
   Whether it was used in whole or parts, citation is a must! Our software is under development, and a proper presentation paper is underway.
   For now, if you may, cite the following papers (since it was used for validations):
   - Version 1: CARRAZEDO, R.; CODA, H. B. Triangular based prismatic finite element for the analysis of orthotropic laminated beams, plates and shells. Composite Structures, v. 168, p. 234-246, 2017.
@@ -59,7 +59,7 @@ Resources
 ---------
 The following libraries have to be pre-instaled:
 
-- [Eigen C++ Libraries, version 1.76.0](https://eigen.tuxfamily.org/)
+- [Eigen C++ Libraries, version 3.4.0](https://eigen.tuxfamily.org/)
 - [Microsoft Visual Studio Community 2019, Version 16.11.14](https://visualstudio.microsoft.com/)
 - [Intel C++ Compiler, Package ID: w_oneAPI_2021.2.0.243](https://software.intel.com/content/www/us/en/develop/tools/oneapi.html)
 

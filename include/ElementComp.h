@@ -14,6 +14,7 @@
 #include <vector>		// required by std::vector
 #include <memory>		// required by std::shared_pointer
 #include <utility>		// required by std::make_pair
+#include <assert.h>		// required by assert
 
 // Custom libraries
 #include "Element.h"
@@ -40,7 +41,7 @@
   * Uma depende da outra, e tem notações distintas (matricial e Voigt). Poderia registrar só Voigt e retornar conforme solicitado.
   * Será que o overhead seria muito grande? E o uso de memória, mantido (afinal está usando temporárias)?
   * @todo 3 - getConstitutiveMatrix não depende da temperatura?
-  * @todo 4 - Não deveria estar em função da seção transversal em algum lugar (2D)?
+  * 
   */
 class ElemComp
 {
@@ -59,12 +60,16 @@ protected:
 	ElemComp() { m_nDof = 0; };
 
 	/** @return a pointer to the element indexing, after casting.
+	  *
+	  * @tparam nDim The dimensionality of the problem. It is either 2 or 3 (bidimensional or tridimensional).
 	  */
 	template<int nDim>
 	std::vector<std::shared_ptr<Node<nDim>>> getConectivity() { return nullptr; };
 
 	/** @return a pointer to a node.
 	  * @param index Element convectivity container index.
+	  *
+	  * @tparam nDim The dimensionality of the problem. It is either 2 or 3 (bidimensional or tridimensional).
 	  */
 	template<int nDim>
 	Node<nDim>* getConectivity(const int& index) { return nullptr; };
@@ -128,10 +133,17 @@ protected:
 	  */
 	Eigen::MatrixXd getConstitutiveMatrix();
 
+	/** @return Young modulus for linear elements. 
+	  */
+	double getYoungModulus();
+
 	/** Prepare element contribution fo SVK_ISO material.
 	  * @param FInt Element contribution to the internal force.
 	  * @param Hessian Element contribution to the hessian matrix.
+	  *
+	  * @tparam nElDim The dimensionality of the element. It can be 1, 2 or 3 (linear, plane or solid).
 	  */
+	template<int nElDim>
 	void getContribution_SVK_ISO(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian);
 
 	/** @return a pointer to the element indexing, after casting.

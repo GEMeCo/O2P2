@@ -60,13 +60,13 @@ public:
 	virtual const std::string printByAdder_AV(const size_t add) const = 0;
 
 	/** Evaluates shape function in the point.
-	  * @return Returns a vector with the shape function.
+	  * @return a vector with the shape function.
 	  * @param Point Dimensionless coordinates of the point.
 	  */
 	virtual Eigen::VectorXd getShapeFcOnPoint(const double* Point) = 0;
 
 	/** Evaluates the derivative of shape function in the point.
-	  * @return Returns a matrix with the value of the derivative of shape functions.
+	  * @return a matrix with the value of the derivative of shape functions.
 	  * @param Point Dimensionless coordinates of the point.
 	  */
 	virtual Eigen::MatrixXd getShapeDerivOnPoint(const double* Point) = 0;
@@ -80,7 +80,12 @@ public:
 	/** @return a pointer to the weight of the integation points (with size [m_NumIP]). */
 	virtual double const* getWeight() const = 0;
 
-	/** @return the number of nodes of current element. */
+	/** return a vector with values on the integration points currently known in the element' nodes (such as temperature).
+	  * @param value element nodal values of the required parameter. There must be the same number of values than there are nodes in the element.
+	  */
+	virtual Eigen::VectorXd getValueOnIPs(const double* value) = 0;
+
+		/** @return the number of nodes of current element. */
 	virtual int getNumNodes() = 0;
 
 	/** @return the number of faces of current element. */

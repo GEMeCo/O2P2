@@ -35,11 +35,12 @@ template void ElemComponent<3>::setMaterialPoint();
 template<int nDim> void ElemComponent<nDim>::setMaterialPoint()
 {
 	int nIP = m_pElem->getNumIP();
+	int nElDim = m_pElem->getDIM();
 
 	// One material point for each integration point
 	for (int i = 0; i < nIP; ++i) {
 		// Once created, evaluates F0 (Ref. Jacobian)
-		Eigen::MatrixXd F0 = Eigen::MatrixXd::Zero(nDim, nDim);
+		Eigen::MatrixXd F0 = Eigen::MatrixXd::Zero(nDim, nElDim);
 
 		// Some pointer arithmetic is required
 		int n = i * m_pElem->getNumNodes() * nDim;
@@ -48,18 +49,10 @@ template<int nDim> void ElemComponent<nDim>::setMaterialPoint()
 			for (int m = 0; m < m_pElem->getNumNodes(); ++m) {
 				auto node = getConectivity(m);
 
-				for (int k = 0; k < nDim; ++k) {
-					F0(j, k) += node->getInitPos()[j] * *(m_pElem->getShapeDerivative() + n + m*nDim + k);
+				for (int k = 0; k < nElDim; ++k) {
+					F0(j, k) += node->getInitPos()[j] * *(m_pElem->getShapeDerivative() + n + m*nElDim + k);
 				}
 			}
-
-			//int m = 0;
-			//for (auto& node : getConectivity()) {
-			//	for (int k = 0; k < nDim; k++) {
-			//		F0(k, j) += node->getInitPos()[j] * *(m_pElem->getShapeDerivative() + n + m);
-			//		m++;
-			//	}
-			//}
 		}
 
 		// Record the Jacobian Matrix on every Material (Integration) point
@@ -70,7 +63,38 @@ template<int nDim> void ElemComponent<nDim>::setMaterialPoint()
 
 // ================================================================================================
 //
-// Implementation of ElemComp Member Function (2D only): getConstitutiveMatrix
+// Implementation of ElemComp Member Function: getYoungModulus
+//
+// ================================================================================================
+template<int nDim>
+double ElemComponent<nDim>::getYoungModulus()
+{
+	// Dimensionality of the element
+	auto nElDim = m_pElem->getDIM();
+
+	assert((nElDim == 1) && "ElemComponent<nDim>::getYoungModulus() should only be used with linear elements");
+
+	// Downcasting to linear element.
+	ElementLinear<nDim>* pElem = static_cast<ElementLinear<nDim>*> (m_pElem.get());
+
+	// Pointer to section
+	auto pSec = pElem->getSection();
+
+	// Pointer to the material
+	auto pMat = pElem->getMaterial();
+
+	// Should also downcast to SVK material
+	Mat_SVK_ISO* pSVK_Mat = static_cast<Mat_SVK_ISO*> (pMat);
+
+	double E = pSVK_Mat->getLongitudinalModulus() * pSec->getSection();
+
+	return E;
+}
+
+
+// ================================================================================================
+//
+// Specialization of ElemComp Member Function (2D only): getConstitutiveMatrix
 //
 // ================================================================================================
 template<>
@@ -87,6 +111,9 @@ Eigen::MatrixXd ElemComponent<2>::getConstitutiveMatrix()
 
 	// Plane State Type
 	auto PS = pSec->getPS();
+
+	// Thickness
+	auto tk = pSec->getSection();
 
 	// Pointer to the material
 	auto pMat = pElem->getMaterial();
@@ -128,13 +155,13 @@ Eigen::MatrixXd ElemComponent<2>::getConstitutiveMatrix()
 		E(2, 2) = G * 2.;
 	}
 
-	return E;
+	return E * tk;
 };
 
 
 // ================================================================================================
 //
-// Implementation of ElemComp Member Function (3D only): getConstitutiveMatrix
+// Specialization of ElemComp Member Function (3D only): getConstitutiveMatrix
 //
 // ================================================================================================
 template<>
@@ -194,9 +221,22 @@ template<int nDim>
 void ElemComponent<nDim>::getContribution(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian)
 {
 	auto pMat = m_pElem->getMaterial();
+	auto nElDim = m_pElem->getDIM();
 
-	if (pMat->getMaterialType() == MaterialType::SVK_ISO)
-		this->getContribution_SVK_ISO(FInt, Hessian);
+	if (nElDim == 1) {
+		if (pMat->getMaterialType() == MaterialType::SVK_ISO)
+			this->getContribution_SVK_ISO<1>(FInt, Hessian);
+	}
+
+	if (nElDim == 2) {
+		if (pMat->getMaterialType() == MaterialType::SVK_ISO)
+			this->getContribution_SVK_ISO<2>(FInt, Hessian);
+	}
+
+	if (nElDim == 3) {
+		if (pMat->getMaterialType() == MaterialType::SVK_ISO)
+			this->getContribution_SVK_ISO<3>(FInt, Hessian);
+	}
 };
 
 
@@ -205,7 +245,123 @@ void ElemComponent<nDim>::getContribution(Eigen::VectorXd& FInt, Eigen::MatrixXd
 // Specialization of ElemComp Member Function: getContribution_SVK_ISO
 //
 // ================================================================================================
-template<int nDim>
+template<> template<>
+void ElemComponent<2>::getContribution_SVK_ISO<1>(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian)
+{
+	// Pointer to the first Shape Fuctions Derivative (const static)
+	auto pShape = m_pElem->getShapeDerivative();
+	auto pWeight = m_pElem->getWeight();
+
+	auto nNodes = m_pElem->getNumNodes();
+	auto nIP = m_pElem->getNumIP();
+
+	const int nDim = 2;
+
+	// One material point for each integration point
+	for (int i = 0; i < nIP; ++i) {
+
+		// For fiber elements, F0 and F1 holds the initial and current length in each direction
+		Eigen::MatrixXd F1 = Eigen::MatrixXd::Zero(nDim, 1);
+
+		// Some pointer arithmetic is required
+		int n = i * m_pElem->getNumNodes() * nDim;
+
+		for (int j = 0; j < nDim; ++j) {
+			int m = 0;
+
+			for (auto& node : getConectivity()) {
+				F1(j, 0) += node->getTrial()[j] * *(m_pElem->getShapeDerivative() + n + m);
+				m++;
+			}
+		}
+
+		double dA0 = m_MatPoint[i]->getJacobian();
+		double dA1 = 0.;
+
+		for (int j = 0; j < nDim; ++j) {
+			dA1 += F1(j, 0) * F1(j, 0);
+		}
+
+		// Green-Lagrange Strain
+		double L = 0.5 * (dA1 - dA0) * dA0;
+
+		// Elasticity properties
+		double E = this->getYoungModulus();
+
+		// Second Piola-Kirchhoff Stress
+		double S = E * L;
+
+		// Green-Lagrange Strain Derivative
+		Eigen::VectorXd dLdy = Eigen::VectorXd::Zero(nDim);
+
+		for (int j = 0; j < nDim; ++j) {
+			dLdy(j) = F1(j, 0) * F1(j, 0) * dA0;
+		}
+
+		// Green-Lagrange Strain Second Derivative
+		// It is the same in every direction, and equal to dA0
+		double d2Ldy2 = dA0;
+
+		// Specific energy derivative
+		double dUedy = S * d2Ldy2;
+
+		// Weight for Gauss point and Jacobian
+		double numInt = *(pWeight + i) * this->m_MatPoint[i]->getJacobian();
+
+		// Integration of the specific energy derivative = internal force
+		for (int j = 0; j < nNodes; ++j) {
+			FInt(j) += dUedy * *(pShape + n + j) * numInt;
+		}
+
+		// Auxiliary for Hessian matrix
+		Eigen::MatrixXd auxH = Eigen::MatrixXd::Zero(nDim, nDim);
+
+		for (int j = 0; j < nDim; ++j) {
+			for (int k = 0; k < nDim; ++k) {
+				auxH(j, k) = E * dLdy(j) * dLdy(k);
+			}
+			auxH(j, j) += S * d2Ldy2;
+		}
+
+		// First part of Hessian
+		Eigen::MatrixXd H1 = Eigen::MatrixXd::Zero(nDim, nDim * nNodes);
+
+		// Kronecker delta
+		Eigen::MatrixXd I = Eigen::MatrixXd::Identity(nDim, nDim);
+
+		for (int j = 0; j < nNodes; ++j) {
+			for (int k = 0; k < nDim; ++k) {
+				for (int l = 0; l < nDim; ++l) {
+					for (int m = 0; m < nDim; ++m) {
+						H1(l, j * nDim + k) += auxH(l, m) * I(m, k) * *(pShape + n + j);
+					}
+				}
+			}
+		}
+
+		// Local Hessian
+		for (int j = 0; j < nNodes; ++j) {
+			for (int k = 0; k < nDim; ++k) {
+
+				for (int l = 0; l < nNodes; ++l) {
+					for (int m = 0; m < nDim; ++m) {
+
+						for (int o = 0; o < nDim; ++o) {
+							Hessian(j * nNodes + k, l * nNodes + m) += *(pShape + n + j) * I(o, k) * H1(o, l * nNodes + m) * numInt;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+// ================================================================================================
+//
+// Implementation of ElemComp Member Function: getContribution_SVK_ISO
+//
+// ================================================================================================
+template<int nDim> template<int nElDim>
 void ElemComponent<nDim>::getContribution_SVK_ISO(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian)
 {
 	// Pointer to the first Shape Fuctions Derivative (const static)

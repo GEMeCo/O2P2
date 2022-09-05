@@ -119,6 +119,9 @@ public:
 	// Evaluates the derivative of shape function in the point.
 	Eigen::MatrixXd getShapeDerivOnPoint(const double* Point) override;
 
+	// Return a vector with values on the integration points currently known in the element' nodes.
+	Eigen::VectorXd getValueOnIPs(const double* value) override;
+
 	// Returns a pointer to the first element of the shape functions (with size [nIP][m_NumNodes]).
 	double const* getShapeFc() const override { return &m_Psi[0][0]; };
 
@@ -260,6 +263,27 @@ inline Eigen::MatrixXd Elem_Rect20::getShapeDerivOnPoint(const double* Point) {
 	DPsi(19, 1) = 0.010416666666667 * (1. + Point[0] - 9. * Point[0] * Point[0] - 9. * Point[0] * Point[0] * Point[0] + 2. * Point[1] + 2. * Point[0] * Point[1] - 18. * Point[0] * Point[0] * Point[1] - 18. * Point[0] * Point[0] * Point[0] * Point[1] - 12. * Point[1] * Point[1] - 12. * Point[0] * Point[1] * Point[1] + 108. * Point[0] * Point[0] * Point[1] * Point[1] + 108. * Point[0] * Point[0] * Point[0] * Point[1] * Point[1] - 16. * Point[1] * Point[1] * Point[1] - 16. * Point[0] * Point[1] * Point[1] * Point[1] + 144. * Point[0] * Point[0] * Point[1] * Point[1] * Point[1] + 144. * Point[0] * Point[0] * Point[0] * Point[1] * Point[1] * Point[1]);
 
 	return DPsi;
+};
+
+
+// ================================================================================================
+//
+// Implementation of Member Function: getValueOnIPs
+// Return the values on the integration points currently known in the element' nodes
+// 
+// ================================================================================================
+inline Eigen::VectorXd Elem_Rect20::getValueOnIPs(const double* value) {
+
+	// return value
+	Eigen::VectorXd valueOnIp = Eigen::VectorXd::Zero(this->m_NumNodes);
+
+	for (int i = 0; i < m_NumIP; i++) {
+		for (int j = 0; j < this->m_NumNodes; j++) {
+			valueOnIp(i) += value[i] * m_Psi[i][j];
+		}
+	}
+
+	return valueOnIp;
 };
 
 

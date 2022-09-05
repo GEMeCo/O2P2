@@ -97,6 +97,9 @@ public:
 	// Evaluates the derivative of shape function in the point.
 	Eigen::MatrixXd getShapeDerivOnPoint(const double* Point) override;
 
+	// Return a vector with values on the integration points currently known in the element' nodes.
+	Eigen::VectorXd getValueOnIPs(const double* value) override;
+
 	// Returns a pointer to the first element of the shape functions (with size [nIP][m_NumNodes]).
 	double const* getShapeFc() const override { return &m_Psi[0][0]; };
 
@@ -403,6 +406,28 @@ inline void Elem_Pri40::setGeomProperties() {
 	// Since centroid is not the circumcenter, the radius is related to the minimum bounding circle
 	m_Radius = *std::max_element(dist, dist + nVertices);
 };
+
+
+// ================================================================================================
+//
+// Implementation of Member Function: getValueOnIPs
+// Return the values on the integration points currently known in the element' nodes
+// 
+// ================================================================================================
+inline Eigen::VectorXd Elem_Pri40::getValueOnIPs(const double* value) {
+
+	// return value
+	Eigen::VectorXd valueOnIp = Eigen::VectorXd::Zero(m_NumNodes);
+
+	for (int i = 0; i < m_NumIP; i++) {
+		for (int j = 0; j < this->m_NumNodes; j++) {
+			valueOnIp(i) += value[i] * m_Psi[i][j];
+		}
+	}
+
+	return valueOnIp;
+};
+
 
 // ================================================================================================
 //

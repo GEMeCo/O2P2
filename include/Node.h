@@ -63,6 +63,7 @@ public:
 	  */
 	const std::array<double, nDim>& getInitPos() { return this->v_X; };
 
+
 	/** Retrieve the inverse indexing - elements that are connected to the node.
 	  * @return standard vector with elements connected to the node.
 	  */
