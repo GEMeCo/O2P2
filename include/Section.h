@@ -13,47 +13,52 @@
 // Standard libraries
 #include "Common.h"
 
-/** @ingroup PreProcessor_Module
-  * @class Section
-  *
-  * @brief Section definitions, a Domain component.
-  * @details Contains the basic definitions of the cross section of linear and plane elements.
-  * 
-  * @todo Seção transversal de elementos lineares separada dos elementos planos?
-  */
-class Section
-{
-private:
-	Section() = delete;
+namespace O2P2 {
+	namespace Prep {
 
-public:
-	/** Constructor for cross section objects.
-	  * @param sec Cross sectional area / thickness.
-	  */
-	Section(const double& sec) : m_section(sec) {
-		m_PlaneState = PlaneStateType::PLANE_STRESS;
-	};
+		/** @ingroup PreProcessor_Module
+		  * @class Section
+		  *
+		  * @brief Section definitions, a Domain component.
+		  * @details Contains the basic definitions of the cross section of linear and plane elements.
+		  *
+		  * @todo Seção transversal de elementos lineares separada dos elementos planos?
+		  */
+		class Section
+		{
+		private:
+			Section() = delete;
 
-	/** Constructor for cross section objects.
-	  * @param PS Plane state type.
-	  * @param thick Thickness of the plane element.
-	  */
-	Section(const PlaneStateType& PS, const double& thick)
-		: m_section(thick) , m_PlaneState(PS) { };
+		public:
+			/** Constructor for cross section objects.
+			  * @param sec Cross sectional area / thickness.
+			  */
+			Section(const double& sec) : m_section(sec) {
+				m_PlaneState = PlaneStateType::PLANE_STRESS;
+			};
 
-	/** Defaul destructor. */
-	virtual ~Section() = default;
+			/** Constructor for cross section objects.
+			  * @param PS Plane state type.
+			  * @param thick Thickness of the plane element.
+			  */
+			Section(const PlaneStateType& PS, const double& thick)
+				: m_section(thick), m_PlaneState(PS) { }
 
-	/** @return Cross sectional area / thickness. */
-	double getSection() { return m_section; };
+			// Default destructor of private / protected pointers.
+			virtual ~Section() = default;
 
-	/** @return Plane state type. */
-	PlaneStateType getPS() { return m_PlaneState; };
+			/** @return Cross sectional area / thickness. */
+			double getSection() { return m_section; }
 
-private:
-	/** @brief Cross sectional area for truss elements and thickness for plane elements. */
-	double m_section;
+			/** @return Plane state type. */
+			PlaneStateType getPS() { return m_PlaneState; }
 
-	/** @brief Plane state for plane elements (Stress or Strain Plane State) */
-	PlaneStateType m_PlaneState;
-};
+		private:
+			/** @brief Cross sectional area for truss elements and thickness for plane elements. */
+			double m_section;
+
+			/** @brief Plane state for plane elements (Stress or Strain Plane State) */
+			PlaneStateType m_PlaneState;
+		};
+	} // End of Prep Namespace
+} // End of O2P2 Namespace

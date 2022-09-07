@@ -17,131 +17,137 @@
 // Custom Header Files
 #include "Element.h"
 
-/** @ingroup Elements
-  * @class Elem_Rect12
-  *
-  * @brief Quadrangular cubic / quadratic element with 12 nodes.
-  * @details Plane element, with cubic interpolation functions in one direction and quadratic function in the other, rectangular shaped.
-  * @image html Elem_Quad12.png height=300
-  */
-class Elem_Rect12 : public ElementPlane
-{
-private:
-	Elem_Rect12() = delete;
+namespace O2P2 {
+	namespace Prep {
+		namespace Elem {
+			/** @ingroup Elements
+			  * @class Elem_Rect12
+			  *
+			  * @brief Quadrangular cubic / quadratic element with 12 nodes.
+			  * @details Plane element, with cubic interpolation functions in one direction and quadratic function in the other, rectangular shaped.
+			  * @image html Elem_Quad12.png height=300
+			  */
+			class Elem_Rect12 : public ElementPlane
+			{
+			private:
+				Elem_Rect12() = delete;
 
-public:
-	/** Constructor for rectangular cubic / quadratic elements.
-	  * @param Material Pointer to Material class.
-	  * @param Section Pointer to Section class.
-	  */
-	explicit Elem_Rect12(std::shared_ptr<Material>& Material, std::shared_ptr<Section>& Section)
-		: ElementPlane(Material, Section) { };
+			public:
+				/** Constructor for rectangular cubic / quadratic elements.
+				  * @param Material Pointer to Material class.
+				  * @param Section Pointer to Section class.
+				  */
+				explicit Elem_Rect12(std::shared_ptr<O2P2::Prep::Material>& Material, std::shared_ptr<O2P2::Prep::Section>& Section)
+					: ElementPlane(Material, Section) { }
 
-	// Output function for AcadView, based on element index.
-	const std::string printByIndex_AV(const size_t add) const override {
-		std::stringstream msg;
-		msg << "3 1 " << this->v_Conect[0]->m_index + add << " " << this->v_Conect[1]->m_index + add << " "
-			<< this->v_Conect[4]->m_index + add << " " << this->v_Conect[5]->m_index + add << " "
-			<< this->m_Mat->m_index << "\n";
-		msg << "3 1 " << this->v_Conect[1]->m_index + add << " " << this->v_Conect[2]->m_index + add << " "
-			<< this->v_Conect[5]->m_index + add << " " << this->v_Conect[6]->m_index + add << " "
-			<< this->m_Mat->m_index << "\n";
-		msg << "3 1 " << this->v_Conect[2]->m_index + add << " " << this->v_Conect[3]->m_index + add << " "
-			<< this->v_Conect[6]->m_index + add << " " << this->v_Conect[7]->m_index + add << " "
-			<< this->m_Mat->m_index << "\n";
-		msg << "3 1 " << this->v_Conect[4]->m_index + add << " " << this->v_Conect[5]->m_index + add << " "
-			<< this->v_Conect[8]->m_index + add << " " << this->v_Conect[9]->m_index + add << " "
-			<< this->m_Mat->m_index << "\n";
-		msg << "3 1 " << this->v_Conect[5]->m_index + add << " " << this->v_Conect[6]->m_index + add << " "
-			<< this->v_Conect[9]->m_index + add << " " << this->v_Conect[10]->m_index + add << " "
-			<< this->m_Mat->m_index << "\n";
-		msg << "3 1 " << this->v_Conect[6]->m_index + add << " " << this->v_Conect[7]->m_index + add << " "
-			<< this->v_Conect[10]->m_index + add << " " << this->v_Conect[11]->m_index + add << " "
-			<< this->m_Mat->m_index << "\n";
-		return msg.str();
-	};
+				// Output function for AcadView, based on element index.
+				const std::string printByIndex_AV(const size_t add) const override {
+					std::stringstream msg;
+					msg << "3 1 " << this->v_Conect[0]->m_index + add << " " << this->v_Conect[1]->m_index + add << " "
+						<< this->v_Conect[4]->m_index + add << " " << this->v_Conect[5]->m_index + add << " "
+						<< this->m_Mat->m_index << "\n";
+					msg << "3 1 " << this->v_Conect[1]->m_index + add << " " << this->v_Conect[2]->m_index + add << " "
+						<< this->v_Conect[5]->m_index + add << " " << this->v_Conect[6]->m_index + add << " "
+						<< this->m_Mat->m_index << "\n";
+					msg << "3 1 " << this->v_Conect[2]->m_index + add << " " << this->v_Conect[3]->m_index + add << " "
+						<< this->v_Conect[6]->m_index + add << " " << this->v_Conect[7]->m_index + add << " "
+						<< this->m_Mat->m_index << "\n";
+					msg << "3 1 " << this->v_Conect[4]->m_index + add << " " << this->v_Conect[5]->m_index + add << " "
+						<< this->v_Conect[8]->m_index + add << " " << this->v_Conect[9]->m_index + add << " "
+						<< this->m_Mat->m_index << "\n";
+					msg << "3 1 " << this->v_Conect[5]->m_index + add << " " << this->v_Conect[6]->m_index + add << " "
+						<< this->v_Conect[9]->m_index + add << " " << this->v_Conect[10]->m_index + add << " "
+						<< this->m_Mat->m_index << "\n";
+					msg << "3 1 " << this->v_Conect[6]->m_index + add << " " << this->v_Conect[7]->m_index + add << " "
+						<< this->v_Conect[10]->m_index + add << " " << this->v_Conect[11]->m_index + add << " "
+						<< this->m_Mat->m_index << "\n";
+					return msg.str();
+				}
 
-	// Output function for AcadView, based on element node number.
-	const std::string printByAdder_AV(const size_t add) const override {
-		std::stringstream msg;
-		msg << "3 1 " << (1 + add) << " " << (2 + add) << " " << (5 + add) << " " << (6 + add)
-			<< " " << this->m_Mat->m_index << "\n";
-		msg << "3 1 " << (2 + add) << " " << (3 + add) << " " << (6 + add) << " " << (7 + add)
-			<< " " << this->m_Mat->m_index << "\n";
-		msg << "3 1 " << (3 + add) << " " << (4 + add) << " " << (7 + add) << " " << (8 + add)
-			<< " " << this->m_Mat->m_index << "\n";
-		msg << "3 1 " << (5 + add) << " " << (6 + add) << " " << (9 + add) << " " << (10 + add)
-			<< " " << this->m_Mat->m_index << "\n";
-		msg << "3 1 " << (6 + add) << " " << (7 + add) << " " << (10 + add) << " " << (11 + add)
-			<< " " << this->m_Mat->m_index << "\n";
-		msg << "3 1 " << (7 + add) << " " << (8 + add) << " " << (11 + add) << " " << (12 + add)
-			<< " " << this->m_Mat->m_index << "\n";
-		return msg.str();
-	};
+				// Output function for AcadView, based on element node number.
+				const std::string printByAdder_AV(const size_t add) const override {
+					std::stringstream msg;
+					msg << "3 1 " << (1 + add) << " " << (2 + add) << " " << (5 + add) << " " << (6 + add)
+						<< " " << this->m_Mat->m_index << "\n";
+					msg << "3 1 " << (2 + add) << " " << (3 + add) << " " << (6 + add) << " " << (7 + add)
+						<< " " << this->m_Mat->m_index << "\n";
+					msg << "3 1 " << (3 + add) << " " << (4 + add) << " " << (7 + add) << " " << (8 + add)
+						<< " " << this->m_Mat->m_index << "\n";
+					msg << "3 1 " << (5 + add) << " " << (6 + add) << " " << (9 + add) << " " << (10 + add)
+						<< " " << this->m_Mat->m_index << "\n";
+					msg << "3 1 " << (6 + add) << " " << (7 + add) << " " << (10 + add) << " " << (11 + add)
+						<< " " << this->m_Mat->m_index << "\n";
+					msg << "3 1 " << (7 + add) << " " << (8 + add) << " " << (11 + add) << " " << (12 + add)
+						<< " " << this->m_Mat->m_index << "\n";
+					return msg.str();
+				}
 
-	// Evaluates shape function in the point.
-	Eigen::VectorXd getShapeFcOnPoint(const double* Point) override;
+				// Evaluates shape function in the point.
+				Eigen::VectorXd getShapeFcOnPoint(const double* Point) override;
 
-	// Evaluates the derivative of shape function in the point.
-	Eigen::MatrixXd getShapeDerivOnPoint(const double* Point) override;
+				// Evaluates the derivative of shape function in the point.
+				Eigen::MatrixXd getShapeDerivOnPoint(const double* Point) override;
 
-	// Return a vector with values on the integration points currently known in the element' nodes.
-	Eigen::VectorXd getValueOnIPs(const double* value) override;
+				// Return a vector with values on the integration points currently known in the element' nodes.
+				Eigen::VectorXd getValueOnIPs(const double* value) override;
 
-	// Returns a pointer to the first element of the shape functions (with size [nIP][m_NumNodes]).
-	double const* getShapeFc() const override { return &m_Psi[0][0]; };
+				// Returns a pointer to the first element of the shape functions (with size [nIP][m_NumNodes]).
+				double const* getShapeFc() const override { return &m_Psi[0][0]; }
 
-	// Returns a pointer to the first element of the derivative of shape functions (with size [nIP][m_NumNodes][m_Dim]).
-	double const* getShapeDerivative() const override { return &m_DPsi[0][0][0]; };
+				// Returns a pointer to the first element of the derivative of shape functions (with size [nIP][m_NumNodes][m_Dim]).
+				double const* getShapeDerivative() const override { return &m_DPsi[0][0][0]; }
 
-	// Returns a pointer to the weight of the integation points (with size [nIP]).
-	double const* getWeight() const override { return &m_weight[0]; };
+				// Returns a pointer to the weight of the integation points (with size [nIP]).
+				double const* getWeight() const override { return &m_weight[0]; }
 
-	// Returns the number of nodes of current element.
-	int getNumNodes() override { return m_NumNodes; };
+				// Returns the number of nodes of current element.
+				int getNumNodes() override { return m_NumNodes; }
 
-	// Returns the number of faces of current element.
-	int getNumFaces() override { return m_NumFaces; };
+				// Returns the number of faces of current element.
+				int getNumFaces() override { return m_NumFaces; }
 
-	// Returns the number of integration points of current element.
-	int getNumIP() override { return m_NumIP; };
+				// Returns the number of integration points of current element.
+				int getNumIP() override { return m_NumIP; }
 
-	/** Verifies dimensionless coordinates from input - if it is immersed on the element.
-	  * @return True if input falls within the element.
-	  * @param xsi Trial dimensionless coordinates.
-	  */
-	bool evaluateXsi(const std::array<double, m_Dim> xsi) override {
-		const auto [min, max] = std::minmax_element(xsi.begin(), xsi.end());
-		if (*max < 1.000001 && *min > -1.000001) return true;
-		return false;
-	};
+				/** Verifies dimensionless coordinates from input - if it is immersed on the element.
+				  * @return True if input falls within the element.
+				  * @param xsi Trial dimensionless coordinates.
+				  */
+				bool evaluateXsi(const std::array<double, m_Dim> xsi) override {
+					const auto [min, max] = std::minmax_element(xsi.begin(), xsi.end());
+					if (*max < 1.000001 && *min > -1.000001) return true;
+					return false;
+				}
 
-private:
-	// Evaluate centroid and circumsphere Radius. Must be called after setting the conectivity.
-	void setGeomProperties() override;
+			private:
+				// Evaluate centroid and circumsphere Radius. Must be called after setting the conectivity.
+				void setGeomProperties() override;
 
-private:
-	/** @brief Number of Nodes */
-	static const int m_NumNodes{ 12 };
+			private:
+				/** @brief Number of Nodes */
+				static const int m_NumNodes{ 12 };
 
-	/** @brief Number of Integration Points */
-	static const int m_NumIP{ 12 };
+				/** @brief Number of Integration Points */
+				static const int m_NumIP{ 12 };
 
-	/** @brief Number of Faces (for output purposes) */
-	static const int m_NumFaces{ 6 };
+				/** @brief Number of Faces (for output purposes) */
+				static const int m_NumFaces{ 6 };
 
-	/** @brief Weights for numerical integration */
-	static const double m_weight[m_NumIP];
+				/** @brief Weights for numerical integration */
+				static const double m_weight[m_NumIP];
 
-	/** @brief Shape functions */
-	static const double m_Psi[m_NumIP][m_NumNodes];
+				/** @brief Shape functions */
+				static const double m_Psi[m_NumIP][m_NumNodes];
 
-	/** @brief Shape functions derivative */
-	static const double m_DPsi[m_NumIP][m_NumNodes][m_Dim];
+				/** @brief Shape functions derivative */
+				static const double m_DPsi[m_NumIP][m_NumNodes][m_Dim];
 
-	// Since the number of Integration points is fixed, the shape functions are also constant (static)
-	static const double m_xsi[m_NumIP][m_Dim];
-};
+				/** @brief Integration points */
+				static const double m_xsi[m_NumIP][m_Dim];
+			};
+		} // End of Elem Namespace
+	} // End of Prep Namespace
+} // End of O2P2 Namespace
 
 
 // ================================================================================================
@@ -150,7 +156,7 @@ private:
 // Shape functions evaluated on Point
 // 
 // ================================================================================================
-inline Eigen::VectorXd Elem_Rect12::getShapeFcOnPoint(const double* Point) {
+inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Rect12::getShapeFcOnPoint(const double* Point) {
 	Eigen::VectorXd Psi(12);
 
 	Psi(0) = 0.03125 * (-9. * Point[0] * Point[0] * Point[0] * Point[1] * Point[1] + 9. * Point[0] * Point[0] * Point[0] * Point[1] + 9. * Point[0] * Point[0] * Point[1] * Point[1] - 9. * Point[0] * Point[0] * Point[1] + Point[0] * Point[1] * Point[1] - Point[0] * Point[1] - Point[1] * Point[1] + Point[1]);
@@ -175,7 +181,7 @@ inline Eigen::VectorXd Elem_Rect12::getShapeFcOnPoint(const double* Point) {
 // Shape functions derivative evaluated on Point
 // 
 // ================================================================================================
-inline Eigen::MatrixXd Elem_Rect12::getShapeDerivOnPoint(const double* Point) {
+inline Eigen::MatrixXd O2P2::Prep::Elem::Elem_Rect12::getShapeDerivOnPoint(const double* Point) {
 	Eigen::MatrixXd DPsi(12, 2);
 
 	DPsi(0, 0) = 0.03125 * (-27. * Point[0] * Point[0] * Point[1] * Point[1] + 27. * Point[0] * Point[0] * Point[1] + 18. * Point[0] * Point[1] * Point[1] - 18. * Point[0] * Point[1] + Point[1] * Point[1] - Point[1]);
@@ -214,7 +220,7 @@ inline Eigen::MatrixXd Elem_Rect12::getShapeDerivOnPoint(const double* Point) {
 // Evaluate initial properties
 // 
 // ================================================================================================
-inline void Elem_Rect12::setGeomProperties() {
+inline void O2P2::Prep::Elem::Elem_Rect12::setGeomProperties() {
 
 	const int nVertices = 4;
 
@@ -222,7 +228,7 @@ inline void Elem_Rect12::setGeomProperties() {
 	m_Centroid = std::make_unique<double[]>(m_Dim);
 
 	// Create a temporary array with the vertices of the polygon
-	std::array<Node<m_Dim>*, nVertices> vertices;
+	std::array<O2P2::Prep::Node<m_Dim>*, nVertices> vertices;
 	vertices[0] = v_Conect[0].get();
 	vertices[1] = v_Conect[3].get();
 	vertices[2] = v_Conect[8].get();
@@ -266,7 +272,7 @@ inline void Elem_Rect12::setGeomProperties() {
 // Return the values on the integration points currently known in the element' nodes
 // 
 // ================================================================================================
-inline Eigen::VectorXd Elem_Rect12::getValueOnIPs(const double* value) {
+inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Rect12::getValueOnIPs(const double* value) {
 
 	// return value
 	Eigen::VectorXd valueOnIp = Eigen::VectorXd::Zero(this->m_NumNodes);
@@ -287,32 +293,33 @@ inline Eigen::VectorXd Elem_Rect12::getValueOnIPs(const double* value) {
 // Integration Points
 //
 // ================================================================================================
-inline const double Elem_Rect12::m_xsi[m_NumIP][m_Dim] = { { -0.861136311594053,  0.000000000000000 } ,
-														   { -0.861136311594053, -0.774596669241483 } ,
-														   { -0.861136311594053,  0.774596669241483 } ,
-														   {  0.861136311594053,  0.000000000000000 } ,
-														   {  0.861136311594053, -0.774596669241483 } ,
-														   {  0.861136311594053,  0.774596669241483 } ,
-														   { -0.339981043584856,  0.000000000000000 } ,
-														   { -0.339981043584856, -0.774596669241483 } ,
-														   { -0.339981043584856,  0.774596669241483 } ,
-														   {  0.339981043584856,  0.000000000000000 } ,
-														   {  0.339981043584856, -0.774596669241483 } ,
-														   {  0.339981043584856,  0.774596669241483 } };
+inline const double O2P2::Prep::Elem::Elem_Rect12::m_xsi[m_NumIP][m_Dim] = {
+	{ -0.861136311594053,  0.000000000000000 } ,
+	{ -0.861136311594053, -0.774596669241483 } ,
+	{ -0.861136311594053,  0.774596669241483 } ,
+	{  0.861136311594053,  0.000000000000000 } ,
+	{  0.861136311594053, -0.774596669241483 } ,
+	{  0.861136311594053,  0.774596669241483 } ,
+	{ -0.339981043584856,  0.000000000000000 } ,
+	{ -0.339981043584856, -0.774596669241483 } ,
+	{ -0.339981043584856,  0.774596669241483 } ,
+	{  0.339981043584856,  0.000000000000000 } ,
+	{  0.339981043584856, -0.774596669241483 } ,
+	{  0.339981043584856,  0.774596669241483 } };
 
 // ================================================================================================
 //
 // Weights for numerical integration
 //
 // ================================================================================================
-inline const double Elem_Rect12::m_weight[m_NumIP] = { 0.309204306788848, 0.193252691743030, 0.193252691743030, 0.309204306788848, 0.193252691743030, 0.193252691743030, 0.579684582100041, 0.362302863812526, 0.362302863812526, 0.579684582100041, 0.362302863812526, 0.362302863812526 };
+inline const double O2P2::Prep::Elem::Elem_Rect12::m_weight[m_NumIP] = { 0.309204306788848, 0.193252691743030, 0.193252691743030, 0.309204306788848, 0.193252691743030, 0.193252691743030, 0.579684582100041, 0.362302863812526, 0.362302863812526, 0.579684582100041, 0.362302863812526, 0.362302863812526 };
 
 // ================================================================================================
 //
 // Shape function
 //
 // ================================================================================================
-inline const double Elem_Rect12::m_Psi[m_NumIP][m_NumNodes] = {
+inline const double O2P2::Prep::Elem::Elem_Rect12::m_Psi[m_NumIP][m_NumNodes] = {
 	{ 0.03125 * (-9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] * m_xsi[0][1] + 9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] + 9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] * m_xsi[0][1] - 9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] + m_xsi[0][0] * m_xsi[0][1] * m_xsi[0][1] - m_xsi[0][0] * m_xsi[0][1] - m_xsi[0][1] * m_xsi[0][1] + m_xsi[0][1]),
 	  0.03125 * (27. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] * m_xsi[0][1] - 27. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] - 9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] * m_xsi[0][1] + 9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] - 27. * m_xsi[0][0] * m_xsi[0][1] * m_xsi[0][1] + 27. * m_xsi[0][0] * m_xsi[0][1] + 9. * m_xsi[0][1] * m_xsi[0][1] - 9. * m_xsi[0][1]),
 	  0.03125 * (-27. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] * m_xsi[0][1] + 27. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] - 9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] * m_xsi[0][1] + 9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] + 27. * m_xsi[0][0] * m_xsi[0][1] * m_xsi[0][1] - 27. * m_xsi[0][0] * m_xsi[0][1] + 9. * m_xsi[0][1] * m_xsi[0][1] - 9. * m_xsi[0][1]),
@@ -475,7 +482,7 @@ inline const double Elem_Rect12::m_Psi[m_NumIP][m_NumNodes] = {
 // Shape functions derivative
 //
 // ================================================================================================
-inline const double Elem_Rect12::m_DPsi[m_NumIP][m_NumNodes][m_Dim] = {
+inline const double O2P2::Prep::Elem::Elem_Rect12::m_DPsi[m_NumIP][m_NumNodes][m_Dim] = {
 	{ { 0.03125 * (-27. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] * m_xsi[0][1] + 27. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] + 18. * m_xsi[0][0] * m_xsi[0][1] * m_xsi[0][1] - 18. * m_xsi[0][0] * m_xsi[0][1] + m_xsi[0][1] * m_xsi[0][1] - m_xsi[0][1]),
 		0.03125 * (-18. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] + 9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] + 18. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] - 9. * m_xsi[0][0] * m_xsi[0][0] + 2. * m_xsi[0][0] * m_xsi[0][1] - m_xsi[0][0] - 2. * m_xsi[0][1] + 1.) },
 	  { 0.03125 * (81. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] * m_xsi[0][1] - 81. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] - 18. * m_xsi[0][0] * m_xsi[0][1] * m_xsi[0][1] + 18. * m_xsi[0][0] * m_xsi[0][1] - 27. * m_xsi[0][1] * m_xsi[0][1] + 27. * m_xsi[0][1]),

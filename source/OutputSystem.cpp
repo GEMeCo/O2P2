@@ -21,11 +21,11 @@
 // Explicit template instantiation
 //
 // ================================================================================================
-template class OutputSystem<2>;
-template class OutputSystem<3>;
+template class O2P2::Post::OutputSystem<2>;
+template class O2P2::Post::OutputSystem<3>;
 
-template void OutputSystem<2>::draw_AcadView_Node(std::ofstream& file, Domain<2>* theDomain, PostProcess* thePost);
-template void OutputSystem<3>::draw_AcadView_Node(std::ofstream& file, Domain<3>* theDomain, PostProcess* thePost);
+template void O2P2::Post::OutputSystem<2>::draw_AcadView_Node(std::ofstream& file, O2P2::Prep::Domain<2>* theDomain, O2P2::Post::PostProcess* thePost);
+template void O2P2::Post::OutputSystem<3>::draw_AcadView_Node(std::ofstream& file, O2P2::Prep::Domain<3>* theDomain, O2P2::Post::PostProcess* thePost);
 
 // ================================================================================================
 //
@@ -33,7 +33,7 @@ template void OutputSystem<3>::draw_AcadView_Node(std::ofstream& file, Domain<3>
 // 
 // ================================================================================================
 template<int nDim>
-void OutputSystem<nDim>::draw_AcadView_Node(std::ofstream& file, Domain<nDim>* theDomain, PostProcess* thePost)
+void O2P2::Post::OutputSystem<nDim>::draw_AcadView_Node(std::ofstream& file, O2P2::Prep::Domain<nDim>* theDomain, O2P2::Post::PostProcess* thePost)
 {
 	file << "Project Description.\n";
 
@@ -96,7 +96,7 @@ void OutputSystem<nDim>::draw_AcadView_Node(std::ofstream& file, Domain<nDim>* t
 // 
 // ================================================================================================
 template<int nDim>
-void OutputSystem<nDim>::draw_AcadView_Elem(std::ofstream& file, Domain<nDim>* theDomain, PostProcess* thePost)
+void O2P2::Post::OutputSystem<nDim>::draw_AcadView_Elem(std::ofstream& file, O2P2::Prep::Domain<nDim>* theDomain, O2P2::Post::PostProcess* thePost)
 {
 	file << "Project Description.\n";
 

@@ -15,7 +15,8 @@ Content on this work is licensed under a Creative Commons Attribution-NonCommeri
 
 This program is free software: you can redistribute it and/or modify it under the terms of the Creative Commons Attribution-NonCommerical 4.0 International license..
 
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See License for more details.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+It is provided "AS IS". In no event shall the authors be liable for any claim, damages or other liability, whether in an action of contract, tort or otherwire, arising from, out of or in connection with the software or the use of other dealing in the software.
 
 Also, this is a research software. There are neither pre-processor nor post-processor. For now, output was made only for displacements, using AcadView.
 
@@ -54,6 +55,8 @@ Features
 - v1: Geometric nonlinear analysis with SVK constitutive model.
 	- v1.1: only 2D elements;
 	- v1.2: 2D and 3D elements;
+	- v1.3: bar elements in 2D and 3D environments;
+	- v1.4: Parallel processing enabled;
 
 Resources
 ---------

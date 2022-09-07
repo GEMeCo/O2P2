@@ -115,31 +115,31 @@ int main(int argc, char** args)
         {
             {
                 Timer timer("FEAnalysis.initComponents");
-                FEAnalysis<2>::initComponents(file);
+                O2P2::FEAnalysis<2>::initComponents(file);
                 file.close();
             }
             {
                 Timer timer("FEAnalysis.runAnalysis");
-                FEAnalysis<2>::runAnalysis();
+                O2P2::FEAnalysis<2>::runAnalysis();
             }
             {
                 Timer timer("FEAnalysis.drawResults");
-                FEAnalysis<2>::drawResults(stProj);
+                O2P2::FEAnalysis<2>::drawResults(stProj);
             }
         }
         else if (nDim == 3) {
             {
                 Timer timer("FEAnalysis.initComponents");
-                FEAnalysis<3>::initComponents(file);
+                O2P2::FEAnalysis<3>::initComponents(file);
                 file.close();
             }
             {
                 Timer timer("FEAnalysis.runAnalysis");
-                FEAnalysis<3>::runAnalysis();
+                O2P2::FEAnalysis<3>::runAnalysis();
             }
             {
                 Timer timer("FEAnalysis.drawResults");
-                FEAnalysis<3>::drawResults(stProj);
+                O2P2::FEAnalysis<3>::drawResults(stProj);
             }
         }
         else {
@@ -192,7 +192,7 @@ int main(int argc, char** args)
 
 /**
   * @mainpage O2P2, an object oriented environment for the positional finite element method.
-  * @image html icon2.png width=50
+  * @image html icon2.png width=100
   * @brief O2P2 is an C++ environment developed for non-linear coupled thermo-mechanical analyzes with the finite element method based on positions.
   *
   * @section first_sec Legal Information
@@ -201,8 +201,13 @@ int main(int argc, char** args)
   * Copyright (C) 2022 Rogério Carrazedo - All Rights Reserved.
   * Structural Engineering Department / University of São Paulo at São Carlos School of Engineering
   *
-  * This program comes with ABSOLUTELY NO WARRANTY.
-  * This is free software, and you are welcome to redistribute it under certain conditions.
+  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  * SOFTWARE.
   *
   * You may use, distribute and even modify this code under terms of Creative Commons Attribution-NonCommerical 4.0 International license.
   * @image html CC-BY-NC.jpg width=150
@@ -216,6 +221,8 @@ int main(int argc, char** args)
   *  @author    [Thiago da Silva Costa Santos](http://lattes.cnpq.br/6048758348229035)
   *  @version   1.3.0.1
   *  @date      2022.09.01
+  * 
+  * @warning None of the developers are software engineers of any sort. We are civil engineers, seeking to solve engineering problems. We know that this software has lots of bugs. We just don't have time to solve them all.
   *
   * @section citation_sec How to cite:
   *
@@ -255,7 +262,7 @@ int main(int argc, char** args)
   * @note A profiler will create a file named "results.json", but only in debug mode. Just open the google chrome in address chrome://tracing and drag/paste the file.
   *
   * @todo 1 - Incluir fluxogramas no detalhamento dos módulos (arquivo O2P2.cpp).
-  * @todo 2 - Complementar documentação dos módulos
+  * @todo 2 - Complementar documentação dos módulos.
   *
   * @defgroup Main_Module O2P2.
   * @brief An object oriented environment for the positional finite element method.

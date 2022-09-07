@@ -23,14 +23,14 @@
 // Explicit template member function instantiation
 //
 // ================================================================================================
-template bool NLS_NewtonRaphson::runNonLinearSolver<AnalysisComp>(AnalysisComp* theModel, const double initialNorm, const bool output);
+template bool O2P2::Proc::NLS_NewtonRaphson::runNonLinearSolver<O2P2::Proc::Mesh>(O2P2::Proc::Mesh* theModel, const double initialNorm, const bool output);
 
 // ================================================================================================
 //
 // Implementation of Template Member Function: runNonLinearSolver
 //
 // ================================================================================================
-template<class T> bool NLS_NewtonRaphson::runNonLinearSolver(T* theModel, const double initialNorm, const bool output)
+template<class T> bool O2P2::Proc::NLS_NewtonRaphson::runNonLinearSolver(T* theModel, const double initialNorm, const bool output)
 {
     // Returns false if results are infeasible.
     bool feasible = false;

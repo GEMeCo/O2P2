@@ -127,7 +127,7 @@ struct Timer
         start = std::chrono::high_resolution_clock::now();
     }
 
-    // Destructor
+    // Destructor of private / protected pointers.
     ~Timer() {
         end = std::chrono::high_resolution_clock::now();
         auto var = end - start;
@@ -145,3 +145,21 @@ struct Timer
         std::cout << "\n------------------------------------------------------------";
     }
 };
+
+// This was included here only for doxygen documentation :)
+// 
+//! Outer bounds of the implementation
+namespace O2P2 {
+    //! Preprocessor classes are gathered in Prep namespace
+    namespace Prep {
+        //! Domain elements are gathered in Elem namespace
+        namespace Elem {}
+    }
+    //! Processor classes are gathered in Proc namespace
+    namespace Proc {
+        //! Processor component elements to build mesh are gathered in Comp namespace
+        namespace Comp {}
+    }
+    //! Post-Processor classes are gathered in Post namespace
+    namespace Post {}
+}

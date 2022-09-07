@@ -18,157 +18,163 @@
 #include "Element.h"
 #include "IntegrationPoint.h"
 
-/** @ingroup Elements
-  * @class Elem_Tet20
-  *
-  * @brief Tetrahedral cubic element with 20 nodes.
-  * @details Solid element, with cubic interpolation functions, tetrahedral shape.
-  * Options for integration points: 10, 11, 14, 15 and 24.
-  * @image html Elem_Tet20.png height=300
-  */
-class Elem_Tet20 : public ElementSolid
-{
-private:
-	Elem_Tet20() = delete;
+namespace O2P2 {
+	namespace Prep {
+		namespace Elem {
+			/** @ingroup Elements
+			  * @class Elem_Tet20
+			  *
+			  * @brief Tetrahedral cubic element with 20 nodes.
+			  * @details Solid element, with cubic interpolation functions, tetrahedral shape.
+			  * Options for integration points: 10, 11, 14, 15 and 24.
+			  * @image html Elem_Tet20.png height=300
+			  */
+			class Elem_Tet20 : public ElementSolid
+			{
+			private:
+				Elem_Tet20() = delete;
 
-protected:
-	/** Constructor for tetrahedral cubic elements.
-	  * @param Material Pointer to Material class.
-	  */
-	explicit Elem_Tet20(std::shared_ptr<Material>& Material)
-		: ElementSolid(Material) { };
+			protected:
+				/** Constructor for tetrahedral cubic elements.
+				  * @param Material Pointer to Material class.
+				  */
+				explicit Elem_Tet20(std::shared_ptr<O2P2::Prep::Material>& Material)
+					: ElementSolid(Material) { }
 
-public:
-	// Output function for AcadView, based on element index.
-	const std::string printByIndex_AV(const size_t add) const override {
-		std::stringstream msg;
-		msg << "2 3 " << this->v_Conect[0]->m_index + add << " " << this->v_Conect[1]->m_index + add << " " << this->v_Conect[2]->m_index + add << " "
-			<< this->v_Conect[3]->m_index + add << " " << this->v_Conect[4]->m_index + add << " " << this->v_Conect[5]->m_index + add << " "
-			<< this->v_Conect[6]->m_index + add << " " << this->v_Conect[7]->m_index + add << " " << this->v_Conect[8]->m_index + add << " "
-			<< this->v_Conect[9]->m_index + add << " " << this->m_Mat->m_index << "\n";
-		msg << "2 3 " << this->v_Conect[0]->m_index + add << " " << this->v_Conect[1]->m_index + add << " " << this->v_Conect[2]->m_index + add << " "
-			<< this->v_Conect[3]->m_index + add <<  " " << this->v_Conect[10]->m_index + add << " " << this->v_Conect[11]->m_index + add << " "
-			<< this->v_Conect[12]->m_index + add << " " << this->v_Conect[16]->m_index + add << " " << this->v_Conect[17]->m_index + add << " "
-			<< this->v_Conect[19]->m_index + add << " " << this->m_Mat->m_index << "\n";
-		msg << "2 3 " << this->v_Conect[0]->m_index + add << " " << this->v_Conect[4]->m_index + add << " " << this->v_Conect[7]->m_index + add << " "
-			<< this->v_Conect[9]->m_index + add <<  " " << this->v_Conect[10]->m_index + add << " " << this->v_Conect[13]->m_index + add << " "
-			<< this->v_Conect[15]->m_index + add << " " << this->v_Conect[16]->m_index + add << " " << this->v_Conect[18]->m_index + add << " "
-			<< this->v_Conect[19]->m_index + add << " " << this->m_Mat->m_index << "\n";
-		msg << "2 3 " << this->v_Conect[3]->m_index + add << " " << this->v_Conect[6]->m_index + add << " " << this->v_Conect[8]->m_index + add << " "
-			<< this->v_Conect[9]->m_index + add <<  " " << this->v_Conect[12]->m_index + add << " " << this->v_Conect[14]->m_index + add << " "
-			<< this->v_Conect[15]->m_index + add << " " << this->v_Conect[17]->m_index + add << " " << this->v_Conect[18]->m_index + add << " "
-			<< this->v_Conect[19]->m_index + add << " " << this->m_Mat->m_index << "\n";
-		return msg.str();
-	};
+			public:
+				// Output function for AcadView, based on element index.
+				const std::string printByIndex_AV(const size_t add) const override {
+					std::stringstream msg;
+					msg << "2 3 " << this->v_Conect[0]->m_index + add << " " << this->v_Conect[1]->m_index + add << " " << this->v_Conect[2]->m_index + add << " "
+						<< this->v_Conect[3]->m_index + add << " " << this->v_Conect[4]->m_index + add << " " << this->v_Conect[5]->m_index + add << " "
+						<< this->v_Conect[6]->m_index + add << " " << this->v_Conect[7]->m_index + add << " " << this->v_Conect[8]->m_index + add << " "
+						<< this->v_Conect[9]->m_index + add << " " << this->m_Mat->m_index << "\n";
+					msg << "2 3 " << this->v_Conect[0]->m_index + add << " " << this->v_Conect[1]->m_index + add << " " << this->v_Conect[2]->m_index + add << " "
+						<< this->v_Conect[3]->m_index + add << " " << this->v_Conect[10]->m_index + add << " " << this->v_Conect[11]->m_index + add << " "
+						<< this->v_Conect[12]->m_index + add << " " << this->v_Conect[16]->m_index + add << " " << this->v_Conect[17]->m_index + add << " "
+						<< this->v_Conect[19]->m_index + add << " " << this->m_Mat->m_index << "\n";
+					msg << "2 3 " << this->v_Conect[0]->m_index + add << " " << this->v_Conect[4]->m_index + add << " " << this->v_Conect[7]->m_index + add << " "
+						<< this->v_Conect[9]->m_index + add << " " << this->v_Conect[10]->m_index + add << " " << this->v_Conect[13]->m_index + add << " "
+						<< this->v_Conect[15]->m_index + add << " " << this->v_Conect[16]->m_index + add << " " << this->v_Conect[18]->m_index + add << " "
+						<< this->v_Conect[19]->m_index + add << " " << this->m_Mat->m_index << "\n";
+					msg << "2 3 " << this->v_Conect[3]->m_index + add << " " << this->v_Conect[6]->m_index + add << " " << this->v_Conect[8]->m_index + add << " "
+						<< this->v_Conect[9]->m_index + add << " " << this->v_Conect[12]->m_index + add << " " << this->v_Conect[14]->m_index + add << " "
+						<< this->v_Conect[15]->m_index + add << " " << this->v_Conect[17]->m_index + add << " " << this->v_Conect[18]->m_index + add << " "
+						<< this->v_Conect[19]->m_index + add << " " << this->m_Mat->m_index << "\n";
+					return msg.str();
+				}
 
-	// Output function for AcadView, based on element node number.
-	const std::string printByAdder_AV(const size_t add) const override {
-		std::stringstream msg;
-		msg << "2 3 " << (1 + add) << " " << (2 + add) << " " << (3 + add) << " " << (4 + add) << " "
-			<< (5 + add) << " " << (6 + add) << " " << (7 + add) << " " << (8 + add) << " "
-			<< (9 + add) << " " << (10 + add) << " " << this->m_Mat->m_index << "\n";
-		msg << "2 3 " << (1 + add) << " " << (2 + add) << " " << (3 + add) << " " << (4 + add) << " "
-			<< (11 + add) << " " << (12 + add) << " " << (13 + add) << " " << (17 + add) << " "
-			<< (18 + add) << " " << (20 + add) << " " << this->m_Mat->m_index << "\n";
-		msg << "2 3 " << (1 + add) << " " << (5 + add) << " " << (8 + add) << " " << (10 + add) << " "
-			<< (11 + add) << " " << (14 + add) << " " << (16 + add) << " " << (17 + add) << " "
-			<< (19 + add) << " " << (20 + add) << " " << this->m_Mat->m_index << "\n";
-		msg << "2 3 " << (4 + add) << " " << (7 + add) << " " << (9 + add) << " " << (10 + add) << " "
-			<< (13 + add) << " " << (15 + add) << " " << (16 + add) << " " << (18 + add) << " "
-			<< (19 + add) << " " << (20 + add) << " " << this->m_Mat->m_index << "\n";
-		return msg.str();
-	};
+				// Output function for AcadView, based on element node number.
+				const std::string printByAdder_AV(const size_t add) const override {
+					std::stringstream msg;
+					msg << "2 3 " << (1 + add) << " " << (2 + add) << " " << (3 + add) << " " << (4 + add) << " "
+						<< (5 + add) << " " << (6 + add) << " " << (7 + add) << " " << (8 + add) << " "
+						<< (9 + add) << " " << (10 + add) << " " << this->m_Mat->m_index << "\n";
+					msg << "2 3 " << (1 + add) << " " << (2 + add) << " " << (3 + add) << " " << (4 + add) << " "
+						<< (11 + add) << " " << (12 + add) << " " << (13 + add) << " " << (17 + add) << " "
+						<< (18 + add) << " " << (20 + add) << " " << this->m_Mat->m_index << "\n";
+					msg << "2 3 " << (1 + add) << " " << (5 + add) << " " << (8 + add) << " " << (10 + add) << " "
+						<< (11 + add) << " " << (14 + add) << " " << (16 + add) << " " << (17 + add) << " "
+						<< (19 + add) << " " << (20 + add) << " " << this->m_Mat->m_index << "\n";
+					msg << "2 3 " << (4 + add) << " " << (7 + add) << " " << (9 + add) << " " << (10 + add) << " "
+						<< (13 + add) << " " << (15 + add) << " " << (16 + add) << " " << (18 + add) << " "
+						<< (19 + add) << " " << (20 + add) << " " << this->m_Mat->m_index << "\n";
+					return msg.str();
+				}
 
-	// Evaluates shape function in the point.
-	Eigen::VectorXd getShapeFcOnPoint(const double* Point) override;
+				// Evaluates shape function in the point.
+				Eigen::VectorXd getShapeFcOnPoint(const double* Point) override;
 
-	// Evaluates the derivative of shape function in the point.
-	Eigen::MatrixXd getShapeDerivOnPoint(const double* Point) override;
+				// Evaluates the derivative of shape function in the point.
+				Eigen::MatrixXd getShapeDerivOnPoint(const double* Point) override;
 
-	// Returns the number of nodes of current element.
-	int getNumNodes() override { return m_NumNodes; };
+				// Returns the number of nodes of current element.
+				int getNumNodes() override { return m_NumNodes; }
 
-	// Returns the number of faces of current element.
-	int getNumFaces() override { return m_NumFaces; };
+				// Returns the number of faces of current element.
+				int getNumFaces() override { return m_NumFaces; }
 
-	/** Verifies dimensionless coordinates from input - if it is immersed on the element.
-	  * @return True if input falls within the element.
-	  * @param xsi Trial dimensionless coordinates.
-	  */
-	bool evaluateXsi(const std::array<double, m_Dim> xsi) override {
+				/** Verifies dimensionless coordinates from input - if it is immersed on the element.
+				  * @return True if input falls within the element.
+				  * @param xsi Trial dimensionless coordinates.
+				  */
+				bool evaluateXsi(const std::array<double, m_Dim> xsi) override {
 
-		std::array<double, m_Dim + 1> new_xsi = {};
+					std::array<double, m_Dim + 1> new_xsi = {};
 
-		for (int i = 0; i < m_Dim; ++i) {
-			new_xsi.at(i) = xsi.at(i);
-			new_xsi.at(m_Dim) -= xsi.at(i);
-		}
-		new_xsi.at(m_Dim) += 1.;
+					for (int i = 0; i < m_Dim; ++i) {
+						new_xsi.at(i) = xsi.at(i);
+						new_xsi.at(m_Dim) -= xsi.at(i);
+					}
+					new_xsi.at(m_Dim) += 1.;
 
-		const auto [min, max] = std::minmax_element(new_xsi.begin(), new_xsi.end());
-		if (*max < 1.000001 && *min > -0.000001) return true;
-		return false;
-	};
+					const auto [min, max] = std::minmax_element(new_xsi.begin(), new_xsi.end());
+					if (*max < 1.000001 && *min > -0.000001) return true;
+					return false;
+				}
 
-private:
-	// Evaluate centroid and circumsphere Radius. Must be called after setting the conectivity.
-	void setGeomProperties() override;
+			private:
+				// Evaluate centroid and circumsphere Radius. Must be called after setting the conectivity.
+				void setGeomProperties() override;
 
-protected:
-	/** @brief Number of Nodes */
-	static const int m_NumNodes{ 20 };
+			protected:
+				/** @brief Number of Nodes */
+				static const int m_NumNodes{ 20 };
 
-	/** @brief Number of Faces */
-	static const int m_NumFaces{ 4 };
-};
+				/** @brief Number of Faces */
+				static const int m_NumFaces{ 4 };
+			};
 
 
-/**
-  * @class Elem_Tet20_IP
-  *
-  * @brief Tetrahedral cubic element with 20 nodes.
-  * @details Solid element, with cubic interpolation functions, tetrahedral shape.
-  *
-  * @tparam nIP Number of integration points. Must be: 10, 11, 14, 15 or 24.
-  */
-template<int nIP>
-class Elem_Tet20_IP : public Elem_Tet20
-{
-private:
-	Elem_Tet20_IP() = delete;
+			/**
+			  * @class Elem_Tet20_IP
+			  *
+			  * @brief Tetrahedral cubic element with 20 nodes.
+			  * @details Solid element, with cubic interpolation functions, tetrahedral shape.
+			  *
+			  * @tparam nIP Number of integration points. Must be: 10, 11, 14, 15 or 24.
+			  */
+			template<int nIP>
+			class Elem_Tet20_IP : public Elem_Tet20
+			{
+			private:
+				Elem_Tet20_IP() = delete;
 
-public:
-	/** Constructor for tetrahedral cubic elements.
-	  * @param Material Pointer to Material class.
-	  */
-	explicit Elem_Tet20_IP(std::shared_ptr<Material>& Material)
-		: Elem_Tet20(Material) { };
+			public:
+				/** Constructor for tetrahedral cubic elements.
+				  * @param Material Pointer to Material class.
+				  */
+				explicit Elem_Tet20_IP(std::shared_ptr<O2P2::Prep::Material>& Material)
+					: Elem_Tet20(Material) { }
 
-	// Return a vector with values on the integration points currently known in the element' nodes.
-	Eigen::VectorXd getValueOnIPs(const double* value) override;
+				// Return a vector with values on the integration points currently known in the element' nodes.
+				Eigen::VectorXd getValueOnIPs(const double* value) override;
 
-	// Returns a pointer to the first element of the shape functions (with size [nIP][m_NumNodes]).
-	double const* getShapeFc() const override { return &m_Psi[0][0]; };
+				// Returns a pointer to the first element of the shape functions (with size [nIP][m_NumNodes]).
+				double const* getShapeFc() const override { return &m_Psi[0][0]; }
 
-	// Returns a pointer to the first element of the derivative of shape functions (with size [nIP][m_NumNodes][m_Dim]).
-	double const* getShapeDerivative() const override { return &m_DPsi[0][0][0]; };
+				// Returns a pointer to the first element of the derivative of shape functions (with size [nIP][m_NumNodes][m_Dim]).
+				double const* getShapeDerivative() const override { return &m_DPsi[0][0][0]; }
 
-	// Returns a pointer to the weight of the integation points (with size [nIP]).
-	double const* getWeight() const override { return m_weight; };
+				// Returns a pointer to the weight of the integation points (with size [nIP]).
+				double const* getWeight() const override { return m_weight; }
 
-	// Returns the number of integration points of current element.
-	int getNumIP() override { return nIP; };
+				// Returns the number of integration points of current element.
+				int getNumIP() override { return nIP; }
 
-private:
-	// Weights for numerical integration
-	static const double* m_weight;
+			private:
+				// Weights for numerical integration
+				static const double* m_weight;
 
-	// Shape functions
-	static const double m_Psi[nIP][m_NumNodes];
+				// Shape functions
+				static const double m_Psi[nIP][m_NumNodes];
 
-	// Shape functions derivative
-	static const double m_DPsi[nIP][m_NumNodes][m_Dim];
-};
+				// Shape functions derivative
+				static const double m_DPsi[nIP][m_NumNodes][m_Dim];
+			};
+		} // End of Elem Namespace
+	} // End of Prep Namespace
+} // End of O2P2 Namespace
 
 
 // ================================================================================================
@@ -177,7 +183,7 @@ private:
 // Shape functions evaluated on Point
 // 
 // ================================================================================================
-inline Eigen::VectorXd Elem_Tet20::getShapeFcOnPoint(const double* Point) {
+inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Tet20::getShapeFcOnPoint(const double* Point) {
 	Eigen::VectorXd Psi(20);
 
 	Psi(1) = 1. - 5.5 * Point[2] + 9. * Point[2] * Point[2] - 4.5 * Point[2] * Point[2] * Point[2] - 5.5 * Point[1] + 18. * Point[1] * Point[2] - 13.5 * Point[1] * Point[2] * Point[2] + 9. * Point[1] * Point[1] - 13.5 * Point[1] * Point[1] * Point[2] - 4.5 * Point[1] * Point[1] * Point[1] - 5.5 * Point[0] + 18. * Point[0] * Point[2] - 13.5 * Point[0] * Point[2] * Point[2] + 18. * Point[0] * Point[1] - 27. * Point[0] * Point[1] * Point[2] - 13.5 * Point[0] * Point[1] * Point[1] + 9. * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[2] - 13.5 * Point[0] * Point[0] * Point[1] - 4.5 * Point[0] * Point[0] * Point[0];
@@ -210,7 +216,7 @@ inline Eigen::VectorXd Elem_Tet20::getShapeFcOnPoint(const double* Point) {
 // Shape functions derivative evaluated on Point
 // 
 // ================================================================================================
-inline Eigen::MatrixXd Elem_Tet20::getShapeDerivOnPoint(const double* Point) {
+inline Eigen::MatrixXd O2P2::Prep::Elem::Elem_Tet20::getShapeDerivOnPoint(const double* Point) {
 	Eigen::MatrixXd DPsi(20, 3);
 
 	DPsi( 0, 0) = -5.5 + 18. * Point[2] - 13.5 * Point[2] * Point[2] + 18. * Point[1] - 27. * Point[1] * Point[2] - 13.5 * Point[1] * Point[1] + 18. * Point[0] - 27. * Point[0] * Point[2] - 27. * Point[0] * Point[1] - 13.5 * Point[0] * Point[0];
@@ -285,7 +291,7 @@ inline Eigen::MatrixXd Elem_Tet20::getShapeDerivOnPoint(const double* Point) {
 // Evaluate initial properties
 // 
 // ================================================================================================
-inline void Elem_Tet20::setGeomProperties() {
+inline void O2P2::Prep::Elem::Elem_Tet20::setGeomProperties() {
 
 	const int nVertices = 4;
 
@@ -293,7 +299,7 @@ inline void Elem_Tet20::setGeomProperties() {
 	m_Centroid = std::make_unique<double[]>(m_Dim);
 
 	// Create a temporary array with the vertices of the polygon
-	std::array<Node<m_Dim>*, nVertices> vertices;
+	std::array<O2P2::Prep::Node<m_Dim>*, nVertices> vertices;
 	vertices[0] = v_Conect[0].get();
 	vertices[1] = v_Conect[3].get();
 	vertices[2] = v_Conect[9].get();
@@ -338,7 +344,7 @@ inline void Elem_Tet20::setGeomProperties() {
 // 
 // ================================================================================================
 template<int nIP>
-inline Eigen::VectorXd Elem_Tet20_IP<nIP>::getValueOnIPs(const double* value) {
+inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Tet20_IP<nIP>::getValueOnIPs(const double* value) {
 
 	// return value
 	Eigen::VectorXd valueOnIp = Eigen::VectorXd::Zero(this->m_NumNodes);
@@ -358,17 +364,17 @@ inline Eigen::VectorXd Elem_Tet20_IP<nIP>::getValueOnIPs(const double* value) {
 // Weights for numerical integration
 //
 // ================================================================================================
-template<> const double* Elem_Tet20_IP<10>::m_weight = &Hammer3D::Wg_10P[0];
-template<> const double* Elem_Tet20_IP<11>::m_weight = &Hammer3D::Wg_11P[0];
-template<> const double* Elem_Tet20_IP<14>::m_weight = &Hammer3D::Wg_14P[0];
-template<> const double* Elem_Tet20_IP<15>::m_weight = &Hammer3D::Wg_15P[0];
-template<> const double* Elem_Tet20_IP<24>::m_weight = &Hammer3D::Wg_24P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Tet20_IP<10>::m_weight = &Hammer3D::Wg_10P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Tet20_IP<11>::m_weight = &Hammer3D::Wg_11P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Tet20_IP<14>::m_weight = &Hammer3D::Wg_14P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Tet20_IP<15>::m_weight = &Hammer3D::Wg_15P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Tet20_IP<24>::m_weight = &Hammer3D::Wg_24P[0];
 
 // ================================================================================================
 //
 // Shape functions
 //
-template<> const double Elem_Tet20_IP<10>::m_Psi[10][m_NumNodes] = {
+template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<10>::m_Psi[10][m_NumNodes] = {
 	{ 1. - 5.5 * Hammer3D::Qsi_10P[0][2] + 9. * Hammer3D::Qsi_10P[0][2] * Hammer3D::Qsi_10P[0][2] - 4.5 * Hammer3D::Qsi_10P[0][2] * Hammer3D::Qsi_10P[0][2] * Hammer3D::Qsi_10P[0][2] - 5.5 * Hammer3D::Qsi_10P[0][1] + 18. * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][2] - 13.5 * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][2] * Hammer3D::Qsi_10P[0][2] + 9. * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][1] - 13.5 * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][2] - 4.5 * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][1] - 5.5 * Hammer3D::Qsi_10P[0][0] + 18. * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][2] - 13.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][2] * Hammer3D::Qsi_10P[0][2] + 18. * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][1] - 27. * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][2] - 13.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][1] + 9. * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0] - 13.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][2] - 13.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][1] - 4.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0],
 	  9. * Hammer3D::Qsi_10P[0][0] - 22.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][2] + 13.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][2] * Hammer3D::Qsi_10P[0][2] - 22.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][1] + 27. * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][2] + 13.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][1] - 22.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0] + 27. * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][2] + 27. * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][1] + 13.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0],
 	  -4.5 * Hammer3D::Qsi_10P[0][0] + 4.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][2] + 4.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][1] + 18. * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0] - 13.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][2] - 13.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][1] - 13.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0],
@@ -579,7 +585,7 @@ template<> const double Elem_Tet20_IP<10>::m_Psi[10][m_NumNodes] = {
 	  -4.5 * Hammer3D::Qsi_10P[9][1] * Hammer3D::Qsi_10P[9][2] + 13.5 * Hammer3D::Qsi_10P[9][1] * Hammer3D::Qsi_10P[9][2] * Hammer3D::Qsi_10P[9][2],
 	  Hammer3D::Qsi_10P[9][2] - 4.5 * Hammer3D::Qsi_10P[9][2] * Hammer3D::Qsi_10P[9][2] + 4.5 * Hammer3D::Qsi_10P[9][2] * Hammer3D::Qsi_10P[9][2] * Hammer3D::Qsi_10P[9][2] } };
 
-template<> const double Elem_Tet20_IP<11>::m_Psi[11][m_NumNodes] = {
+template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<11>::m_Psi[11][m_NumNodes] = {
 	{ 1. - 5.5 * Hammer3D::Qsi_11P[0][2] + 9. * Hammer3D::Qsi_11P[0][2] * Hammer3D::Qsi_11P[0][2] - 4.5 * Hammer3D::Qsi_11P[0][2] * Hammer3D::Qsi_11P[0][2] * Hammer3D::Qsi_11P[0][2] - 5.5 * Hammer3D::Qsi_11P[0][1] + 18. * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][2] - 13.5 * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][2] * Hammer3D::Qsi_11P[0][2] + 9. * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][1] - 13.5 * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][2] - 4.5 * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][1] - 5.5 * Hammer3D::Qsi_11P[0][0] + 18. * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][2] - 13.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][2] * Hammer3D::Qsi_11P[0][2] + 18. * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][1] - 27. * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][2] - 13.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][1] + 9. * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0] - 13.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][2] - 13.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][1] - 4.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0],
 	  9. * Hammer3D::Qsi_11P[0][0] - 22.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][2] + 13.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][2] * Hammer3D::Qsi_11P[0][2] - 22.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][1] + 27. * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][2] + 13.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][1] - 22.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0] + 27. * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][2] + 27. * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][1] + 13.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0],
 	  -4.5 * Hammer3D::Qsi_11P[0][0] + 4.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][2] + 4.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][1] + 18. * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0] - 13.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][2] - 13.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][1] - 13.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0],
@@ -811,7 +817,7 @@ template<> const double Elem_Tet20_IP<11>::m_Psi[11][m_NumNodes] = {
 	  -4.5 * Hammer3D::Qsi_11P[10][1] * Hammer3D::Qsi_11P[10][2] + 13.5 * Hammer3D::Qsi_11P[10][1] * Hammer3D::Qsi_11P[10][2] * Hammer3D::Qsi_11P[10][2],
 	  Hammer3D::Qsi_11P[10][2] - 4.5 * Hammer3D::Qsi_11P[10][2] * Hammer3D::Qsi_11P[10][2] + 4.5 * Hammer3D::Qsi_11P[10][2] * Hammer3D::Qsi_11P[10][2] * Hammer3D::Qsi_11P[10][2] } };
 
-template<> const double Elem_Tet20_IP<14>::m_Psi[14][m_NumNodes] = {
+template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<14>::m_Psi[14][m_NumNodes] = {
 	{ 1. - 5.5 * Hammer3D::Qsi_14P[0][2] + 9. * Hammer3D::Qsi_14P[0][2] * Hammer3D::Qsi_14P[0][2] - 4.5 * Hammer3D::Qsi_14P[0][2] * Hammer3D::Qsi_14P[0][2] * Hammer3D::Qsi_14P[0][2] - 5.5 * Hammer3D::Qsi_14P[0][1] + 18. * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][2] - 13.5 * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][2] * Hammer3D::Qsi_14P[0][2] + 9. * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][1] - 13.5 * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][2] - 4.5 * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][1] - 5.5 * Hammer3D::Qsi_14P[0][0] + 18. * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][2] - 13.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][2] * Hammer3D::Qsi_14P[0][2] + 18. * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][1] - 27. * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][2] - 13.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][1] + 9. * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0] - 13.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][2] - 13.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][1] - 4.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0],
 	  9. * Hammer3D::Qsi_14P[0][0] - 22.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][2] + 13.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][2] * Hammer3D::Qsi_14P[0][2] - 22.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][1] + 27. * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][2] + 13.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][1] - 22.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0] + 27. * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][2] + 27. * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][1] + 13.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0],
 	  -4.5 * Hammer3D::Qsi_14P[0][0] + 4.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][2] + 4.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][1] + 18. * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0] - 13.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][2] - 13.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][1] - 13.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0],
@@ -1107,7 +1113,7 @@ template<> const double Elem_Tet20_IP<14>::m_Psi[14][m_NumNodes] = {
 	  Hammer3D::Qsi_14P[13][2] - 4.5 * Hammer3D::Qsi_14P[13][2] * Hammer3D::Qsi_14P[13][2] + 4.5 * Hammer3D::Qsi_14P[13][2] * Hammer3D::Qsi_14P[13][2] * Hammer3D::Qsi_14P[13][2] } };
 
 
-template<> const double Elem_Tet20_IP<15>::m_Psi[15][m_NumNodes] = {
+template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<15>::m_Psi[15][m_NumNodes] = {
 	{ 1. - 5.5 * Hammer3D::Qsi_15P[0][2] + 9. * Hammer3D::Qsi_15P[0][2] * Hammer3D::Qsi_15P[0][2] - 4.5 * Hammer3D::Qsi_15P[0][2] * Hammer3D::Qsi_15P[0][2] * Hammer3D::Qsi_15P[0][2] - 5.5 * Hammer3D::Qsi_15P[0][1] + 18. * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][2] - 13.5 * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][2] * Hammer3D::Qsi_15P[0][2] + 9. * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][1] - 13.5 * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][2] - 4.5 * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][1] - 5.5 * Hammer3D::Qsi_15P[0][0] + 18. * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][2] - 13.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][2] * Hammer3D::Qsi_15P[0][2] + 18. * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][1] - 27. * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][2] - 13.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][1] + 9. * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0] - 13.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][2] - 13.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][1] - 4.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0],
 	  9. * Hammer3D::Qsi_15P[0][0] - 22.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][2] + 13.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][2] * Hammer3D::Qsi_15P[0][2] - 22.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][1] + 27. * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][2] + 13.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][1] - 22.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0] + 27. * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][2] + 27. * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][1] + 13.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0],
 	  -4.5 * Hammer3D::Qsi_15P[0][0] + 4.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][2] + 4.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][1] + 18. * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0] - 13.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][2] - 13.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][1] - 13.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0],
@@ -1423,7 +1429,7 @@ template<> const double Elem_Tet20_IP<15>::m_Psi[15][m_NumNodes] = {
 	  -4.5 * Hammer3D::Qsi_15P[14][1] * Hammer3D::Qsi_15P[14][2] + 13.5 * Hammer3D::Qsi_15P[14][1] * Hammer3D::Qsi_15P[14][2] * Hammer3D::Qsi_15P[14][2],
 	  Hammer3D::Qsi_15P[14][2] - 4.5 * Hammer3D::Qsi_15P[14][2] * Hammer3D::Qsi_15P[14][2] + 4.5 * Hammer3D::Qsi_15P[14][2] * Hammer3D::Qsi_15P[14][2] * Hammer3D::Qsi_15P[14][2] } };
 
-template<> const double Elem_Tet20_IP<24>::m_Psi[24][m_NumNodes] = {
+template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<24>::m_Psi[24][m_NumNodes] = {
 	{ 1. - 5.5 * Hammer3D::Qsi_24P[0][2] + 9. * Hammer3D::Qsi_24P[0][2] * Hammer3D::Qsi_24P[0][2] - 4.5 * Hammer3D::Qsi_24P[0][2] * Hammer3D::Qsi_24P[0][2] * Hammer3D::Qsi_24P[0][2] - 5.5 * Hammer3D::Qsi_24P[0][1] + 18. * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][2] - 13.5 * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][2] * Hammer3D::Qsi_24P[0][2] + 9. * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][1] - 13.5 * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][2] - 4.5 * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][1] - 5.5 * Hammer3D::Qsi_24P[0][0] + 18. * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][2] - 13.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][2] * Hammer3D::Qsi_24P[0][2] + 18. * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][1] - 27. * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][2] - 13.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][1] + 9. * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0] - 13.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][2] - 13.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][1] - 4.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0],
 	  9. * Hammer3D::Qsi_24P[0][0] - 22.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][2] + 13.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][2] * Hammer3D::Qsi_24P[0][2] - 22.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][1] + 27. * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][2] + 13.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][1] - 22.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0] + 27. * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][2] + 27. * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][1] + 13.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0],
 	  -4.5 * Hammer3D::Qsi_24P[0][0] + 4.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][2] + 4.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][1] + 18. * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0] - 13.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][2] - 13.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][1] - 13.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0],
@@ -1933,7 +1939,7 @@ template<> const double Elem_Tet20_IP<24>::m_Psi[24][m_NumNodes] = {
 // Shape functions derivative
 //
 // ================================================================================================
-template<> const double Elem_Tet20_IP<10>::m_DPsi[10][m_NumNodes][m_Dim] = {
+template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<10>::m_DPsi[10][m_NumNodes][m_Dim] = {
 	{ { -5.5 + 18. * Hammer3D::Qsi_10P[0][2] - 13.5 * Hammer3D::Qsi_10P[0][2] * Hammer3D::Qsi_10P[0][2] + 18. * Hammer3D::Qsi_10P[0][1] - 27. * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][2] - 13.5 * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][1] + 18. * Hammer3D::Qsi_10P[0][0] - 27. * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][2] - 27. * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][1] - 13.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0],
 		-5.5 + 18. * Hammer3D::Qsi_10P[0][2] - 13.5 * Hammer3D::Qsi_10P[0][2] * Hammer3D::Qsi_10P[0][2] + 18. * Hammer3D::Qsi_10P[0][1] - 27. * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][2] - 13.5 * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][1] + 18. * Hammer3D::Qsi_10P[0][0] - 27. * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][2] - 27. * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][1] - 13.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0],
 		-5.5 + 18. * Hammer3D::Qsi_10P[0][2] - 13.5 * Hammer3D::Qsi_10P[0][2] * Hammer3D::Qsi_10P[0][2] + 18. * Hammer3D::Qsi_10P[0][1] - 27. * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][2] - 13.5 * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][1] + 18. * Hammer3D::Qsi_10P[0][0] - 27. * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][2] - 27. * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][1] - 13.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0] },
@@ -2224,7 +2230,7 @@ template<> const double Elem_Tet20_IP<10>::m_DPsi[10][m_NumNodes][m_Dim] = {
 		  { 0., -4.5 * Hammer3D::Qsi_10P[9][2] + 13.5 * Hammer3D::Qsi_10P[9][2] * Hammer3D::Qsi_10P[9][2], -4.5 * Hammer3D::Qsi_10P[9][1] + 27. * Hammer3D::Qsi_10P[9][1] * Hammer3D::Qsi_10P[9][2] },
 		  { 0., 0., 1. - 9. * Hammer3D::Qsi_10P[9][2] + 13.5 * Hammer3D::Qsi_10P[9][2] * Hammer3D::Qsi_10P[9][2] } } };
 
-template<> const double Elem_Tet20_IP<11>::m_DPsi[11][m_NumNodes][m_Dim] = {
+template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<11>::m_DPsi[11][m_NumNodes][m_Dim] = {
 	{ { -5.5 + 18. * Hammer3D::Qsi_11P[0][2] - 13.5 * Hammer3D::Qsi_11P[0][2] * Hammer3D::Qsi_11P[0][2] + 18. * Hammer3D::Qsi_11P[0][1] - 27. * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][2] - 13.5 * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][1] + 18. * Hammer3D::Qsi_11P[0][0] - 27. * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][2] - 27. * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][1] - 13.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0],
 		-5.5 + 18. * Hammer3D::Qsi_11P[0][2] - 13.5 * Hammer3D::Qsi_11P[0][2] * Hammer3D::Qsi_11P[0][2] + 18. * Hammer3D::Qsi_11P[0][1] - 27. * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][2] - 13.5 * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][1] + 18. * Hammer3D::Qsi_11P[0][0] - 27. * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][2] - 27. * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][1] - 13.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0],
 		-5.5 + 18. * Hammer3D::Qsi_11P[0][2] - 13.5 * Hammer3D::Qsi_11P[0][2] * Hammer3D::Qsi_11P[0][2] + 18. * Hammer3D::Qsi_11P[0][1] - 27. * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][2] - 13.5 * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][1] + 18. * Hammer3D::Qsi_11P[0][0] - 27. * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][2] - 27. * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][1] - 13.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0] },
@@ -2544,7 +2550,7 @@ template<> const double Elem_Tet20_IP<11>::m_DPsi[11][m_NumNodes][m_Dim] = {
 		  { 0., -4.5 * Hammer3D::Qsi_11P[10][2] + 13.5 * Hammer3D::Qsi_11P[10][2] * Hammer3D::Qsi_11P[10][2], -4.5 * Hammer3D::Qsi_11P[10][1] + 27. * Hammer3D::Qsi_11P[10][1] * Hammer3D::Qsi_11P[10][2] },
 		  { 0., 0., 1. - 9. * Hammer3D::Qsi_11P[10][2] + 13.5 * Hammer3D::Qsi_11P[10][2] * Hammer3D::Qsi_11P[10][2] } } };
 
-template<> const double Elem_Tet20_IP<14>::m_DPsi[14][m_NumNodes][m_Dim] = {
+template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<14>::m_DPsi[14][m_NumNodes][m_Dim] = {
 	{ { -5.5 + 18. * Hammer3D::Qsi_14P[0][2] - 13.5 * Hammer3D::Qsi_14P[0][2] * Hammer3D::Qsi_14P[0][2] + 18. * Hammer3D::Qsi_14P[0][1] - 27. * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][2] - 13.5 * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][1] + 18. * Hammer3D::Qsi_14P[0][0] - 27. * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][2] - 27. * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][1] - 13.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0],
 		-5.5 + 18. * Hammer3D::Qsi_14P[0][2] - 13.5 * Hammer3D::Qsi_14P[0][2] * Hammer3D::Qsi_14P[0][2] + 18. * Hammer3D::Qsi_14P[0][1] - 27. * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][2] - 13.5 * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][1] + 18. * Hammer3D::Qsi_14P[0][0] - 27. * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][2] - 27. * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][1] - 13.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0],
 		-5.5 + 18. * Hammer3D::Qsi_14P[0][2] - 13.5 * Hammer3D::Qsi_14P[0][2] * Hammer3D::Qsi_14P[0][2] + 18. * Hammer3D::Qsi_14P[0][1] - 27. * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][2] - 13.5 * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][1] + 18. * Hammer3D::Qsi_14P[0][0] - 27. * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][2] - 27. * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][1] - 13.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0] },
@@ -2952,7 +2958,7 @@ template<> const double Elem_Tet20_IP<14>::m_DPsi[14][m_NumNodes][m_Dim] = {
 		  { 0., 0., 1. - 9. * Hammer3D::Qsi_14P[13][2] + 13.5 * Hammer3D::Qsi_14P[13][2] * Hammer3D::Qsi_14P[13][2] } } };
 
 
-template<> const double Elem_Tet20_IP<15>::m_DPsi[15][m_NumNodes][m_Dim] = {
+template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<15>::m_DPsi[15][m_NumNodes][m_Dim] = {
 	{ { -5.5 + 18. * Hammer3D::Qsi_15P[0][2] - 13.5 * Hammer3D::Qsi_15P[0][2] * Hammer3D::Qsi_15P[0][2] + 18. * Hammer3D::Qsi_15P[0][1] - 27. * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][2] - 13.5 * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][1] + 18. * Hammer3D::Qsi_15P[0][0] - 27. * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][2] - 27. * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][1] - 13.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0],
 		-5.5 + 18. * Hammer3D::Qsi_15P[0][2] - 13.5 * Hammer3D::Qsi_15P[0][2] * Hammer3D::Qsi_15P[0][2] + 18. * Hammer3D::Qsi_15P[0][1] - 27. * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][2] - 13.5 * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][1] + 18. * Hammer3D::Qsi_15P[0][0] - 27. * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][2] - 27. * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][1] - 13.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0],
 		-5.5 + 18. * Hammer3D::Qsi_15P[0][2] - 13.5 * Hammer3D::Qsi_15P[0][2] * Hammer3D::Qsi_15P[0][2] + 18. * Hammer3D::Qsi_15P[0][1] - 27. * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][2] - 13.5 * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][1] + 18. * Hammer3D::Qsi_15P[0][0] - 27. * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][2] - 27. * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][1] - 13.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0] },
@@ -3388,7 +3394,7 @@ template<> const double Elem_Tet20_IP<15>::m_DPsi[15][m_NumNodes][m_Dim] = {
 		  { 0., -4.5 * Hammer3D::Qsi_15P[14][2] + 13.5 * Hammer3D::Qsi_15P[14][2] * Hammer3D::Qsi_15P[14][2], -4.5 * Hammer3D::Qsi_15P[14][1] + 27. * Hammer3D::Qsi_15P[14][1] * Hammer3D::Qsi_15P[14][2] },
 		  { 0., 0., 1. - 9. * Hammer3D::Qsi_15P[14][2] + 13.5 * Hammer3D::Qsi_15P[14][2] * Hammer3D::Qsi_15P[14][2] } } };
 
-template<> const double Elem_Tet20_IP<24>::m_DPsi[24][m_NumNodes][m_Dim] = {
+template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<24>::m_DPsi[24][m_NumNodes][m_Dim] = {
 	{ { -5.5 + 18. * Hammer3D::Qsi_24P[0][2] - 13.5 * Hammer3D::Qsi_24P[0][2] * Hammer3D::Qsi_24P[0][2] + 18. * Hammer3D::Qsi_24P[0][1] - 27. * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][2] - 13.5 * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][1] + 18. * Hammer3D::Qsi_24P[0][0] - 27. * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][2] - 27. * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][1] - 13.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0],
 		-5.5 + 18. * Hammer3D::Qsi_24P[0][2] - 13.5 * Hammer3D::Qsi_24P[0][2] * Hammer3D::Qsi_24P[0][2] + 18. * Hammer3D::Qsi_24P[0][1] - 27. * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][2] - 13.5 * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][1] + 18. * Hammer3D::Qsi_24P[0][0] - 27. * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][2] - 27. * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][1] - 13.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0],
 		-5.5 + 18. * Hammer3D::Qsi_24P[0][2] - 13.5 * Hammer3D::Qsi_24P[0][2] * Hammer3D::Qsi_24P[0][2] + 18. * Hammer3D::Qsi_24P[0][1] - 27. * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][2] - 13.5 * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][1] + 18. * Hammer3D::Qsi_24P[0][0] - 27. * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][2] - 27. * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][1] - 13.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0] },

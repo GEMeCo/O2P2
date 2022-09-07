@@ -21,11 +21,11 @@
 // Explicit template member functions instantiation
 //
 // ================================================================================================
-template bool SolutionAlgorithm<2>::initFEModel(Domain<2>* theDomain, PostProcess* thePost);
-template bool SolutionAlgorithm<3>::initFEModel(Domain<3>* theDomain, PostProcess* thePost);
+template bool O2P2::Proc::SolutionAlgorithm<2>::initFEModel(O2P2::Prep::Domain<2>* theDomain, O2P2::Post::PostProcess* thePost);
+template bool O2P2::Proc::SolutionAlgorithm<3>::initFEModel(O2P2::Prep::Domain<3>* theDomain, O2P2::Post::PostProcess* thePost);
 
-template void SolutionAlgorithm<2>::runSolutionAlgorithm(Domain<2>* theDomain);
-template void SolutionAlgorithm<3>::runSolutionAlgorithm(Domain<3>* theDomain);
+template void O2P2::Proc::SolutionAlgorithm<2>::runSolutionAlgorithm(O2P2::Prep::Domain<2>* theDomain);
+template void O2P2::Proc::SolutionAlgorithm<3>::runSolutionAlgorithm(O2P2::Prep::Domain<3>* theDomain);
 
 // ================================================================================================
 //
@@ -33,7 +33,7 @@ template void SolutionAlgorithm<3>::runSolutionAlgorithm(Domain<3>* theDomain);
 //
 // ================================================================================================
 template<int nDim>
-bool SolutionAlgorithm<nDim>::initFEModel(Domain<nDim>* theDomain, PostProcess* thePost)
+bool O2P2::Proc::SolutionAlgorithm<nDim>::initFEModel(O2P2::Prep::Domain<nDim>* theDomain, O2P2::Post::PostProcess* thePost)
 {
 	PROFILE_FUNCTION();
 
@@ -41,7 +41,7 @@ bool SolutionAlgorithm<nDim>::initFEModel(Domain<nDim>* theDomain, PostProcess* 
 	LOG("SolutionAlgorithm.initFEModel: Initiating DOF Mapping system");
 
 	// Creates the container of Solution Components
-	m_theFEModel = std::make_unique<AnalysisComp_Mec<nDim>>(theDomain, thePost);
+	m_theFEModel = std::make_unique<O2P2::Proc::Mesh_Mec<nDim>>(theDomain, thePost);
 
 	// Add the number of dof for every node to the system
 	auto ptNode = theDomain->getNode();
@@ -63,12 +63,12 @@ bool SolutionAlgorithm<nDim>::initFEModel(Domain<nDim>* theDomain, PostProcess* 
 	for (size_t i = 0; i < m_theFEModel->m_ElemComp.size(); i++) {
 
 		// Domain element associated to the current element component
-		Element<nDim>* pElem = theDomain->getElem(i);
+		O2P2::Prep::Elem::Element<nDim>* pElem = theDomain->getElem(i);
 
 		std::vector<size_t> elemDofIndex;
 		elemDofIndex.reserve(pElem->getConectivity().size() * pElem->getNumNdDOF());
 
-		for (std::shared_ptr<Node<nDim>>& node : pElem->getConectivity()) {
+		for (std::shared_ptr<O2P2::Prep::Node<nDim>>& node : pElem->getConectivity()) {
 			for (int i = 0; i < pElem->getNumNdDOF(); ++i) {
 				elemDofIndex.emplace_back(node->v_DofIndex.at(i));
 			}
@@ -94,7 +94,7 @@ bool SolutionAlgorithm<nDim>::initFEModel(Domain<nDim>* theDomain, PostProcess* 
 //
 // ================================================================================================
 template<int nDim>
-void SolutionAlgorithm<nDim>::runSolutionAlgorithm(Domain<nDim>* theDomain)
+void O2P2::Proc::SolutionAlgorithm<nDim>::runSolutionAlgorithm(O2P2::Prep::Domain<nDim>* theDomain)
 {
 	PROFILE_FUNCTION();
 

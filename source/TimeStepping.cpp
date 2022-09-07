@@ -18,18 +18,18 @@
 
 // ================================================================================================
 //
-// Explicit template  member functions instantiation
+// Explicit template member functions instantiation
 //
 // ================================================================================================
-template void TimeStep_QsiStatic::runTimeLooping<2>(Domain<2>* theDomain, AnalysisComp* theFEModel, NonLinearSolver* theSolver);
-template void TimeStep_QsiStatic::runTimeLooping<3>(Domain<3>* theDomain, AnalysisComp* theFEModel, NonLinearSolver* theSolver);
+template void O2P2::Proc::TimeStep_QsiStatic::runTimeLooping<2>(O2P2::Prep::Domain<2>* theDomain, O2P2::Proc::Mesh* theFEModel, O2P2::Proc::NonLinearSolver* theSolver);
+template void O2P2::Proc::TimeStep_QsiStatic::runTimeLooping<3>(O2P2::Prep::Domain<3>* theDomain, O2P2::Proc::Mesh* theFEModel, O2P2::Proc::NonLinearSolver* theSolver);
 
 // ================================================================================================
 //
 // Implementation of Template Member Function: runTimeLoop
 //
 // ================================================================================================
-template<int nDim> void TimeStep_QsiStatic::runTimeLooping(Domain<nDim>* theDomain, AnalysisComp* theFEModel, NonLinearSolver* theSolver) {
+template<int nDim> void O2P2::Proc::TimeStep_QsiStatic::runTimeLooping(O2P2::Prep::Domain<nDim>* theDomain, O2P2::Proc::Mesh* theFEModel, O2P2::Proc::NonLinearSolver* theSolver) {
 
     // Loop on time step
     for (int timeIt = 0; timeIt < theFEModel->getLoadStep()->m_NumSteps; ++timeIt) {

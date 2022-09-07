@@ -21,18 +21,18 @@
 // Explicit template class instantiation
 //
 // ================================================================================================
-template class ElemComponent<2>;
-template class ElemComponent<3>;
+template class O2P2::Proc::Comp::ElemComponent<2>;
+template class O2P2::Proc::Comp::ElemComponent<3>;
 
-template void ElemComponent<2>::setMaterialPoint();
-template void ElemComponent<3>::setMaterialPoint();
+template void O2P2::Proc::Comp::ElemComponent<2>::setMaterialPoint();
+template void O2P2::Proc::Comp::ElemComponent<3>::setMaterialPoint();
 
 // ================================================================================================
 //
 // Implementation of Template Member Function: setMaterialPoint
 //
 // ================================================================================================
-template<int nDim> void ElemComponent<nDim>::setMaterialPoint()
+template<int nDim> void O2P2::Proc::Comp::ElemComponent<nDim>::setMaterialPoint()
 {
 	int nIP = m_pElem->getNumIP();
 	int nElDim = m_pElem->getDIM();
@@ -56,7 +56,7 @@ template<int nDim> void ElemComponent<nDim>::setMaterialPoint()
 		}
 
 		// Record the Jacobian Matrix on every Material (Integration) point
-		this->m_MatPoint.emplace_back(std::make_unique<MaterialPoint>(F0));
+		this->m_MatPoint.emplace_back(std::make_unique<O2P2::Proc::Comp::MaterialPoint>(F0));
 	}
 };
 
@@ -67,7 +67,7 @@ template<int nDim> void ElemComponent<nDim>::setMaterialPoint()
 //
 // ================================================================================================
 template<int nDim>
-double ElemComponent<nDim>::getYoungModulus()
+double O2P2::Proc::Comp::ElemComponent<nDim>::getYoungModulus()
 {
 	// Dimensionality of the element
 	auto nElDim = m_pElem->getDIM();
@@ -75,7 +75,7 @@ double ElemComponent<nDim>::getYoungModulus()
 	assert((nElDim == 1) && "ElemComponent<nDim>::getYoungModulus() should only be used with linear elements");
 
 	// Downcasting to linear element.
-	ElementLinear<nDim>* pElem = static_cast<ElementLinear<nDim>*> (m_pElem.get());
+	O2P2::Prep::Elem::ElementLinear<nDim>* pElem = static_cast<O2P2::Prep::Elem::ElementLinear<nDim>*> (m_pElem.get());
 
 	// Pointer to section
 	auto pSec = pElem->getSection();
@@ -84,7 +84,7 @@ double ElemComponent<nDim>::getYoungModulus()
 	auto pMat = pElem->getMaterial();
 
 	// Should also downcast to SVK material
-	Mat_SVK_ISO* pSVK_Mat = static_cast<Mat_SVK_ISO*> (pMat);
+	O2P2::Prep::Mat_SVK_ISO* pSVK_Mat = static_cast<O2P2::Prep::Mat_SVK_ISO*> (pMat);
 
 	double E = pSVK_Mat->getLongitudinalModulus() * pSec->getSection();
 
@@ -98,13 +98,13 @@ double ElemComponent<nDim>::getYoungModulus()
 //
 // ================================================================================================
 template<>
-Eigen::MatrixXd ElemComponent<2>::getConstitutiveMatrix()
+Eigen::MatrixXd O2P2::Proc::Comp::ElemComponent<2>::getConstitutiveMatrix()
 {
 	// Dimensionality of the element
 	auto nDim = m_pElem->getDIM();
 
 	// Downcasting to plane element.
-	ElementPlane* pElem = static_cast<ElementPlane*> (m_pElem.get());
+	O2P2::Prep::Elem::ElementPlane* pElem = static_cast<O2P2::Prep::Elem::ElementPlane*> (m_pElem.get());
 
 	// Pointer to section
 	auto pSec = pElem->getSection();
@@ -119,7 +119,7 @@ Eigen::MatrixXd ElemComponent<2>::getConstitutiveMatrix()
 	auto pMat = pElem->getMaterial();
 
 	// Should also downcast to SVK material
-	Mat_SVK_ISO* pSVK_Mat = static_cast<Mat_SVK_ISO*> (pMat);
+	O2P2::Prep::Mat_SVK_ISO* pSVK_Mat = static_cast<O2P2::Prep::Mat_SVK_ISO*> (pMat);
 
 	// Size of Constitutive matrix
 	int nVoigt = 3 * nDim - 3;
@@ -165,19 +165,19 @@ Eigen::MatrixXd ElemComponent<2>::getConstitutiveMatrix()
 //
 // ================================================================================================
 template<>
-Eigen::MatrixXd ElemComponent<3>::getConstitutiveMatrix()
+Eigen::MatrixXd O2P2::Proc::Comp::ElemComponent<3>::getConstitutiveMatrix()
 {
 	// Dimensionality of the element
 	auto nDim = m_pElem->getDIM();
 
 	// Downcasting to solid element.
-	ElementSolid* pElem = static_cast<ElementSolid*>(m_pElem.get());
+	O2P2::Prep::Elem::ElementSolid* pElem = static_cast<O2P2::Prep::Elem::ElementSolid*>(m_pElem.get());
 
 	// Pointer to the material
 	auto pMat = pElem->getMaterial();
 
 	// Should also downcast to SVK material
-	Mat_SVK_ISO* pSVK_Mat = static_cast<Mat_SVK_ISO*>(pMat);
+	O2P2::Prep::Mat_SVK_ISO* pSVK_Mat = static_cast<O2P2::Prep::Mat_SVK_ISO*>(pMat);
 
 	// Size of Constitutive matrix
 	int nVoigt = 3 * nDim - 3;
@@ -218,7 +218,7 @@ Eigen::MatrixXd ElemComponent<3>::getConstitutiveMatrix()
 //
 // ================================================================================================
 template<int nDim>
-void ElemComponent<nDim>::getContribution(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian)
+void O2P2::Proc::Comp::ElemComponent<nDim>::getContribution(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian)
 {
 	auto pMat = m_pElem->getMaterial();
 	auto nElDim = m_pElem->getDIM();
@@ -246,7 +246,7 @@ void ElemComponent<nDim>::getContribution(Eigen::VectorXd& FInt, Eigen::MatrixXd
 //
 // ================================================================================================
 template<> template<>
-void ElemComponent<2>::getContribution_SVK_ISO<1>(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian)
+void O2P2::Proc::Comp::ElemComponent<2>::getContribution_SVK_ISO<1>(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian)
 {
 	// Pointer to the first Shape Fuctions Derivative (const static)
 	auto pShape = m_pElem->getShapeDerivative();
@@ -362,7 +362,7 @@ void ElemComponent<2>::getContribution_SVK_ISO<1>(Eigen::VectorXd& FInt, Eigen::
 //
 // ================================================================================================
 template<int nDim> template<int nElDim>
-void ElemComponent<nDim>::getContribution_SVK_ISO(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian)
+void O2P2::Proc::Comp::ElemComponent<nDim>::getContribution_SVK_ISO(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian)
 {
 	// Pointer to the first Shape Fuctions Derivative (const static)
 	auto pShape = m_pElem->getShapeDerivative();
@@ -540,7 +540,9 @@ void ElemComponent<nDim>::getContribution_SVK_ISO(Eigen::VectorXd& FInt, Eigen::
 // Implementation of ElemComp Member Function (2D only): getContribution
 //
 // ================================================================================================
-/*template<> void ElemComponent<2>::getContribution_SVK_ISO(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian)
+/*
+template<>
+void O2P2::Proc::Comp::ElemComponent<2>::getContribution_SVK_ISO(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian)
 {
 	// Pointer to the first Shape Fuctions Derivative (const static)
 	auto pShape = m_pElem->getShapeDerivative();
@@ -676,7 +678,9 @@ void ElemComponent<nDim>::getContribution_SVK_ISO(Eigen::VectorXd& FInt, Eigen::
 // Implementation of ElemComp Member Function (3D only): getContribution
 //
 // ================================================================================================
-/*template<> void ElemComponent<3>::getContribution_SVK_ISO(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian)
+/*
+template<>
+void O2P2::Proc::Comp::ElemComponent<3>::getContribution_SVK_ISO(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian)
 {
 	// Pointer to the first Shape Fuctions Derivative (const static)
 	auto pShape = m_pElem->getShapeDerivative();
@@ -817,4 +821,5 @@ void ElemComponent<nDim>::getContribution_SVK_ISO(Eigen::VectorXd& FInt, Eigen::
 			}
 		}
 	}
-};*/
+};
+*/

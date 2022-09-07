@@ -91,7 +91,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="O2P2.cpp" />
-    <ClCompile Include="source\AnalysisComp.cpp" />
+    <ClCompile Include="source\Mesh.cpp" />
     <ClCompile Include="source\Common.cpp" />
     <ClCompile Include="source\Domain.cpp" />
     <ClCompile Include="source\ElementComp.cpp" />
@@ -107,7 +107,7 @@
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\AnalysisComp.h" />
+    <ClInclude Include="include\Mesh.h" />
     <ClInclude Include="include\Common.h" />
     <ClInclude Include="include\Constraints.h" />
     <ClInclude Include="include\Domain.h" />
@@ -141,6 +141,7 @@
     <ClInclude Include="include\MaterialPoint.h" />
     <ClInclude Include="include\ModelBuilder.h" />
     <ClInclude Include="include\Node.h" />
+    <ClInclude Include="include\NodeComp.h" />
     <ClInclude Include="include\NonLinearSolver.h" />
     <ClInclude Include="include\OutputSystem.h" />
     <ClInclude Include="include\PostProcess.h" />
