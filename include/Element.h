@@ -14,7 +14,7 @@
 #include <vector>		// required by std::vector
 #include <memory>		// required by std::shared_pointer
 #include <iostream>		// required by operator << overloading
-#include <algorithm>    // std::max / std::max_element
+#include <algorithm>	// std::max / std::max_element
 #include <math.h>		// std::sqrt
 
 // Eigen libraries

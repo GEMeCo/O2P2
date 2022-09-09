@@ -104,7 +104,7 @@ void O2P2::Post::OutputSystem<nDim>::draw_AcadView_Elem(std::ofstream& file, O2P
 	file << "#\n";
 
 	// Total number of nodes
-    int iNd = 0;
+	int iNd = 0;
 	for (auto& elem : theDomain->getElem()) {
 		iNd += elem->getNumNodes();
 	}
