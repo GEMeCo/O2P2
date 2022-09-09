@@ -2,11 +2,10 @@
 //
 // This file is part of PosFEM++, an object oriented environment for the positional FEM
 //
-// Copyright(C) 2021 Rogerio Carrazedo - All Rights Reserved.
+// Copyright(C) 2022 Rogerio Carrazedo - All Rights Reserved.
 // 
-// This source code form is subject to the terms of the GNU General Public License.
-// If a copy of GPL was not distributed with this file, you can obtain one at
-// https://www.gnu.org/licenses/.
+// This source code form is subject to the terms of 
+// Creative Commons Attribution-NonCommerical 4.0 International license
 // 
 // ================================================================================================
 //

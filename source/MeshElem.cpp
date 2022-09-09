@@ -9,30 +9,30 @@
 //
 // ================================================================================================
 //
-// Element Component
+// Mesh Element Component
 // 
 // Handler of element routines and local (element) matrices
 // 
 // ================================================================================================
-#include "ElementComp.h"
+#include "MeshElem.h"
 
 // ================================================================================================
 //
 // Explicit template class instantiation
 //
 // ================================================================================================
-template class O2P2::Proc::Comp::ElemComponent<2>;
-template class O2P2::Proc::Comp::ElemComponent<3>;
+template class O2P2::Proc::Comp::MeshElem_SVK<2>;
+template class O2P2::Proc::Comp::MeshElem_SVK<3>;
 
-template void O2P2::Proc::Comp::ElemComponent<2>::setMaterialPoint();
-template void O2P2::Proc::Comp::ElemComponent<3>::setMaterialPoint();
+template void O2P2::Proc::Comp::MeshElem_SVK<2>::setMaterialPoint();
+template void O2P2::Proc::Comp::MeshElem_SVK<3>::setMaterialPoint();
 
 // ================================================================================================
 //
 // Implementation of Template Member Function: setMaterialPoint
 //
 // ================================================================================================
-template<int nDim> void O2P2::Proc::Comp::ElemComponent<nDim>::setMaterialPoint()
+template<int nDim> void O2P2::Proc::Comp::MeshElem_SVK<nDim>::setMaterialPoint()
 {
 	int nIP = m_pElem->getNumIP();
 	int nElDim = m_pElem->getDIM();
@@ -63,16 +63,16 @@ template<int nDim> void O2P2::Proc::Comp::ElemComponent<nDim>::setMaterialPoint(
 
 // ================================================================================================
 //
-// Implementation of ElemComp Member Function: getYoungModulus
+// Implementation of MeshElem_SVK Member Function: getYoungModulus
 //
 // ================================================================================================
 template<int nDim>
-double O2P2::Proc::Comp::ElemComponent<nDim>::getYoungModulus()
+double O2P2::Proc::Comp::MeshElem_SVK<nDim>::getYoungModulus()
 {
 	// Dimensionality of the element
 	auto nElDim = m_pElem->getDIM();
 
-	assert((nElDim == 1) && "ElemComponent<nDim>::getYoungModulus() should only be used with linear elements");
+	assert((nElDim == 1) && "MeshElem_SVK<nDim>::getYoungModulus() should only be used with linear elements");
 
 	// Downcasting to linear element.
 	O2P2::Prep::Elem::ElementLinear<nDim>* pElem = static_cast<O2P2::Prep::Elem::ElementLinear<nDim>*> (m_pElem.get());
@@ -94,11 +94,11 @@ double O2P2::Proc::Comp::ElemComponent<nDim>::getYoungModulus()
 
 // ================================================================================================
 //
-// Specialization of ElemComp Member Function (2D only): getConstitutiveMatrix
+// Specialization of MeshElem_SVK Member Function (2D only): getConstitutiveMatrix
 //
 // ================================================================================================
 template<>
-Eigen::MatrixXd O2P2::Proc::Comp::ElemComponent<2>::getConstitutiveMatrix()
+Eigen::MatrixXd O2P2::Proc::Comp::MeshElem_SVK<2>::getConstitutiveMatrix()
 {
 	// Dimensionality of the element
 	auto nDim = m_pElem->getDIM();
@@ -161,11 +161,11 @@ Eigen::MatrixXd O2P2::Proc::Comp::ElemComponent<2>::getConstitutiveMatrix()
 
 // ================================================================================================
 //
-// Specialization of ElemComp Member Function (3D only): getConstitutiveMatrix
+// Specialization of MeshElem_SVK Member Function (3D only): getConstitutiveMatrix
 //
 // ================================================================================================
 template<>
-Eigen::MatrixXd O2P2::Proc::Comp::ElemComponent<3>::getConstitutiveMatrix()
+Eigen::MatrixXd O2P2::Proc::Comp::MeshElem_SVK<3>::getConstitutiveMatrix()
 {
 	// Dimensionality of the element
 	auto nDim = m_pElem->getDIM();
@@ -214,11 +214,11 @@ Eigen::MatrixXd O2P2::Proc::Comp::ElemComponent<3>::getConstitutiveMatrix()
 
 // ================================================================================================
 //
-// Implementation of ElemComp Member Function: getContribution
+// Implementation of MeshElem_SVK Member Function: getContribution
 //
 // ================================================================================================
 template<int nDim>
-void O2P2::Proc::Comp::ElemComponent<nDim>::getContribution(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian)
+void O2P2::Proc::Comp::MeshElem_SVK<nDim>::getContribution(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian)
 {
 	auto pMat = m_pElem->getMaterial();
 	auto nElDim = m_pElem->getDIM();
@@ -242,11 +242,11 @@ void O2P2::Proc::Comp::ElemComponent<nDim>::getContribution(Eigen::VectorXd& FIn
 
 // ================================================================================================
 //
-// Specialization of ElemComp Member Function: getContribution_SVK_ISO
+// Specialization of MeshElem_SVK Member Function: getContribution_SVK_ISO
 //
 // ================================================================================================
 template<> template<>
-void O2P2::Proc::Comp::ElemComponent<2>::getContribution_SVK_ISO<1>(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian)
+void O2P2::Proc::Comp::MeshElem_SVK<2>::getContribution_SVK_ISO<1>(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian)
 {
 	// Pointer to the first Shape Fuctions Derivative (const static)
 	auto pShape = m_pElem->getShapeDerivative();
@@ -358,11 +358,11 @@ void O2P2::Proc::Comp::ElemComponent<2>::getContribution_SVK_ISO<1>(Eigen::Vecto
 
 // ================================================================================================
 //
-// Implementation of ElemComp Member Function: getContribution_SVK_ISO
+// Implementation of MeshElem_SVK Member Function: getContribution_SVK_ISO
 //
 // ================================================================================================
 template<int nDim> template<int nElDim>
-void O2P2::Proc::Comp::ElemComponent<nDim>::getContribution_SVK_ISO(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian)
+void O2P2::Proc::Comp::MeshElem_SVK<nDim>::getContribution_SVK_ISO(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian)
 {
 	// Pointer to the first Shape Fuctions Derivative (const static)
 	auto pShape = m_pElem->getShapeDerivative();
@@ -537,12 +537,12 @@ void O2P2::Proc::Comp::ElemComponent<nDim>::getContribution_SVK_ISO(Eigen::Vecto
 
 // ================================================================================================
 //
-// Implementation of ElemComp Member Function (2D only): getContribution
+// Implementation of MeshElem_SVK Member Function (2D only): getContribution
 //
 // ================================================================================================
 /*
 template<>
-void O2P2::Proc::Comp::ElemComponent<2>::getContribution_SVK_ISO(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian)
+void O2P2::Proc::Comp::MeshElem_SVK<2>::getContribution_SVK_ISO(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian)
 {
 	// Pointer to the first Shape Fuctions Derivative (const static)
 	auto pShape = m_pElem->getShapeDerivative();
@@ -675,12 +675,12 @@ void O2P2::Proc::Comp::ElemComponent<2>::getContribution_SVK_ISO(Eigen::VectorXd
 
 // ================================================================================================
 //
-// Implementation of ElemComp Member Function (3D only): getContribution
+// Implementation of MeshElem_SVK Member Function (3D only): getContribution
 //
 // ================================================================================================
 /*
 template<>
-void O2P2::Proc::Comp::ElemComponent<3>::getContribution_SVK_ISO(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian)
+void O2P2::Proc::Comp::MeshElem_SVK<3>::getContribution_SVK_ISO(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian)
 {
 	// Pointer to the first Shape Fuctions Derivative (const static)
 	auto pShape = m_pElem->getShapeDerivative();

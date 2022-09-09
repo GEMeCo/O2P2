@@ -96,7 +96,7 @@ template<int nDim> void O2P2::Proc::Mesh_Mec<nDim>::assembleSOE(Eigen::SparseMat
 	Hessian.setZero();
 
 	// Fourth nested loop - Elements
-	std::for_each(std::execution::par, m_ElemComp.begin(), m_ElemComp.end(), [this](auto& elem)
+	std::for_each(std::execution::par, m_meshElem.begin(), m_meshElem.end(), [this](auto& elem)
 		{
 			// Matrices sizes
 			int nDof = elem->m_ElemDofIndex.size();
@@ -137,7 +137,7 @@ template<int nDim> void O2P2::Proc::Mesh_Mec<nDim>::assembleSOE(Eigen::SparseMat
 	// Add element contribution to global system
 	std::vector<Eigen::Triplet<double>> gl_triplets;
 
-	for (auto& elem : m_ElemComp) {
+	for (auto& elem : m_meshElem) {
 		std::move(elem->m_elHes.begin(), elem->m_elHes.end(), std::back_inserter(gl_triplets));
 		elem->m_elHes.erase(elem->m_elHes.begin(), elem->m_elHes.end());
 
@@ -150,10 +150,10 @@ template<int nDim> void O2P2::Proc::Mesh_Mec<nDim>::assembleSOE(Eigen::SparseMat
 
 // I'm getting this way slower than for_each
 //#pragma omp parallel for
-//	//for (auto& elem : m_ElemComp) {
-//	for (std::vector<std::unique_ptr<ElemComp>>::size_type i = 0; i != m_ElemComp.size(); i++)
+//	//for (auto& elem : m_meshElem) {
+//	for (std::vector<std::unique_ptr<meshElem>>::size_type i = 0; i != m_meshElem.size(); i++)
 //	{
-//		auto& elem = m_ElemComp[i];
+//		auto& elem = m_meshElem[i];
 //
 //		// Matrices sizes
 //		int nDof = elem->m_ElemDofIndex.size();

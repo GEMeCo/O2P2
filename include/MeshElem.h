@@ -29,27 +29,26 @@ namespace O2P2 {
 	namespace Proc {
 		namespace Comp {
 			/** @ingroup Processor_Module
-			  * @class ElemComp
+			  * @class MeshElem
 			  *
 			  * @brief Base class for elements and inclusion elements routines and local matrices.
 			  * @details Evaluates local matrices and handles material points elements, one for each integration point.
 			  * It should also evaluate the internal stresses.
 			  *
-			  * @note For each Geometry Element, there is only one Element Component, according to material and section types
+			  * @note For each Geometry Element, there is only one Mesh Element, according to material type.
 			  *
-			  * @todo 1 - ElemComponent deve estar relacionada ao material (MaterialType). A implementação atual se refere apenas à SVK isotrópico.
-			  * @todo 2 - Seria interessante implementar uma versão teste com menos temporários e mais funções, para auxiliar novas derivações.
+			  * @todo 1 - Seria interessante implementar uma versão teste com menos temporários e mais funções, para auxiliar novas derivações.
 			  * Por exemplo, em cada ponto de integração, calcula-se F1, F, C, L, S, dLdy, dUedy, e d2Ldy2.
 			  * Uma depende da outra, e tem notações distintas (matricial e Voigt). Poderia registrar só Voigt e retornar conforme solicitado.
 			  * Será que o overhead seria muito grande? E o uso de memória, mantido (afinal está usando temporárias)?
-			  * @todo 3 - getConstitutiveMatrix não depende da temperatura?
+			  * @todo 2 - getConstitutiveMatrix não depende da temperatura?
 			  *
 			  */
-			class ElemComp
+			class MeshElem
 			{
 			public:
 				// Default destructor of private / protected pointers.
-				virtual ~ElemComp() = default;
+				virtual ~MeshElem() = default;
 
 				/** Prepare element contribution.
 				  * @param FInt Element contribution to the internal force.
@@ -59,7 +58,7 @@ namespace O2P2 {
 
 			protected:
 				/** @brief Basic constructor. */
-				ElemComp() { m_nDof = 0; }
+				MeshElem() { m_nDof = 0; }
 
 				/** @return a pointer to the element indexing, after casting.
 				  *
@@ -96,7 +95,7 @@ namespace O2P2 {
 
 
 			/**
-			  * @class ElemComponent
+			  * @class MeshElem_SVK
 			  *
 			  * @brief Class for elements and inclusion elements routines and local matrices for SVK material model.
 			  * @details Evaluates local matrices and handles material points elements, one for each integration point.
@@ -105,16 +104,16 @@ namespace O2P2 {
 			  * @tparam nDim The dimensionality of the problem. It is either 2 or 3 (bidimensional or tridimensional).
 			  */
 			template<int nDim>
-			class ElemComponent : public ElemComp
+			class MeshElem_SVK : public MeshElem
 			{
 			private:
-				ElemComponent() = delete;
+				MeshElem_SVK() = delete;
 
 			public:
 				/** Constructor for mechanical analysis elements, for SVK material model.
 				  * @param pElmt Pointer to geometry element.
 				  */
-				explicit ElemComponent(std::shared_ptr<O2P2::Prep::Elem::BaseElement> pElmt) : ElemComp() {
+				explicit MeshElem_SVK(std::shared_ptr<O2P2::Prep::Elem::BaseElement> pElmt) : MeshElem() {
 					m_pElem = pElmt;
 					this->m_MatPoint.reserve(pElmt->getNumIP());
 
@@ -122,7 +121,7 @@ namespace O2P2 {
 				}
 
 				// Default destructor of private / protected pointers.
-				virtual ~ElemComponent() = default;
+				virtual ~MeshElem_SVK() = default;
 
 				// Prepare element contribution.
 				void getContribution(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian) override;

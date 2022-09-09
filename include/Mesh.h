@@ -20,7 +20,7 @@
 #include "LoadStep.h"
 
 #include "Domain.h"
-#include "ElementComp.h"
+#include "MeshElem.h"
 #include "PostProcess.h"
 
 namespace O2P2 {
@@ -138,7 +138,7 @@ namespace O2P2 {
 			double m_currentTime{ 0. };
 
 			/** @brief Container of element components associated to the analysis. */
-			std::vector<std::unique_ptr<O2P2::Proc::Comp::ElemComp>> m_ElemComp;
+			std::vector<std::unique_ptr<O2P2::Proc::Comp::MeshElem>> m_meshElem;
 
 		protected:
 			/** @brief Current load step under process. */
@@ -179,11 +179,11 @@ namespace O2P2 {
 			  */
 			explicit Mesh_Mec(O2P2::Prep::Domain<nDim>* theDomain, O2P2::Post::PostProcess* vOut) : Mesh(vOut) {
 				m_NodePt = &theDomain->getNode();
-				m_ElemComp.reserve(theDomain->getElem().size());
+				m_meshElem.reserve(theDomain->getElem().size());
 
 				// Generates element components for each domain element
 				for (std::shared_ptr<O2P2::Prep::Elem::Element<nDim>> elem : theDomain->getElem()) {
-					m_ElemComp.emplace_back(std::make_unique<O2P2::Proc::Comp::ElemComponent<nDim>>(elem));
+					m_meshElem.emplace_back(std::make_unique<O2P2::Proc::Comp::MeshElem_SVK<nDim>>(elem));
 				}
 			}
 

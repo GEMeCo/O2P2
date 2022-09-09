@@ -60,7 +60,7 @@ bool O2P2::Proc::SolutionAlgorithm<nDim>::initFEModel(O2P2::Prep::Domain<nDim>* 
 	}
 
 	// Now assemble the elemental dof
-	for (size_t i = 0; i < m_theFEModel->m_ElemComp.size(); i++) {
+	for (size_t i = 0; i < m_theFEModel->m_meshElem.size(); i++) {
 
 		// Domain element associated to the current element component
 		O2P2::Prep::Elem::Element<nDim>* pElem = theDomain->getElem(i);
@@ -75,11 +75,11 @@ bool O2P2::Proc::SolutionAlgorithm<nDim>::initFEModel(O2P2::Prep::Domain<nDim>* 
 		}
 
 		// Transfer the elemental dof to the element component
-		m_theFEModel->m_ElemComp[i]->m_nDof = elemDofIndex.size();
-		m_theFEModel->m_ElemComp[i]->m_ElemDofIndex = std::move(elemDofIndex);
+		m_theFEModel->m_meshElem[i]->m_nDof = elemDofIndex.size();
+		m_theFEModel->m_meshElem[i]->m_ElemDofIndex = std::move(elemDofIndex);
 
 		// Set the size for the internal force vector
-		m_theFEModel->m_ElemComp[i]->m_elFor.resize(m_theFEModel->m_ElemComp[i]->m_nDof);
+		m_theFEModel->m_meshElem[i]->m_elFor.resize(m_theFEModel->m_meshElem[i]->m_nDof);
 	}
 
 	LOG("SolutionAlgorithm.initFEModel: Total number of DOF: " << std::to_string(m_theFEModel->getNumDof()));
