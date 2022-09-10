@@ -18,18 +18,11 @@
 
 // ================================================================================================
 //
-// Explicit template member functions instantiation
+// Implementation of Member Function: runTimeLoop
 //
 // ================================================================================================
-template void O2P2::Proc::TimeStep_QsiStatic::runTimeLooping<2>(O2P2::Prep::Domain<2>* theDomain, O2P2::Proc::Mesh* theFEModel, O2P2::Proc::NonLinearSolver* theSolver);
-template void O2P2::Proc::TimeStep_QsiStatic::runTimeLooping<3>(O2P2::Prep::Domain<3>* theDomain, O2P2::Proc::Mesh* theFEModel, O2P2::Proc::NonLinearSolver* theSolver);
-
-// ================================================================================================
-//
-// Implementation of Template Member Function: runTimeLoop
-//
-// ================================================================================================
-template<int nDim> void O2P2::Proc::TimeStep_QsiStatic::runTimeLooping(O2P2::Prep::Domain<nDim>* theDomain, O2P2::Proc::Mesh* theFEModel, O2P2::Proc::NonLinearSolver* theSolver) {
+void O2P2::Proc::TimeStep_QsiStatic::runTimeLoop(O2P2::Proc::Mesh* theFEModel, O2P2::Proc::NonLinearSolver* theSolver) {
+	PROFILE_FUNCTION();
 
 	// Loop on time step
 	for (int timeIt = 0; timeIt < theFEModel->getLoadStep()->m_NumSteps; ++timeIt) {
@@ -45,17 +38,8 @@ template<int nDim> void O2P2::Proc::TimeStep_QsiStatic::runTimeLooping(O2P2::Pre
 		// Setup current analysis time step
 		theFEModel->setTimeStep(timeIt);
 
-		// Initial norm
-		double initialNorm = 0.;
-		for (auto& x0 : theDomain->getNode()) {
-			for (double coord : x0->getInitPos()) {
-				initialNorm += coord * coord;
-			}
-		}
-		initialNorm = std::sqrt(initialNorm);
-
 		// Call loop of non-linear solver
-		bool feasible = theSolver->runNLS(theFEModel, initialNorm, true);
+		bool feasible = theSolver->runNLS(theFEModel, theFEModel->m_initialNorm, true);
 		LOG("NLSolver.runNLS: Solution attained - feasibility: " << std::boolalpha << feasible << std::noboolalpha);
 		std::cout << "\n------------------------------------------------------------";
 	}

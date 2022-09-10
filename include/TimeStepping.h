@@ -44,14 +44,7 @@ namespace O2P2 {
 			  * @param theFEModel Container of solution components.
 			  * @param theSolver Pointer to the non-linear solver.
 			  */
-			virtual void runTimeLoop(O2P2::Prep::Domain<2>* theDomain, O2P2::Proc::Mesh* theFEModel, O2P2::Proc::NonLinearSolver* theSolver) = 0;
-
-			/** Manages the time stepping integration scheme.
-			  * @param theDomain Container with nodal and elements information.
-			  * @param theFEModel Container of solution components.
-			  * @param theSolver Pointer to the non-linear solver.
-			  */
-			virtual void runTimeLoop(O2P2::Prep::Domain<3>* theDomain, O2P2::Proc::Mesh* theFEModel, O2P2::Proc::NonLinearSolver* theSolver) = 0;
+			virtual void runTimeLoop(O2P2::Proc::Mesh* theFEModel, O2P2::Proc::NonLinearSolver* theSolver) = 0;
 
 		protected:
 			/** @brief Default construtor. Implemented in derived classes.  */
@@ -72,21 +65,7 @@ namespace O2P2 {
 			TimeStep_QsiStatic() {};
 
 			// Work-around to implement Quasi-Static time stepping integration for 2D and 3D problems.
-			void runTimeLoop(O2P2::Prep::Domain<2>* theDomain, O2P2::Proc::Mesh* theFEModel, O2P2::Proc::NonLinearSolver* theSolver) override {
-				PROFILE_FUNCTION();
-				this->runTimeLooping(theDomain, theFEModel, theSolver);
-			}
-
-			// Work-around to implement Quasi-Static time stepping integration for 2D and 3D problems.
-			void runTimeLoop(O2P2::Prep::Domain<3>* theDomain, O2P2::Proc::Mesh* theFEModel, O2P2::Proc::NonLinearSolver* theSolver) override {
-				PROFILE_FUNCTION();
-				this->runTimeLooping(theDomain, theFEModel, theSolver);
-			}
-
-		private:
-			// Actual implementation of Quasi-Static time stepping integration. 2D AND 3D.
-			template<int nDim>
-			void runTimeLooping(O2P2::Prep::Domain<nDim>* theDomain, O2P2::Proc::Mesh* theFEModel, O2P2::Proc::NonLinearSolver* theSolver);
+			void runTimeLoop(O2P2::Proc::Mesh* theFEModel, O2P2::Proc::NonLinearSolver* theSolver) override;
 		};
 	} // End of Proc Namespace
 } // End of O2P2 Namespace

@@ -54,9 +54,6 @@
     <ClCompile Include="source\TimeStepping.cpp">
       <Filter>Source Files\Solution Components</Filter>
     </ClCompile>
-    <ClCompile Include="source\OutputSystem.cpp">
-      <Filter>Source Files\Post-Process Components</Filter>
-    </ClCompile>
     <ClCompile Include="source\PostProcess.cpp">
       <Filter>Source Files\Post-Process Components</Filter>
     </ClCompile>
@@ -68,6 +65,9 @@
     </ClCompile>
     <ClCompile Include="source\MeshElem.cpp">
       <Filter>Source Files\Solution Components</Filter>
+    </ClCompile>
+    <ClCompile Include="source\OutputSystem.cpp">
+      <Filter>Source Files\Post-Process Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -195,9 +195,6 @@
     </ClInclude>
     <ClInclude Include="include\Elements\Elem_Lin.h">
       <Filter>Header Files\Domain Components\Elements</Filter>
-    </ClInclude>
-    <ClInclude Include="include\MeshNode.h">
-      <Filter>Header Files\Solution Components</Filter>
     </ClInclude>
     <ClInclude Include="include\ModelBuilder.h">
       <Filter>Header Files\Domain Components</Filter>

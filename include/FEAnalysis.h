@@ -82,7 +82,7 @@ namespace O2P2 {
 		std::unique_ptr<O2P2::Prep::Domain<nDim>> m_theMesh;
 
 		// Manages the processing unity.
-		std::unique_ptr<O2P2::Proc::SolutionAlgorithm<nDim>> m_theAnalyzer;
+		std::unique_ptr<O2P2::Proc::SolutionAlgorithm> m_theAnalyzer;
 
 		// Manages the pos-process. Also buffers solutions.
 		std::unique_ptr<O2P2::Post::PostProcess> m_thePost;

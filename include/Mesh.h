@@ -137,6 +137,9 @@ namespace O2P2 {
 			/** @brief Current time of anaysis. */
 			double m_currentTime{ 0. };
 
+			/** @brief Initial norm - required by the NLSolver. */
+			double m_initialNorm{ 0 };
+
 			/** @brief Container of element components associated to the analysis. */
 			std::vector<std::unique_ptr<O2P2::Proc::Comp::MeshElem>> m_meshElem;
 
@@ -179,12 +182,20 @@ namespace O2P2 {
 			  */
 			explicit Mesh_Mec(O2P2::Prep::Domain<nDim>* theDomain, O2P2::Post::PostProcess* vOut) : Mesh(vOut) {
 				m_NodePt = &theDomain->getNode();
-				m_meshElem.reserve(theDomain->getElem().size());
+				m_meshElem.reserve(theDomain->m_nElem);
 
 				// Generates element components for each domain element
 				for (std::shared_ptr<O2P2::Prep::Elem::Element<nDim>> elem : theDomain->getElem()) {
 					m_meshElem.emplace_back(std::make_unique<O2P2::Proc::Comp::MeshElem_SVK<nDim>>(elem));
 				}
+
+				// Initial norm (required by Non-linear Solver)
+				for (auto& x0 : *m_NodePt) {
+					for (double coord : x0->getInitPos()) {
+						this->m_initialNorm += coord * coord;
+					}
+				}
+				this->m_initialNorm = std::sqrt(this->m_initialNorm);
 			}
 
 			// Default destructor of private / protected pointers.

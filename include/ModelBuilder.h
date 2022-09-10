@@ -58,7 +58,7 @@ namespace O2P2 {
 		 * @return a pointer to a SolutionAlgorithm object, after initialization.
 		 * @param fileProj Project file (Main file).
 		*/
-		std::unique_ptr<O2P2::Proc::SolutionAlgorithm<nDim>> initAnalyzer(std::istream& fileProj);
+		std::unique_ptr<O2P2::Proc::SolutionAlgorithm> initAnalyzer(std::istream& fileProj);
 
 		/** Populates nodes, materials, sections, elements, loads ands constrains.
 		  * @return True if mesh components were correctly initiated.
@@ -78,7 +78,7 @@ namespace O2P2 {
 		  * @sa Domain
 		  * @sa SolutionAlgorithm
 		  */
-		int readBondaryConditions(O2P2::Prep::Domain<nDim>* theDomain, O2P2::Proc::SolutionAlgorithm<nDim>* theAnalyzer);
+		int readBondaryConditions(O2P2::Prep::Domain<nDim>* theDomain, O2P2::Proc::SolutionAlgorithm* theAnalyzer);
 
 	public:
 		/** @brief Indicates whether input begins with 0 or 1. */

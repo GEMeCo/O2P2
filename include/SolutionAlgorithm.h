@@ -28,10 +28,7 @@ namespace O2P2 {
 		  * @details This class manages the entire processing, aggregating a nonlinear solver, a time step integration scheme and a solver for system of equations.
 		  *
 		  * @todo Adicionar uma figura mostrando o fluxograma do algoritmo de solução (calls). SolAlg -> LoadStep -> TimeStep -> NLSolver -> Mesh -> ElemComp.
-		  *
-		  * @tparam nDim The dimensionality of the problem. It is either 2 or 3 (bidimensional or tridimensional).
 		  */
-		template<int nDim>
 		class SolutionAlgorithm
 		{
 		private:
@@ -92,12 +89,28 @@ namespace O2P2 {
 			  * @param theDomain Container with nodal and elements information.
 			  * @param thePost Container with solutions for post-process.
 			  */
-			bool initFEModel(O2P2::Prep::Domain<nDim>* theDomain, O2P2::Post::PostProcess* thePost);
+			bool initFEModel(O2P2::Prep::Domain<2>* theDomain, O2P2::Post::PostProcess* thePost) {
+				PROFILE_FUNCTION();
+				return this->initFEM(theDomain, thePost);
+			}
+
+			bool initFEModel(O2P2::Prep::Domain<3>* theDomain, O2P2::Post::PostProcess* thePost) {
+				PROFILE_FUNCTION();
+				return this->initFEM(theDomain, thePost);
+			}
 
 			/** Run the analysis, based on previous setup.
 			  * @param theDomain Container with nodal and elements information.
 			  */
-			void runSolutionAlgorithm(O2P2::Prep::Domain<nDim>* theDomain);
+			void runSolutionAlgorithm(O2P2::Prep::Domain<2>* theDomain) {
+				PROFILE_FUNCTION();
+				this->runSolution(theDomain);
+			}
+
+			void runSolutionAlgorithm(O2P2::Prep::Domain<3>* theDomain) {
+				PROFILE_FUNCTION();
+				this->runSolution(theDomain);
+			}
 
 			/** @return the number of Load Steps. */
 			int getNumLoadSteps() const { return m_numLoadSteps; }
@@ -178,6 +191,13 @@ namespace O2P2 {
 
 			/** Container of solution components */
 			std::unique_ptr<O2P2::Proc::Mesh> m_theFEModel;
+
+		private:
+			template<int nDim>
+			void runSolution(O2P2::Prep::Domain<nDim>* theDomain);
+
+			template<int nDim>
+			bool initFEM(O2P2::Prep::Domain<nDim>* theDomain, O2P2::Post::PostProcess* thePost);
 		};
 	} // End of Proc Namespace
 } // End of O2P2 Namespace

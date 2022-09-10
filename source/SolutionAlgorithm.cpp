@@ -21,11 +21,11 @@
 // Explicit template member functions instantiation
 //
 // ================================================================================================
-template bool O2P2::Proc::SolutionAlgorithm<2>::initFEModel(O2P2::Prep::Domain<2>* theDomain, O2P2::Post::PostProcess* thePost);
-template bool O2P2::Proc::SolutionAlgorithm<3>::initFEModel(O2P2::Prep::Domain<3>* theDomain, O2P2::Post::PostProcess* thePost);
+template bool O2P2::Proc::SolutionAlgorithm::initFEM<2>(O2P2::Prep::Domain<2>* theDomain, O2P2::Post::PostProcess* thePost);
+template bool O2P2::Proc::SolutionAlgorithm::initFEM<3>(O2P2::Prep::Domain<3>* theDomain, O2P2::Post::PostProcess* thePost);
 
-template void O2P2::Proc::SolutionAlgorithm<2>::runSolutionAlgorithm(O2P2::Prep::Domain<2>* theDomain);
-template void O2P2::Proc::SolutionAlgorithm<3>::runSolutionAlgorithm(O2P2::Prep::Domain<3>* theDomain);
+template void O2P2::Proc::SolutionAlgorithm::runSolution<2>(O2P2::Prep::Domain<2>* theDomain);
+template void O2P2::Proc::SolutionAlgorithm::runSolution<3>(O2P2::Prep::Domain<3>* theDomain);
 
 // ================================================================================================
 //
@@ -33,10 +33,8 @@ template void O2P2::Proc::SolutionAlgorithm<3>::runSolutionAlgorithm(O2P2::Prep:
 //
 // ================================================================================================
 template<int nDim>
-bool O2P2::Proc::SolutionAlgorithm<nDim>::initFEModel(O2P2::Prep::Domain<nDim>* theDomain, O2P2::Post::PostProcess* thePost)
+bool O2P2::Proc::SolutionAlgorithm::initFEM(O2P2::Prep::Domain<nDim>* theDomain, O2P2::Post::PostProcess* thePost)
 {
-	PROFILE_FUNCTION();
-
 	LOG("\nSolutionAlgorithm.initFEModel: Basic Definitions");
 	LOG("SolutionAlgorithm.initFEModel: Initiating DOF Mapping system");
 
@@ -94,10 +92,8 @@ bool O2P2::Proc::SolutionAlgorithm<nDim>::initFEModel(O2P2::Prep::Domain<nDim>* 
 //
 // ================================================================================================
 template<int nDim>
-void O2P2::Proc::SolutionAlgorithm<nDim>::runSolutionAlgorithm(O2P2::Prep::Domain<nDim>* theDomain)
+void O2P2::Proc::SolutionAlgorithm::runSolution(O2P2::Prep::Domain<nDim>* theDomain)
 {
-	PROFILE_FUNCTION();
-
 	std::cout << "\n\n------------------------------------------------------------"
 		<< "\nIniting Solution Algorithm"
 		<< "\n------------------------------------------------------------";
@@ -113,6 +109,6 @@ void O2P2::Proc::SolutionAlgorithm<nDim>::runSolutionAlgorithm(O2P2::Prep::Domai
 		m_theFEModel->initDirichletBC(loadStep);
 
 		// Second loop -> Time Stepping
-		m_theTimeStep->runTimeLoop(theDomain, m_theFEModel.get(), m_theNLSolver.get());
+		m_theTimeStep->runTimeLoop(m_theFEModel.get(), m_theNLSolver.get());
 	}
 }

@@ -24,14 +24,14 @@
 template std::unique_ptr<O2P2::Prep::Domain<2>> O2P2::ModelBuilder<2>::initMesh(std::istream& fileProj);
 template std::unique_ptr<O2P2::Prep::Domain<3>> O2P2::ModelBuilder<3>::initMesh(std::istream& fileProj);
 
-template std::unique_ptr<O2P2::Proc::SolutionAlgorithm<2>> O2P2::ModelBuilder<2>::initAnalyzer(std::istream& fileProj);
-template std::unique_ptr<O2P2::Proc::SolutionAlgorithm<3>> O2P2::ModelBuilder<3>::initAnalyzer(std::istream& fileProj);
+template std::unique_ptr<O2P2::Proc::SolutionAlgorithm> O2P2::ModelBuilder<2>::initAnalyzer(std::istream& fileProj);
+template std::unique_ptr<O2P2::Proc::SolutionAlgorithm> O2P2::ModelBuilder<3>::initAnalyzer(std::istream& fileProj);
 
 template bool O2P2::ModelBuilder<2>::populateDomain(O2P2::Prep::Domain<2>* theDomain);
 template bool O2P2::ModelBuilder<3>::populateDomain(O2P2::Prep::Domain<3>* theDomain);
 
-template int O2P2::ModelBuilder<2>::readBondaryConditions(O2P2::Prep::Domain<2>* theDomain, O2P2::Proc::SolutionAlgorithm<2>* theAnalyzer);
-template int O2P2::ModelBuilder<3>::readBondaryConditions(O2P2::Prep::Domain<3>* theDomain, O2P2::Proc::SolutionAlgorithm<3>* theAnalyzer);
+template int O2P2::ModelBuilder<2>::readBondaryConditions(O2P2::Prep::Domain<2>* theDomain, O2P2::Proc::SolutionAlgorithm* theAnalyzer);
+template int O2P2::ModelBuilder<3>::readBondaryConditions(O2P2::Prep::Domain<3>* theDomain, O2P2::Proc::SolutionAlgorithm* theAnalyzer);
 
 
 // ================================================================================================
@@ -157,7 +157,7 @@ template<int nDim> std::unique_ptr<O2P2::Prep::Domain<nDim>> O2P2::ModelBuilder<
 // Implementation of Template Member Function (2D and 3D): initAnalyzer
 //
 // ================================================================================================
-template<int nDim> std::unique_ptr<O2P2::Proc::SolutionAlgorithm<nDim>> O2P2::ModelBuilder<nDim>::initAnalyzer(std::istream& fileProj)
+template<int nDim> std::unique_ptr<O2P2::Proc::SolutionAlgorithm> O2P2::ModelBuilder<nDim>::initAnalyzer(std::istream& fileProj)
 {
 	PROFILE_FUNCTION();
 
@@ -203,7 +203,7 @@ template<int nDim> std::unique_ptr<O2P2::Proc::SolutionAlgorithm<nDim>> O2P2::Mo
 	LOG("ModelBuilder.initAnalyzer: Maximum number of iterations: " << std::to_string(MaxIt));
 	LOG("ModelBuilder.initAnalyzer: Tolerance for NonLinear Process: " << std::scientific << Tol << std::fixed);
 
-	return std::make_unique<O2P2::Proc::SolutionAlgorithm<nDim>>(m_AnalysisType, NLSolverType(iSl - 1), m_ProblemType, NumLS, MinIt, MaxIt, Tol);
+	return std::make_unique<O2P2::Proc::SolutionAlgorithm>(m_AnalysisType, NLSolverType(iSl - 1), m_ProblemType, NumLS, MinIt, MaxIt, Tol);
 }
 
 
@@ -480,7 +480,7 @@ template<int nDim> bool O2P2::ModelBuilder<nDim>::populateElements(O2P2::Prep::D
 // Implementation of Template Member Function (2D and 3D): readBoundaryConditions
 //
 // ================================================================================================
-template<int nDim> int O2P2::ModelBuilder<nDim>::readBondaryConditions(O2P2::Prep::Domain<nDim>* theDomain, O2P2::Proc::SolutionAlgorithm<nDim>* theAnalyzer)
+template<int nDim> int O2P2::ModelBuilder<nDim>::readBondaryConditions(O2P2::Prep::Domain<nDim>* theDomain, O2P2::Proc::SolutionAlgorithm* theAnalyzer)
 {
 	PROFILE_FUNCTION();
 

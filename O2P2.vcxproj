@@ -141,7 +141,6 @@
     <ClInclude Include="include\MaterialPoint.h" />
     <ClInclude Include="include\ModelBuilder.h" />
     <ClInclude Include="include\Node.h" />
-    <ClInclude Include="include\MeshNode.h" />
     <ClInclude Include="include\NonLinearSolver.h" />
     <ClInclude Include="include\OutputSystem.h" />
     <ClInclude Include="include\PostProcess.h" />
