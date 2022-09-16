@@ -23,13 +23,16 @@ namespace O2P2 {
 		/** @ingroup PreProcessor_Module
 		  * @class Domain
 		  *
-		  * @brief Container of geometry components: nodes, elements, sections and materials
-		  * @details This class holds vectors of mesh components. These components are objects of the following classes:
-		  * Node, Element, Material, Section and LoadStep.
-		  *
-		  * @todo Funcionalidade para criação de demais materiais.
+		  * @brief Container of geometry components: nodes, elements, sections and materials.
+		  * @details This class holds vectors of geometry components. These components are objects of the following classes:
+		  * Node, Element, Material and Section.
 		  *
 		  * @tparam nDim The dimensionality of the problem. It is either 2 or 3 (bidimensional or tridimensional).
+		  * 
+		  * @sa Node
+		  * @sa Element
+		  * @sa Material
+		  * @sa Section
 		  */
 		template<int nDim>
 		class Domain

@@ -25,11 +25,6 @@ namespace O2P2 {
 		  * @details This class manages the time step integration scheme and handles variables for quasi-static / parabolic / hyperbolic / eigenvalue analysis.
 		  * The values required for the time step integration scheme are available at LoadStep.
 		  *
-		  * @todo 1 - Funcionalidade para problemas parabólicos (temperatura).
-		  * @todo 2 - Funcionalidade para problemas dinâmicos hiperbólicos (Newmark).
-		  * @todo 3 - Funcionalidade para problemas dinâmicos hiperbólicos (HHT alpha).
-		  * @todo 4 - Funcionalidade para problemas de autovalor.
-		  *
 		  * @sa Mesh
 		  * @sa LoadStep
 		  */
@@ -40,7 +35,6 @@ namespace O2P2 {
 			virtual ~TimeStepping() = default;
 
 			/** Manages the time stepping integration scheme.
-			  * @param theDomain Container with nodal and elements information.
 			  * @param theFEModel Container of solution components.
 			  * @param theSolver Pointer to the non-linear solver.
 			  */
@@ -56,7 +50,6 @@ namespace O2P2 {
 		  * @class TimeStep_QsiStatic
 		  * @brief Time step integration schemes for quasi-static problems.
 		  *
-		  * @todo Representação do esquema de integração quase-estático.
 		  */
 		class TimeStep_QsiStatic : public TimeStepping
 		{

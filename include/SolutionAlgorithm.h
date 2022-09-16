@@ -26,8 +26,6 @@ namespace O2P2 {
 		  *
 		  * @brief Aggregation of classes to evaluate the analysis.
 		  * @details This class manages the entire processing, aggregating a nonlinear solver, a time step integration scheme and a solver for system of equations.
-		  *
-		  * @todo Adicionar uma figura mostrando o fluxograma do algoritmo de solução (calls). SolAlg -> LoadStep -> TimeStep -> NLSolver -> Mesh -> ElemComp.
 		  */
 		class SolutionAlgorithm
 		{
@@ -50,7 +48,7 @@ namespace O2P2 {
 			  * @param MaxIt Maximum number of iterations .
 			  * @param Tolerance Tolerance.
 			  */
-			SolutionAlgorithm(const AnalysisType& Analysis, const NLSolverType& Solver, const ProblemType& Problem,
+			explicit SolutionAlgorithm(const AnalysisType& Analysis, const NLSolverType& Solver, const ProblemType& Problem,
 				const int& NumLS, const int& MinIt, const int& MaxIt, const double& Tolerance) :
 				m_AnalysisType(Analysis), m_SolverType(Solver), m_ProblemType(Problem), m_numLoadSteps(NumLS) {
 
@@ -94,6 +92,12 @@ namespace O2P2 {
 				return this->initFEM(theDomain, thePost);
 			}
 
+			/** Initiate the solution container.
+			  * @return true if container is populated.
+			  *
+			  * @param theDomain Container with nodal and elements information.
+			  * @param thePost Container with solutions for post-process.
+			  */
 			bool initFEModel(O2P2::Prep::Domain<3>* theDomain, O2P2::Post::PostProcess* thePost) {
 				PROFILE_FUNCTION();
 				return this->initFEM(theDomain, thePost);
@@ -107,6 +111,9 @@ namespace O2P2 {
 				this->runSolution(theDomain);
 			}
 
+			/** Run the analysis, based on previous setup.
+			  * @param theDomain Container with nodal and elements information.
+			  */
 			void runSolutionAlgorithm(O2P2::Prep::Domain<3>* theDomain) {
 				PROFILE_FUNCTION();
 				this->runSolution(theDomain);

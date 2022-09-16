@@ -20,9 +20,6 @@ namespace O2P2 {
 		  *
 		  * @brief Container of solutions, for post-processing purposes.
 		  * @details This class will manages data save for post-processing.
-		  *
-		  * @todo 1 - Cálculo de valores em ponto qualquer (deslocamento, temperatura, fluxo).
-		  * @todo 2 - Reservar valores nos pontos de integração (dano, tensão, deformação).
 		  */
 		class PostProcess
 		{

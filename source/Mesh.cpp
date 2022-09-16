@@ -96,17 +96,17 @@ template<int nDim> void O2P2::Proc::Mesh_Mec<nDim>::assembleSOE(Eigen::SparseMat
 	Hessian.setZero();
 
 	// Fourth nested loop - Elements
-	std::for_each(std::execution::par, m_meshElem.begin(), m_meshElem.end(), [this](auto& elem)
+	std::for_each(std::execution::par, m_meshElem.begin(), m_meshElem.end(), [&](auto& elem)
 		{
 			// Matrices sizes
 			int nDof = elem->m_ElemDofIndex.size();
 
 			// Element Internal force and Hessian matrix
-			Eigen::VectorXd elemVec = Eigen::VectorXd::Zero(nDof);
 			Eigen::MatrixXd elemMat = Eigen::MatrixXd::Zero(nDof, nDof);
 
 			// Get element contributions for internal force and hessian matrix
-			elem->getContribution(elemVec, elemMat);
+			elem->m_elFor.setZero();
+			elem->getContribution(elemMat);
 
 			// Impose Dirichlet boundary conditions on current element
 			// Eigen matrices are stored in column-major order
@@ -119,7 +119,7 @@ template<int nDim> void O2P2::Proc::Mesh_Mec<nDim>::assembleSOE(Eigen::SparseMat
 				}
 
 				elemMat(i, i) += (static_cast<size_t>(1) - this->m_BCIndex.at(dof));
-				elemVec(i) *= this->m_BCIndex.at(dof);
+				elem->m_elFor(i) *= this->m_BCIndex.at(dof);
 			}
 
 			// Register element contribution to local triplet
@@ -130,7 +130,7 @@ template<int nDim> void O2P2::Proc::Mesh_Mec<nDim>::assembleSOE(Eigen::SparseMat
 			}
 
 			// Register element contribution to the right hand side vector
-			elemVec.swap(elem->m_elFor);
+			//elemVec.swap(elem->m_elFor);
 		}
 	);
 

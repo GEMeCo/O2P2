@@ -130,7 +130,10 @@ namespace O2P2 {
 				/** Constructor for element objects.
 				  * @param Material Pointer to Material class.
 				  */
-				explicit Element(const std::shared_ptr<O2P2::Prep::Material>& Material) : BaseElement(Material) { m_Centroid = nullptr; }
+				explicit Element(const std::shared_ptr<O2P2::Prep::Material>& Material)
+					: BaseElement(Material) {
+					m_Centroid = nullptr;
+				}
 
 				// Default destructor of private / protected pointers.
 				~Element() = default;

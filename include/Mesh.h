@@ -30,11 +30,6 @@ namespace O2P2 {
 		  *
 		  * @brief Container of solution components.
 		  * @details This class holds vectors of solution and analysis components: Load Steps, DOF, System of equation, and such.
-		  *
-		  * @todo 1 - Funcionalidade para problemas térmicos.
-		  * @todo 2 - Geração de elemComp não está associada ao problema (térmico, mecânico, etc), afinal só há uma implementação de elemComp.
-		  * @todo 3 - Não seria mais interessante levar os container de elementos e nós para classe base (atualmente na derivada _MEC)?
-		  * Desta forma, as classes derivadas conteriam apenas implementações específicas, sem novos dados...
 		  */
 		class Mesh
 		{

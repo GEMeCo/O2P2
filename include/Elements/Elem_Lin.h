@@ -30,8 +30,6 @@ namespace O2P2 {
 			  * @tparam nDim The dimensionality of the problem. It is either 2 or 3 (bidimensional or tridimensional).
 			  * @tparam nNodes Number of nodes. Must be: 2, 3 or 4.
 			  * @tparam nIP Number of integration points. Must be: 2, 3 or 4.
-			  *
-			  * @todo setGeomProperties of line elements
 			  */
 			template<int nDim, int nNodes, int nIP>
 			class Elem_Lin : public ElementLinear<nDim>

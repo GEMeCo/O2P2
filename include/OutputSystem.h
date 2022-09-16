@@ -23,9 +23,6 @@ namespace O2P2 {
 		  * @brief Base class for output files
 		  * @details Prepare files for AcadView (OGL), Paraview (VTU), etc.
 		  *
-		  * @todo 1 - Saída de tensões
-		  * @todo 2 - Sáida para paraview
-		  *
 		  * @tparam nDim The dimensionality of the problem. It is either 2 or 3 (bidimensional or tridimensional).
 		  */
 		template<int nDim>

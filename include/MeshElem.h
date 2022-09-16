@@ -36,13 +36,6 @@ namespace O2P2 {
 			  * It should also evaluate the internal stresses.
 			  *
 			  * @note For each Geometry Element, there is only one Mesh Element, according to material type.
-			  *
-			  * @todo 1 - Seria interessante implementar uma versão teste com menos temporários e mais funções, para auxiliar novas derivações.
-			  * Por exemplo, em cada ponto de integração, calcula-se F1, F, C, L, S, dLdy, dUedy, e d2Ldy2.
-			  * Uma depende da outra, e tem notações distintas (matricial e Voigt). Poderia registrar só Voigt e retornar conforme solicitado.
-			  * Será que o overhead seria muito grande? E o uso de memória, mantido (afinal está usando temporárias)?
-			  * @todo 2 - getConstitutiveMatrix não depende da temperatura?
-			  *
 			  */
 			class MeshElem
 			{
@@ -51,10 +44,9 @@ namespace O2P2 {
 				virtual ~MeshElem() = default;
 
 				/** Prepare element contribution.
-				  * @param FInt Element contribution to the internal force.
 				  * @param Hessian Element contribution to the hessian matrix.
 				  */
-				virtual void getContribution(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian) = 0;
+				virtual void getContribution(Eigen::MatrixXd& Hessian) = 0;
 
 			protected:
 				/** @brief Basic constructor. */
@@ -124,7 +116,7 @@ namespace O2P2 {
 				virtual ~MeshElem_SVK() = default;
 
 				// Prepare element contribution.
-				void getContribution(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian) override;
+				void getContribution(Eigen::MatrixXd& Hessian) override;
 
 			protected:
 				/** @brief Populates the material point vector. */
@@ -139,13 +131,12 @@ namespace O2P2 {
 				double getYoungModulus();
 
 				/** Prepare element contribution fo SVK_ISO material.
-				  * @param FInt Element contribution to the internal force.
 				  * @param Hessian Element contribution to the hessian matrix.
 				  *
 				  * @tparam nElDim The dimensionality of the element. It can be 1, 2 or 3 (linear, plane or solid).
 				  */
 				template<int nElDim>
-				void getContribution_SVK_ISO(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian);
+				void getContribution_SVK_ISO(Eigen::MatrixXd& Hessian);
 
 				/** @return a pointer to the element indexing, after casting.
 				  */

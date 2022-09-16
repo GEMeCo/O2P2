@@ -218,24 +218,24 @@ Eigen::MatrixXd O2P2::Proc::Comp::MeshElem_SVK<3>::getConstitutiveMatrix()
 //
 // ================================================================================================
 template<int nDim>
-void O2P2::Proc::Comp::MeshElem_SVK<nDim>::getContribution(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian)
+void O2P2::Proc::Comp::MeshElem_SVK<nDim>::getContribution(Eigen::MatrixXd& Hessian)
 {
 	auto pMat = m_pElem->getMaterial();
 	auto nElDim = m_pElem->getDIM();
 
 	if (nElDim == 1) {
 		if (pMat->getMaterialType() == MaterialType::SVK_ISO)
-			this->getContribution_SVK_ISO<1>(FInt, Hessian);
+			this->getContribution_SVK_ISO<1>(Hessian);
 	}
 
 	if (nElDim == 2) {
 		if (pMat->getMaterialType() == MaterialType::SVK_ISO)
-			this->getContribution_SVK_ISO<2>(FInt, Hessian);
+			this->getContribution_SVK_ISO<2>(Hessian);
 	}
 
 	if (nElDim == 3) {
 		if (pMat->getMaterialType() == MaterialType::SVK_ISO)
-			this->getContribution_SVK_ISO<3>(FInt, Hessian);
+			this->getContribution_SVK_ISO<3>(Hessian);
 	}
 };
 
@@ -246,7 +246,7 @@ void O2P2::Proc::Comp::MeshElem_SVK<nDim>::getContribution(Eigen::VectorXd& FInt
 //
 // ================================================================================================
 template<> template<>
-void O2P2::Proc::Comp::MeshElem_SVK<2>::getContribution_SVK_ISO<1>(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian)
+void O2P2::Proc::Comp::MeshElem_SVK<2>::getContribution_SVK_ISO<1>(Eigen::MatrixXd& Hessian)
 {
 	// Pointer to the first Shape Fuctions Derivative (const static)
 	auto pShape = m_pElem->getShapeDerivative();
@@ -310,7 +310,7 @@ void O2P2::Proc::Comp::MeshElem_SVK<2>::getContribution_SVK_ISO<1>(Eigen::Vector
 
 		// Integration of the specific energy derivative = internal force
 		for (int j = 0; j < nNodes; ++j) {
-			FInt(j) += dUedy * *(pShape + n + j) * numInt;
+			m_elFor(j) += dUedy * *(pShape + n + j) * numInt;
 		}
 
 		// Auxiliary for Hessian matrix
@@ -362,7 +362,7 @@ void O2P2::Proc::Comp::MeshElem_SVK<2>::getContribution_SVK_ISO<1>(Eigen::Vector
 //
 // ================================================================================================
 template<int nDim> template<int nElDim>
-void O2P2::Proc::Comp::MeshElem_SVK<nDim>::getContribution_SVK_ISO(Eigen::VectorXd& FInt, Eigen::MatrixXd& Hessian)
+void O2P2::Proc::Comp::MeshElem_SVK<nDim>::getContribution_SVK_ISO(Eigen::MatrixXd& Hessian)
 {
 	// Pointer to the first Shape Fuctions Derivative (const static)
 	auto pShape = m_pElem->getShapeDerivative();
@@ -468,7 +468,7 @@ void O2P2::Proc::Comp::MeshElem_SVK<nDim>::getContribution_SVK_ISO(Eigen::Vector
 				}
 
 				// Integration of the specific energy derivative = internal force
-				FInt(curDof) += dUedy * numInt;
+				m_elFor(curDof) += dUedy * numInt;
 			}
 		}
 

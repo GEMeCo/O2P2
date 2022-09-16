@@ -66,14 +66,17 @@ template<class T> bool O2P2::Proc::NLS_NewtonRaphson::runNonLinearSolver(T* theM
 		// Asks the template model to assemble the system of equations (RHS = FExt - FInt)
 		theModel->assembleSOE(Hessian, RHS);
 
-		// Solve the system of equation
-		solver.analyzePattern(Hessian);
-		solver.factorize(Hessian);
-		if (solver.info() != Eigen::Success) {
-			LOG("Decomposition failed in iteration " + std::to_string(m_iteration));
-			throw std::invalid_argument("\n\n\nDecomposition failed!\n\n");
+		{
+			PROFILE_SCOPE("solver");
+			// Solve the system of equation
+			solver.analyzePattern(Hessian);
+			solver.factorize(Hessian);
+			if (solver.info() != Eigen::Success) {
+				LOG("Decomposition failed in iteration " + std::to_string(m_iteration));
+				throw std::invalid_argument("\n\n\nDecomposition failed!\n\n");
+			}
+			LHS = solver.solve(RHS);
 		}
-		LHS = solver.solve(RHS);
 
 		// Update trial solution
 		theModel->setTrial(LHS);
@@ -98,14 +101,18 @@ template<class T> bool O2P2::Proc::NLS_NewtonRaphson::runNonLinearSolver(T* theM
 		// Asks the template model to assemble the system of equations (RHS = FExt - FInt)
 		theModel->assembleSOE(Hessian, RHS);
 
-		// Solve the system of equation
-		//solver.analyzePattern(Hessian);
-		solver.factorize(Hessian);
-		if (solver.info() != Eigen::Success) {
-			LOG("Decomposition failed in iteration " + std::to_string(m_iteration));
-			throw std::invalid_argument("\n\n\nDecomposition failed!\n\n");
+		{
+			PROFILE_SCOPE("solver");
+
+			// Solve the system of equation
+			//solver.analyzePattern(Hessian);
+			solver.factorize(Hessian);
+			if (solver.info() != Eigen::Success) {
+				LOG("Decomposition failed in iteration " + std::to_string(m_iteration));
+				throw std::invalid_argument("\n\n\nDecomposition failed!\n\n");
+			}
+			LHS = solver.solve(RHS);
 		}
-		LHS = solver.solve(RHS);
 
 		// Update trial solution
 		theModel->setTrial(LHS);

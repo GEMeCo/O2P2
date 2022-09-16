@@ -261,26 +261,36 @@ int main(int argc, char** args)
   * @warning This is a research software. There are neither pre-processor nor post-processor. For now, output was made only for displacements, using AcadView.
   * @note A profiler will create a file named "results.json", but only in debug mode. Just open the google chrome in address chrome://tracing and drag/paste the file.
   *
-  * @todo 1 - Incluir fluxogramas no detalhamento dos módulos (arquivo O2P2.cpp).
-  * @todo 2 - Complementar documentação dos módulos.
-  *
   * @defgroup Main_Module O2P2.
   * @brief An object oriented environment for the positional finite element method.
   * @details
-  * - Starts the analysis;
-  * - Requests to read files and populares containers;
-  * - Request to begin the solution process; and
-  * - Request to output solution.
+  * - Starts the analysis creating an FEAnalysis;
+  * - Requests to read files and populares containers with FEAnalysis::initComponents;
+  * - Request to begin the solution process with FEAnalysis::runAnalysis; and
+  * - Request to output solution with FEAnalysis::drawResults.
   *
+  * @image html O2P2_Class_Chart.png width=750
+  * 
+  * @sa O2P2::FEAnalysis
+  * 
   * @defgroup PreProcessor_Module Pre-processor classes.
   * @ingroup Main_Module
   * @brief Read files and populate containers.
-  * @details 
+  * @details Once input files are defined, reads their contents and creates the geometry domain.
+  * 
+  * @image html O2P2_Preprocessor_Module.png width=600
+  * 
+  * @sa O2P2::ModelBuilder
+  * @sa O2P2::Prep::Domain
+  * @sa Elements
+  * @sa Material
   *
   * @defgroup Material Material library
   * @ingroup PreProcessor_Module
   * @brief Materials Library.
-  * @details
+  * @details The following constitutive models are available:
+  * - Saint-Venant-Kirchhoff (isotropic).
+  * - That´s all, for now :)
   *
   * @defgroup Elements Elements library
   * @ingroup PreProcessor_Module
@@ -299,9 +309,8 @@ int main(int argc, char** args)
   * @subsection ir_quad Rectangular
   * @image{inline} html Elem_Quad8.png "Quadrangular cubic/linear" height=150
   * @image{inline} html Elem_Quad12.png "Quadrangular cubic/quadratic" height=150
-  * @image{inline} html Elem_Quad20png "Quadrangular cubic/quartic" height=150
+  * @image{inline} html Elem_Quad20.png "Quadrangular cubic/quartic" height=150
   *
-  * 
   * @section Tridimensional
   * @subsection tet Tetrahedral
   * @image{inline} html Elem_Tet4.png "Tetrahedral linear" height=150
@@ -322,21 +331,32 @@ int main(int argc, char** args)
   * @defgroup Processor_Module Processor classes.
   * @ingroup Main_Module
   * @brief Begin the solution processes.
-  * @details
+  * @details Aggregation of classes to evaluate the analysis.
   * 
-  * @defgroup TimeStep Avaliable time step integration schemes
+  * @image html O2P2_Processor_Module.png width=1100
+  * 
+  * @sa O2P2::Proc::SolutionAlgorithm
+  * @sa O2P2::Proc::TimeStepping
+  * @sa O2P2::Proc::NonLinearSolver
+  * @sa O2P2::Proc::Mesh
+  * 
+  * @defgroup TimeStep Time step integration schemes
   * @ingroup Processor_Module
   * @brief Time step integration schemes
-  * @details
+  * @details The following time integrantion schemes are available:
+  * - Quasi-static time integration scheme.
+  * - That's all, so far.
   *
-  * @defgroup NLSolver Avaliable nonlinear solver schemes
+  * @defgroup NLSolver Nonlinear solver schemes
   * @ingroup Processor_Module
   * @brief Nonlinear schemes
-  * @details
-
+  * @details The following nonlinear solver schemes are available:
+  * - Newton-Raphson.
+  * - That's all, so far.
+  *
   * @defgroup PostProcessor_Module Post-processor classes.
   * @ingroup Main_Module
   * @brief Output solution for visualization files.
-  * @details
+  * @details Under development.
   * 
   */

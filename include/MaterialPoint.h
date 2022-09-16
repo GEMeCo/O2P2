@@ -31,12 +31,6 @@ namespace O2P2 {
 			  *
 			  * @brief Material information in the integration point.
 			  * @details Stores informations about damage, plastic strain, and such. There is one material point for each integration point.
-			  *
-			  * @todo 1 - O ponto material está ligado ao tipo de material. Na classe base, apenas materiais elásticos.
-			  * @todo 2 - Classe derivada para material com danificação isotrópica.
-			  * @todo 3 - Classe derivada para material plástico.
-			  * @todo 4 - Distinguir 2D de 3D? Isso afeta a existência de matriz de rotação.
-			  * @todo 5 - Incluir temperatura como parâmetro? Ou extrai valor do elemento?
 			  */
 			class MaterialPoint
 			{

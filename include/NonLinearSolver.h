@@ -30,10 +30,6 @@ namespace O2P2 {
 		  *
 		  * @brief Nonlinear solvers
 		  * @details This class manages the solution scheme for nonlinear problems.
-		  *
-		  * @todo 1 - Funcionalidade para algorítmo BFGS.
-		  * @todo 2 - Funcionalidade para Newton with Line Search.
-		  * @todo 3 - Funcionalidade para Newton with Trust Region.
 		  */
 		class NonLinearSolver
 		{

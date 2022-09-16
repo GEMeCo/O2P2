@@ -28,8 +28,6 @@ namespace O2P2 {
 	  * It aggregates the following classes: Domain, SolutionAlgorithm, and PostProcessing.
 	  * It creates a ModelBuilder object to read files and populates the domain.
 	  *
-	  * @todo drawResultsImpl: VTU (paraview) output.
-	  *
 	  * @tparam nDim The dimensionality of the problem. It is either 2 or 3 (bidimensional or tridimensional).
 	  */
 	template<int nDim>

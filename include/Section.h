@@ -15,14 +15,11 @@
 
 namespace O2P2 {
 	namespace Prep {
-
 		/** @ingroup PreProcessor_Module
 		  * @class Section
 		  *
 		  * @brief Section definitions, a Domain component.
 		  * @details Contains the basic definitions of the cross section of linear and plane elements.
-		  *
-		  * @todo Seção transversal de elementos lineares separada dos elementos planos?
 		  */
 		class Section
 		{
