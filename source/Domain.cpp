@@ -48,8 +48,8 @@
 // Explicit template member functions instantiation
 //
 // ================================================================================================
-template void O2P2::Prep::Domain<2>::addMatrixNode(const size_t& index, const AnalysisType& AnType, const ProblemType& PrType, const std::array<double, 2>& x0);
-template void O2P2::Prep::Domain<3>::addMatrixNode(const size_t& index, const AnalysisType& AnType, const ProblemType& PrType, const std::array<double, 3>& x0);
+template void O2P2::Prep::Domain<2>::addGeomNode(const size_t& index, const std::array<double, 2>& x0);
+template void O2P2::Prep::Domain<3>::addGeomNode(const size_t& index, const std::array<double, 3>& x0);
 
 template void O2P2::Prep::Domain<2>::addMaterial(const size_t& index, const MaterialType& matType, const std::vector<double> matParam);
 template void O2P2::Prep::Domain<3>::addMaterial(const size_t& index, const MaterialType& matType, const std::vector<double> matParam);
@@ -62,31 +62,14 @@ template void O2P2::Prep::Domain<3>::addElementConect(const size_t& index, const
 
 // ================================================================================================
 //
-// Implementation of Template Member Function (2D and 3D): addMatrixNode
+// Implementation of Template Member Function (2D and 3D): addGeomNode
 //
 // ================================================================================================
 template<int nDim>
-void O2P2::Prep::Domain<nDim>::addMatrixNode(const size_t& index, const AnalysisType& AnType, const ProblemType& PrType, const std::array<double, nDim>& x0)
+void O2P2::Prep::Domain<nDim>::addGeomNode(const size_t& index, const std::array<double, nDim>& x0)
 {
-	// Node is related to the type of problem and analysis
-	if (PrType == ProblemType::MECHANICAL) {
-		switch (AnType)
-		{
-		case AnalysisType::STATIC:
-			v_Node.emplace_back(std::make_shared<Node_Mech_Qse<nDim>>(index, x0));
-			break;
-		default:
-			LOG("\n\nDomain.addMatrixNode: Node creation error - Could not find the correct AnalysisType for Mechanical Problem\n\n\n");
-			throw std::invalid_argument("\n\n\nNode creation error - Could not find the correct AnalysisType for Mechanical Problem\n\n\n");
-			break;
-		}
-	}
-	else {
-		LOG("\n\nDomain.addMatrixNode: Node creation error - Coupled analysis not yet implemented\n\n\n");
-		throw std::invalid_argument("\n\n\nNode creation error - Coupled analysis not yet implemented\n\n\n");
-	};
-
-	LOG("Domain.addMatrixNode: Adding Node: " << std::to_string(index) << *v_Node.back());
+	v_Node.emplace_back(std::make_shared<Node<nDim>>(index, x0));
+	LOG("Domain.addGeomNode: Adding Node: " << std::to_string(index) << *v_Node.back());
 };
 
 

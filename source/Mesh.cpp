@@ -99,7 +99,7 @@ template<int nDim> void O2P2::Proc::Mesh_Mec<nDim>::assembleSOE(Eigen::SparseMat
 	std::for_each(std::execution::par, m_meshElem.begin(), m_meshElem.end(), [&](auto& elem)
 		{
 			// Matrices sizes
-			int nDof = elem->m_ElemDofIndex.size();
+			int nDof = elem->m_nDof;
 
 			// Element Internal force and Hessian matrix
 			Eigen::MatrixXd elemMat = Eigen::MatrixXd::Zero(nDof, nDof);
@@ -110,24 +110,77 @@ template<int nDim> void O2P2::Proc::Mesh_Mec<nDim>::assembleSOE(Eigen::SparseMat
 
 			// Impose Dirichlet boundary conditions on current element
 			// Eigen matrices are stored in column-major order
-			for (int i = 0; i < elemMat.rows(); ++i) {
-				size_t dof = elem->m_ElemDofIndex.at(i);
+			//for (int i = 0; i < elem->v_Conect.size(); ++i) {
+			//	for (int j = 0; j < nDim; ++j) {
+			//		// Global dof
+			//		size_t dof = elem->v_Conect.at(i)->m_DofIndex + j;
+			//		// Local dof
+			//		size_t ldof = i * nDim + j;
 
-				for (int j = 0; j < elemMat.cols(); ++j) {
-					elemMat(j, i) *= this->m_BCIndex.at(dof);
-					elemMat(i, j) *= this->m_BCIndex.at(dof);
-				}
+			//		for (int k = 0; k < elem->m_nDof; ++k) {
+			//			elemMat(k, ldof) *= this->m_BCIndex.at(dof);
+			//			elemMat(ldof, k) *= this->m_BCIndex.at(dof);
+			//		}
 
-				elemMat(i, i) += (static_cast<size_t>(1) - this->m_BCIndex.at(dof));
-				elem->m_elFor(i) *= this->m_BCIndex.at(dof);
-			}
+			//		elemMat(ldof, ldof) += (static_cast<size_t>(1) - this->m_BCIndex.at(dof));
+			//		elem->m_elFor(ldof) *= this->m_BCIndex.at(dof);
+			//	}
+			//}
+
+			//// Register element contribution to local triplet
+			//for (int i = 0; i < elem->v_Conect.size(); ++i) {
+			//	for (int j = 0; j < nDim; ++j) {
+			//		// local dof 1
+			//		size_t dof1 = i * nDim + j;
+
+			//		for (int k = 0; k < elem->v_Conect.size(); ++k) {
+			//			for (int l = 0; l < nDim; ++l) {
+			//				size_t dof2 = k * nDim + l;
+
+			//				elem->m_elHes.push_back(Eigen::Triplet<double>(
+			//					static_cast<int>(elem->v_Conect.at(k)->m_DofIndex + l),
+			//					static_cast<int>(elem->v_Conect.at(i)->m_DofIndex + j),
+			//					elemMat(dof2, dof1)));
+			//			}
+			//		}
+			//	}
+			//}
 
 			// Register element contribution to local triplet
-			for (int i = 0; i < elemMat.cols(); ++i) {
-				for (int j = 0; j < elemMat.rows(); ++j) {
-					elem->m_elHes.push_back(Eigen::Triplet<double>(static_cast<int>(elem->m_ElemDofIndex.at(j)), static_cast<int>(elem->m_ElemDofIndex.at(i)), elemMat(j, i)));
+			for (int i = 0; i < elem->v_Conect.size(); ++i) {
+				for (int j = 0; j < nDim; ++j) {
+					// Global dof 1
+					size_t gdof1 = elem->v_Conect.at(i)->m_DofIndex + j;
+					// local dof 1
+					size_t ldof1 = i * nDim + j;
+
+					if (this->m_BCIndex.at(gdof1)) {
+						for (int k = 0; k < elem->v_Conect.size(); ++k) {
+							for (int l = 0; l < nDim; ++l) {
+								// Global dof 2
+								size_t gdof2 = elem->v_Conect.at(k)->m_DofIndex + l;
+								// local dof 1
+								size_t ldof2 = k * nDim + l;
+
+								if (this->m_BCIndex.at(gdof2)) {
+									elem->m_elHes.push_back(Eigen::Triplet<double>(
+										static_cast<int>(gdof2),
+										static_cast<int>(gdof1),
+										elemMat(ldof2, ldof1)));
+								}
+							}
+						}
+					}
+					else
+					{
+						elem->m_elFor(ldof1) *= this->m_BCIndex.at(gdof1);
+
+						elem->m_elHes.push_back(Eigen::Triplet<double>(
+							static_cast<int>(gdof1), static_cast<int>(gdof1), 1.));
+					}
 				}
 			}
+
 
 			// Register element contribution to the right hand side vector
 			//elemVec.swap(elem->m_elFor);
@@ -139,60 +192,20 @@ template<int nDim> void O2P2::Proc::Mesh_Mec<nDim>::assembleSOE(Eigen::SparseMat
 
 	for (auto& elem : m_meshElem) {
 		std::move(elem->m_elHes.begin(), elem->m_elHes.end(), std::back_inserter(gl_triplets));
-		elem->m_elHes.erase(elem->m_elHes.begin(), elem->m_elHes.end());
+		elem->m_elHes.clear();
 
 		// Add element contribution to the right hand side vector
-		for (int i = 0; i < elem->m_elFor.size(); ++i) {
-			RHS(elem->m_ElemDofIndex.at(i)) -= elem->m_elFor(i);
+		for (int i = 0; i < elem->v_Conect.size(); ++i) {
+			for (int j = 0; j < nDim; ++j) {
+				// global dof
+				size_t gdof = elem->v_Conect.at(i)->m_DofIndex + j;
+				// Local dof
+				size_t ldof = i * nDim + j;
+
+				RHS(gdof) -= elem->m_elFor(ldof);
+			}
 		}
 	}
-
-
-// I'm getting this way slower than for_each
-//#pragma omp parallel for
-//	//for (auto& elem : m_meshElem) {
-//	for (std::vector<std::unique_ptr<meshElem>>::size_type i = 0; i != m_meshElem.size(); i++)
-//	{
-//		auto& elem = m_meshElem[i];
-//
-//		// Matrices sizes
-//		int nDof = elem->m_ElemDofIndex.size();
-//
-//		// Element Internal force and Hessian matrix
-//		Eigen::VectorXd elemVec = Eigen::VectorXd::Zero(nDof);
-//		Eigen::MatrixXd elemMat = Eigen::MatrixXd::Zero(nDof, nDof);
-//
-//		// Get element contributions for internal force and hessian matrix
-//		elem->getContribution(elemVec, elemMat);
-//
-//		// Impose Dirichlet boundary conditions on current element
-//		// Eigen matrices are stored in column-major order
-//		for (int i = 0; i < elemMat.rows(); ++i) {
-//			size_t dof = elem->m_ElemDofIndex.at(i);
-//
-//			for (int j = 0; j < elemMat.cols(); ++j) {
-//				elemMat(j, i) *= this->m_BCIndex.at(dof);
-//				elemMat(i, j) *= this->m_BCIndex.at(dof);
-//			}
-//
-//			elemMat(i, i) += (static_cast<size_t>(1) - this->m_BCIndex.at(dof));
-//			elemVec(i) *= this->m_BCIndex.at(dof);
-//		}
-//
-//		// Add element contribution to global system
-//		for (int i = 0; i < elemMat.cols(); ++i) {
-//			for (int j = 0; j < elemMat.rows(); ++j) {
-//#pragma omp critical
-//				gl_triplets.push_back(Eigen::Triplet<double>(static_cast<int>(elem->m_ElemDofIndex.at(j)), static_cast<int>(elem->m_ElemDofIndex.at(i)), elemMat(j, i)));
-//			}
-//		}
-//
-//		// Add element contribution to the right hand side vector
-//		for (int i = 0; i < elemVec.size(); ++i) {
-//#pragma omp critical
-//			RHS(elem->m_ElemDofIndex.at(i)) -= elemVec(i);
-//		}
-//	}
 
 	Hessian.setFromTriplets(gl_triplets.begin(), gl_triplets.end());
 }
@@ -207,12 +220,14 @@ template<int nDim> void O2P2::Proc::Mesh_Mec<nDim>::setTrial(Eigen::VectorXd& LH
 {
 	//LOG("Mesh_Mec.setTrial: Updating trial solution to nodes");
 	double* sol = new double[nDim];
-	for (auto& node : (*m_NodePt)) {
+	for (auto& node : m_meshNode) {
+		// Number of DOF associated to node - since is fixed, using outside loop
 		//double* sol = new double[node->v_DofIndex.size()];
 
 		int i = 0;
-		for (size_t dof : node->v_DofIndex) {
-			sol[i] = LHS(dof);
+		//for (int j = 0; j < node->m_nDOF; ++j) {
+		for (int j = 0; j < nDim; ++j) {
+			sol[i] = LHS(node->m_DofIndex + j);
 			i++;
 		}
 
@@ -236,17 +251,18 @@ template<int nDim> void O2P2::Proc::Mesh_Mec<nDim>::setCommit()
 	// Commit the solution and transfer it to Sol (for post-processing).
 
 	// This was made only for displacement, nothing else.
-	std::vector<double> Sol((*m_NodePt).size() * nDim);
+	std::vector<double> Sol(m_TotalDof);
 
 	size_t i = 0;
-	for (auto& node : (*m_NodePt)) {
+	for (auto& node : m_meshNode) {
+		// Set trial position as current (commit position)
 		node->setCurrent();
 
-		auto x = node->getInitPos();
+		// Save current position to Sol vector for post-processing
 		auto y = node->getCurrent();
 
-		for (size_t j = 0; j < nDim; ++j) {
-			Sol[i] = y[j] - x[j];
+		for (size_t j = 0; j < node->getNumDOF(); ++j) {
+			Sol[i] = *(y + j);
 			i++;
 		}
 	}

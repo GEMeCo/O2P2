@@ -148,6 +148,7 @@
     <ClInclude Include="include\Section.h" />
     <ClInclude Include="include\SolutionAlgorithm.h" />
     <ClInclude Include="include\TimeStepping.h" />
+    <ClInclude Include="include\MeshNode.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -64,21 +64,24 @@ void O2P2::Post::OutputSystem<nDim>::draw_AcadView_Node(std::ofstream& file, O2P
 
 	// Conectivity and stuff
 	for (auto& elem : theDomain->getElem()) {
-		file << elem->printByIndex_AV(0);
+		file << elem->printByIndex_AV(1);
 	}
 
 	for (int i = 0; i < thePost->m_SolOnNode.size(); ++i) {
 		for (int j = 0; j < nDim; ++j) {
 			file << "#\n" << "Desl_" << j << "_t_" << std::defaultfloat << std::get<0>(thePost->m_SolOnNode[i]) << "\n";
 
-			for (auto& node : theDomain->getNode()) {
-				// Must write four data here -> disp x, y, z, color
-				// For now, we assume that node->v_DofIndex is made only by displacements
-				for (auto dof : node->v_DofIndex) {
-					file << formatScien << std::get<1>(thePost->m_SolOnNode[i])[dof];
+			for (size_t k = 0; k < theDomain->m_nNodes; ++k) {
+				// Must write four data here -> disp x, y, z, "color" - value to be ploted
+				const auto& node = theDomain->getNode(k);
+				const auto& x = node->getInitPos();
+
+				for (int l = 0; l < nDim; l++) {
+					file << formatScien << std::get<1>(thePost->m_SolOnNode[i])[k * nDim + l] - x[l];
 				}
-				if (node->v_DofIndex.size() == 2) file << formatScien << 0.F;
-				file << formatScien << std::get<1>(thePost->m_SolOnNode[i])[node->v_DofIndex[j]] << "\n";
+				if (nDim == 2) file << formatScien << 0.F;
+
+				file << formatScien << std::get<1>(thePost->m_SolOnNode[i])[k * nDim + j] - x[j] << "\n";
 			}
 		}
 	}
@@ -136,7 +139,7 @@ void O2P2::Post::OutputSystem<nDim>::draw_AcadView_Elem(std::ofstream& file, O2P
 
 			for (auto& elem : theDomain->getElem()) {
 				for (auto& node : elem->getConectivity()) {
-					size_t pos = (node->m_index - 1) * nDim;
+					size_t pos = node->m_index * nDim;
 
 					// Must write four data here -> disp x, y, z, color
 					for (int k = 0; k < nDim; ++k) {

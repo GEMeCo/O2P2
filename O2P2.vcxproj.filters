@@ -199,5 +199,8 @@
     <ClInclude Include="include\ModelBuilder.h">
       <Filter>Header Files\Domain Components</Filter>
     </ClInclude>
+    <ClInclude Include="include\MeshNode.h">
+      <Filter>Header Files\Solution Components</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

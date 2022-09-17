@@ -289,12 +289,12 @@ template<int nDim> bool O2P2::ModelBuilder<nDim>::populateNodes(O2P2::Prep::Doma
 		}
 
 		for (int j = 0; j < nDim; ++j) {
-			
 			m_fileNode >> x0[j];
 		}
-		// Numbering in output files must begin with 1, thus indexing will be set accordingly
-		index = index + 1 - m_indexingInit;
-		theDomain->addMatrixNode(index, m_AnalysisType, m_ProblemType, x0);
+
+		// Index always is related to container index (which begins with 0)
+		index = index - m_indexingInit;
+		theDomain->addGeomNode(index, x0);
 	}
 
 	m_fileNode.close();
@@ -530,13 +530,10 @@ template<int nDim> int O2P2::ModelBuilder<nDim>::readBondaryConditions(O2P2::Pre
 
 			// If index begins with 1, reduces 1 to match the container indexing
 			index = index - m_indexingInit;
-			if(m_indexingInit != 0 && iDir !=0) iDir = iDir - m_indexingInit;
-
-			// Check node container for current DOF
-			size_t iDof = theDomain->getNode(index)->v_DofIndex.at(iDir);
+			if (m_indexingInit != 0 && iDir != 0) iDir = iDir - m_indexingInit;
 
 			LOG("SolutionAlgorithm.addDirichletBC: Node / Direction / Value: " << std::to_string(index) << " / " << std::to_string(iDir) << " / " << std::scientific << dbAux << std::fixed);
-			theAnalyzer->addDirichletBC(i, iDof, dbAux, Var);
+			theAnalyzer->addDirichletBC(i, index, iDir, dbAux, Var);
 		}
 
 		stFlag = "#NEU" + std::to_string(i + 1) + "#";
@@ -557,11 +554,8 @@ template<int nDim> int O2P2::ModelBuilder<nDim>::readBondaryConditions(O2P2::Pre
 			index = index - m_indexingInit;
 			if (m_indexingInit != 0 && iDir != 0) iDir = iDir - m_indexingInit;
 
-			// Check node container for current DOF
-			size_t iDof = theDomain->getNode(index)->v_DofIndex.at(iDir);
-
 			LOG("SolutionAlgorithm.addNeumannBC: Node / Direction / Value: " << std::to_string(index) << " / " << std::to_string(iDir) << " / " << std::scientific << dbAux << std::fixed);
-			theAnalyzer->addNeumannBC(i, iDof, dbAux, Var);
+			theAnalyzer->addNeumannBC(i, index, iDir, dbAux, Var);
 		}
 	}
 

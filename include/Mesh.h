@@ -21,6 +21,7 @@
 
 #include "Domain.h"
 #include "MeshElem.h"
+#include "MeshNode.h"
 #include "PostProcess.h"
 
 namespace O2P2 {
@@ -41,6 +42,11 @@ namespace O2P2 {
 			  * @param vOut Reference to post-process container.
 			  */
 			Mesh(O2P2::Post::PostProcess* vOut) { m_PostPt = vOut; }
+
+			/** Add new dof to the system. Used to calculate the total number of DOF.
+			  * @param nDOF Number of DOF to be added to the system of equation.
+			  */
+			void addDOF(int nDOF) { m_TotalDof += nDOF; }
 
 		public:
 			// Default destructor of private / protected pointers.
@@ -76,11 +82,6 @@ namespace O2P2 {
 			void addNeumannBC(const int& nLS, const size_t& Dof, const double& Value, const double Var[]) {
 				m_LoadStep.at(nLS)->addNeumannBC(Dof, Value, Var);
 			}
-
-			/** Add new dof to the system. Used to calculate the total number of DOF.
-			  * @param nDOF Number of DOF to be added to the system of equation.
-			  */
-			void addDOF(int nDOF) { m_TotalDof += nDOF; }
 
 			/** Assemble the system of equation, made by the Hessian matrix and a right hand side vector.
 			  * @param Hessian Square matrix of second-order partial derivatives of a scalar-valued function or scalar field.
@@ -138,6 +139,9 @@ namespace O2P2 {
 			/** @brief Container of element components associated to the analysis. */
 			std::vector<std::unique_ptr<O2P2::Proc::Comp::MeshElem>> m_meshElem;
 
+			/** @brief Container of node components associated to the analysis. */
+			std::vector<std::shared_ptr<O2P2::Proc::Comp::MeshNode>> m_meshNode;
+
 		protected:
 			/** @brief Current load step under process. */
 			int m_curLoadStep{ 0 };
@@ -176,16 +180,31 @@ namespace O2P2 {
 			  * @param vOut  Reference to post-process container.
 			  */
 			explicit Mesh_Mec(O2P2::Prep::Domain<nDim>* theDomain, O2P2::Post::PostProcess* vOut) : Mesh(vOut) {
-				m_NodePt = &theDomain->getNode();
+				m_meshNode.reserve(theDomain->m_nNodes);
 				m_meshElem.reserve(theDomain->m_nElem);
 
-				// Generates element components for each domain element
-				for (std::shared_ptr<O2P2::Prep::Elem::Element<nDim>> elem : theDomain->getElem()) {
-					m_meshElem.emplace_back(std::make_unique<O2P2::Proc::Comp::MeshElem_SVK<nDim>>(elem));
+				// Generates a mesh node for each domain node
+				for (std::shared_ptr<O2P2::Prep::Node<nDim>>& node : theDomain->getNode()) {
+					// Index of DOF for current node
+					// For now, each node has nDim DOF
+					size_t iDof = node->m_index * nDim;
+					m_meshNode.emplace_back(std::make_shared<O2P2::Proc::Comp::MeshNode_MQ<nDim>>(iDof, node->getInitPos()));
+					addDOF(m_meshNode.back()->getNumDOF());
+				}
+
+				// Generates a mesh element for each domain element
+				for (std::shared_ptr<O2P2::Prep::Elem::Element<nDim>>& elem : theDomain->getElem()) {
+
+					std::vector<std::shared_ptr<O2P2::Proc::Comp::MeshNode>> conect(elem->getNumNodes());
+
+					for (int i = 0; i < elem->getNumNodes(); i++) {
+						conect[i] = m_meshNode[elem->getConectivity(i)->m_index];
+					}
+					m_meshElem.emplace_back(std::make_unique<O2P2::Proc::Comp::MeshElem_SVK<nDim>>(elem, conect));
 				}
 
 				// Initial norm (required by Non-linear Solver)
-				for (auto& x0 : *m_NodePt) {
+				for (auto& x0 : theDomain->getNode()) {
 					for (double coord : x0->getInitPos()) {
 						this->m_initialNorm += coord * coord;
 					}
@@ -204,10 +223,6 @@ namespace O2P2 {
 
 			// Update commit solution.
 			void setCommit() override;
-
-		public:
-			/** @brief Pointer to the node container. The pointer is required to directly access and update its contents. */
-			std::vector<std::shared_ptr<O2P2::Prep::Node<nDim>>>* m_NodePt;
 		};
 	} // End of Proc Namespace
 } // End of O2P2 Namespace

@@ -37,6 +37,16 @@ namespace O2P2 {
 		template<int nDim>
 		class Domain
 		{
+		private:
+			// Default constructor
+			Domain() = delete;
+
+			// Domain is unique, therefore it should not be copied. Thus, copy constructor will be deleted.
+			Domain(const Domain& other) = delete;
+
+			// Move constructor will also be deleted.
+			Domain(Domain&& other) = delete;
+
 		public:
 			/** The only constructor that there is. It resizes mesh containers (Node, Element, Section, Material)
 			  * @param nNodes Number of matrix nodes.
@@ -59,13 +69,11 @@ namespace O2P2 {
 
 			/** Add a new node to the matrix node vector.
 			  * @param index Node indexing number.
-			  * @param AnType Type of analysis.
-			  * @param PrType Type of problem
 			  * @param x0 Node initial position coordinates.
 			  *
 			  * @sa Node
 			  */
-			void addMatrixNode(const size_t& index, const AnalysisType& AnType, const ProblemType& PrType, const std::array<double, nDim>& x0);
+			void addGeomNode(const size_t& index, const std::array<double, nDim>& x0);
 
 			/** Add a new material to the container of materials.
 			  * @param index Material number.
@@ -146,10 +154,10 @@ namespace O2P2 {
 			int getNumNodes(const size_t& index) { return v_Elem.at(index)->getNumNodes(); }
 
 		public:
-			/** @brief Number of matrix nodes. */
+			/** @brief Number of geometry nodes. */
 			size_t m_nNodes;
 
-			/** @brief Number of matrix elements. */
+			/** @brief Number of geometry elements. */
 			size_t m_nElem;
 
 			/** @brief Number of materials. */
@@ -157,16 +165,6 @@ namespace O2P2 {
 
 			/** @brief Number of cross sections. */
 			size_t m_nSec;
-
-		private:
-			// Default constructor
-			Domain() = delete;
-
-			// Domain is unique, therefore it should not be copied. Thus, copy constructor will be deleted.
-			Domain(const Domain& other) = delete;
-
-			// Move constructor will also be deleted.
-			Domain(Domain&& other) = delete;
 
 		private:
 			// Container of Node objects.

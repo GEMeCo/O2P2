@@ -149,7 +149,7 @@ namespace O2P2 {
 				const std::string print() const {
 					std::string str;
 					for (auto& node : v_Conect) {
-						str.append(std::to_string(node->m_index));
+						str.append(std::to_string(node->m_index + 1));
 						str.append(" ");
 					}
 					return str;

@@ -75,7 +75,6 @@ namespace O2P2 {
 				}
 
 				m_theFEModel = nullptr;
-				m_SolutionAcquired = false;
 			}
 
 			// Default destructor of private / protected pointers.
@@ -131,9 +130,6 @@ namespace O2P2 {
 			/** @return the selected nonlinear solver. */
 			NLSolverType getSolverType() const { return m_SolverType; }
 
-			/** @return true if analysis succeeded. */
-			bool isFinished() { return m_SolutionAcquired; }
-
 			/** Add a load step to the Mesh.
 			  * @param NumSteps Number of time steps in the current load step.
 			  * @param TimeStep Variation in time in the current load step.
@@ -152,27 +148,42 @@ namespace O2P2 {
 
 			/** Add a Boundary Condition of Dirichlet type to a Load Step.
 			  * @param nLS Number of the load step to recieve the BC.
-			  * @param Dof Degree of freedom with imposed boundary condition.
+			  * @param index Node container index with imposed boundary condition.
+			  * @param iDir  Direction of the imposed boundary condition.
 			  * @param Value Value of the boundary condition.
 			  * @param Var Time behavior, for a quadratic polinomial(var[0] + var[1].t + var[2].t ^ 2).
 			  *
 			  * @sa Mesh
 			  */
-			void addDirichletBC(const int& nLS, const size_t& Dof, const double& Value, const double Var[]) {
+			void addDirichletBC(const int& nLS, const size_t& index, const int& iDir, const double& Value, const double Var[]) {
+				// Check node container for current DOF
+				size_t Dof = m_theFEModel->m_meshNode[index]->m_DofIndex + iDir;
+
 				m_theFEModel->addDirichletBC(nLS, Dof, Value, Var);
 			}
 
 			/** Add a Boundary Condition of Neumann type to a Load Step.
 			  * @param nLS Number of the load step to recieve the BC.
-			  * @param Dof Degree of freedom with imposed boundary condition.
+			  * @param index Node container index with imposed boundary condition.
+			  * @param iDir  Direction of the imposed boundary condition.
 			  * @param Value Value of the boundary condition.
 			  * @param Var Time behavior, for a quadratic polinomial(var[0] + var[1].t + var[2].t ^ 2).
 			  *
 			  * @sa Mesh
 			  */
-			void addNeumannBC(const int& nLS, const size_t& Dof, const double& Value, const double Var[]) {
+			void addNeumannBC(const int& nLS, const size_t& index, const int& iDir, const double& Value, const double Var[]) {
+				// Check node container for current DOF
+				size_t Dof = m_theFEModel->m_meshNode[index]->m_DofIndex + iDir;
+
 				m_theFEModel->addNeumannBC(nLS, Dof, Value, Var);
 			}
+
+		private:
+			template<int nDim>
+			void runSolution(O2P2::Prep::Domain<nDim>* theDomain);
+
+			template<int nDim>
+			bool initFEM(O2P2::Prep::Domain<nDim>* theDomain, O2P2::Post::PostProcess* thePost);
 
 		private:
 			/** Type of analysis */
@@ -187,9 +198,6 @@ namespace O2P2 {
 			/** Number of load steps */
 			int m_numLoadSteps;
 
-			/** Boolean for the end of analysis */
-			bool m_SolutionAcquired;
-
 			/** Pointer to the nonlinear solver */
 			std::unique_ptr<O2P2::Proc::NonLinearSolver> m_theNLSolver;
 
@@ -198,13 +206,6 @@ namespace O2P2 {
 
 			/** Container of solution components */
 			std::unique_ptr<O2P2::Proc::Mesh> m_theFEModel;
-
-		private:
-			template<int nDim>
-			void runSolution(O2P2::Prep::Domain<nDim>* theDomain);
-
-			template<int nDim>
-			bool initFEM(O2P2::Prep::Domain<nDim>* theDomain, O2P2::Post::PostProcess* thePost);
 		};
 	} // End of Proc Namespace
 } // End of O2P2 Namespace

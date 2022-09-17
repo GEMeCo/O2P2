@@ -18,6 +18,7 @@
 
 // Custom libraries
 #include "Element.h"
+#include "MeshNode.h"
 #include "MaterialPoint.h"
 
 // Eigen libraries
@@ -49,34 +50,34 @@ namespace O2P2 {
 				virtual void getContribution(Eigen::MatrixXd& Hessian) = 0;
 
 			protected:
-				/** @brief Basic constructor. */
-				MeshElem() { m_nDof = 0; }
-
-				/** @return a pointer to the element indexing, after casting.
-				  *
-				  * @tparam nDim The dimensionality of the problem. It is either 2 or 3 (bidimensional or tridimensional).
+				/** Constructor for mechanical analysis elements, for SVK material model.
+				  * @param pElem Pointer to geometry element.
+				  * @param conect Mesh nodes indexing.
 				  */
-				template<int nDim>
-				std::vector<std::shared_ptr<O2P2::Prep::Node<nDim>>> getConectivity() { return nullptr; }
+				MeshElem(std::shared_ptr<O2P2::Prep::Elem::BaseElement> pElem, std::vector<std::shared_ptr<O2P2::Proc::Comp::MeshNode>>& conect) {
+					// Store pointer to geometry element
+					m_pElem = pElem;
+					// Sets the number of DOF for current element
+					m_nDof = conect.size() * pElem->getNumNdDOF();
 
-				/** @return a pointer to a node.
-				  * @param index Element convectivity container index.
-				  *
-				  * @tparam nDim The dimensionality of the problem. It is either 2 or 3 (bidimensional or tridimensional).
-				  */
-				template<int nDim>
-				O2P2::Prep::Node<nDim>* getConectivity(const int& index) { return nullptr; }
+					// Set the size for the internal force vector and conectivity
+					m_elFor.resize(m_nDof);
+					v_Conect = std::move(conect);
+				}
 
 			protected:
 				/** @brief Pointer to material point that holds information in the integration point. */
-				std::vector<std::unique_ptr<O2P2::Proc::Comp::MaterialPoint>> m_MatPoint;
+				std::vector<std::unique_ptr<O2P2::Proc::Comp::MaterialPoint>> m_matPoint;
+
+				/** @brief Pointer to domain element. */
+				std::shared_ptr<O2P2::Prep::Elem::BaseElement> m_pElem;
 
 			public:
 				/** @brief Number of DOF for current element. */
 				int m_nDof;
 
-				/** @brief Vector with element DOF index. */
-				std::vector<size_t> m_ElemDofIndex;
+				/** @brief Vector with element indexing. */
+				std::vector<std::shared_ptr<O2P2::Proc::Comp::MeshNode>> v_Conect;
 
 				/** @brief Vector with element contribution to Hessian matrix (used for parallelism). */
 				std::vector<Eigen::Triplet<double>> m_elHes;
@@ -103,12 +104,12 @@ namespace O2P2 {
 
 			public:
 				/** Constructor for mechanical analysis elements, for SVK material model.
-				  * @param pElmt Pointer to geometry element.
+				  * @param pElem Pointer to geometry element.
+				  * @param conect Mesh nodes indexing.
 				  */
-				explicit MeshElem_SVK(std::shared_ptr<O2P2::Prep::Elem::BaseElement> pElmt) : MeshElem() {
-					m_pElem = pElmt;
-					this->m_MatPoint.reserve(pElmt->getNumIP());
-
+				explicit MeshElem_SVK(std::shared_ptr<O2P2::Prep::Elem::BaseElement> pElem, std::vector<std::shared_ptr<O2P2::Proc::Comp::MeshNode>>& conect)
+					: MeshElem(pElem, conect) {
+					this->m_matPoint.reserve(pElem->getNumIP());
 					this->setMaterialPoint();
 				}
 
@@ -137,25 +138,6 @@ namespace O2P2 {
 				  */
 				template<int nElDim>
 				void getContribution_SVK_ISO(Eigen::MatrixXd& Hessian);
-
-				/** @return a pointer to the element indexing, after casting.
-				  */
-				std::vector<std::shared_ptr<O2P2::Prep::Node<nDim>>> getConectivity() {
-					O2P2::Prep::Elem::Element<nDim>* pElem = static_cast<O2P2::Prep::Elem::Element<nDim>*> (m_pElem.get());
-					return pElem->getConectivity();
-				}
-
-				/** @return a pointer to a node.
-				  * @param index Element convectivity container index.
-				  */
-				O2P2::Prep::Node<nDim>* getConectivity(const int& index) {
-					O2P2::Prep::Elem::Element<nDim>* pElem = static_cast<O2P2::Prep::Elem::Element<nDim>*> (m_pElem.get());
-					return pElem->getConectivity(index);
-				}
-
-			protected:
-				/** @brief Pointer to domain element. */
-				std::shared_ptr<O2P2::Prep::Elem::BaseElement> m_pElem;
 			};
 		} // End of Comp Namespace
 	} // End of Proc Namespace
