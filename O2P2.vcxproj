@@ -91,6 +91,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="O2P2.cpp" />
+    <ClCompile Include="O2P2_DOC.cpp" />
     <ClCompile Include="source\Mesh.cpp" />
     <ClCompile Include="source\Common.cpp" />
     <ClCompile Include="source\Domain.cpp" />
