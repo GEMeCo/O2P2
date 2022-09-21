@@ -1,4 +1,4 @@
-# O2P2
+# O2P2 [![GitHub license](https://img.shields.io/github/license/GEMeCo/O2P2?style=for-the-badge)](https://github.com/GEMeCo/O2P2/blob/main/LICENSE) [![GitHub issues](https://img.shields.io/github/issues/GEMeCo/O2P2?style=for-the-badge)](https://github.com/GEMeCo/O2P2/issues) [![GitHub stars](https://img.shields.io/github/stars/GEMeCo/O2P2?style=for-the-badge)](https://github.com/GEMeCo/O2P2/stargazers)
 O2P2 is an Object Oriented Platform for the Positional Finite Element Method applied to Thermomechanical Problems. It is under development at Sao Carlos School of Engineering, University of Sao Paulo.
 
 <h1 align="center">
