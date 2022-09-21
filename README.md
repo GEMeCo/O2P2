@@ -6,13 +6,7 @@ O2P2 is an Object Oriented Platform for the Positional Finite Element Method app
 </h1>
 
 ## Copyright Information:
-Content on this work is licensed under a Creative Commons Attribution-NonCommerical 4.0 International license.
-
-<h1 align="center">
-  <img alt="Banner" title="#Banner" height="100" src="./images/CC-BY-NC.jpg" />
-</h1>
-
-:ballot_box_with_check: This program is free software: you can redistribute it and/or modify it under the terms of the Creative Commons Attribution-NonCommerical 4.0 International license.
+:ballot_box_with_check: This program is free software: you can redistribute it and/or modify it under the terms of the Apache License 2.0 license.
 
 :ballot_box_with_check: This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 It is provided "AS IS". In no event shall the authors be liable for any claim, damages or other liability, whether in an action of contract, tort or otherwire, arising from, out of or in connection with the software or the use of other dealing in the software.
@@ -20,6 +14,12 @@ It is provided "AS IS". In no event shall the authors be liable for any claim, d
 :ballot_box_with_check: This is a research software. There are neither pre-processor nor post-processor (so far). Output was made only for displacements, using AcadView. You may find it [here](https://set.eesc.usp.br/?page_id=237).
 
 :triangular_ruler: None of the developers are **Software Engineers** of any sort. We are **Civil Engineers**, seeking to solve engineering problems. We know that this software has bugs and stuff to improve. We just don't have time to solve them all.
+
+Documentation of this work is under the terms of the Creative Commons Attribution-NonCommerical 4.0 International license.
+
+<h1 align="center">
+  <img alt="Banner" title="#Banner" height="100" src="./images/CC-BY-NC.jpg" />
+</h1>
 
 ## :warning: Under development - Use at your own risk.
 
