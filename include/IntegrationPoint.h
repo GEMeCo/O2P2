@@ -2,11 +2,10 @@
 //
 // This file is part of PosFEM++, an object oriented environment for the positional FEM
 //
-// Copyright(C) 2021 Rogerio Carrazedo - All Rights Reserved.
+// Copyright(C) 2022 Rogerio Carrazedo - All Rights Reserved.
 // 
-// This source code form is subject to the terms of the GNU General Public License.
-// If a copy of GPL was not distributed with this file, you can obtain one at
-// https://www.gnu.org/licenses/.
+// This source code form is subject to the terms of 
+// Creative Commons Attribution-NonCommerical 4.0 International license
 // 
 // ================================================================================================
 //
@@ -124,10 +123,6 @@ namespace Hammer3D {
 		{ 0.13819660, 0.58541020, 0.13819660 }, { 0.13819660, 0.13819660, 0.58541020 },
 		{ 0.13819660, 0.13819660, 0.13819660 } };
 
-	static const double Qsi_5P[5][3] = { { 1.0 / 4.0, 1.0 / 4.0, 1.0 / 4.0 },
-		{ 1.0 / 3.0, 1.0 / 6.0, 1.0 / 6.0 }, { 1.0 / 6.0, 1.0 / 3.0, 1.0 / 6.0 },
-		{ 1.0 / 6.0, 1.0 / 6.0, 1.0 / 3.0 }, { 1.0 / 6.0, 1.0 / 6.0, 1.0 / 6.0 } };
-
 	static const double Qsi_10P[10][3] = { { 0.56843058419684, 0.14385647193439, 0.14385647193439 },
 		{ 0.14385647193439, 0.14385647193439, 0.14385647193439 }, { 0.14385647193439, 0.14385647193439, 0.56843058419684 },
 		{ 0.14385647193439, 0.56843058419684, 0.14385647193439 }, { 0.0, 0.5, 0.5 }, { 0.5, 0.0, 0.5 }, { 0.5, 0.5, 0.0 },
@@ -173,7 +168,6 @@ namespace Hammer3D {
 	// Weights for numerical integration
 	static const double Wg_1P[1] = { 1. / 6. };
 	static const double Wg_4P[4] = { 0.25 / 6., 0.25 / 6., 0.25 / 6., 0.25 / 6. };
-	static const double Wg_5P[5] = { -4.0 / 30.0, 9.0 / 120.0, 9.0 / 120.0, 9.0 / 20.0, 9.0 / 120.0 };
 	static const double Wg_10P[10] = {  0.0362941783134, 0.0362941783134, 0.0362941783134, 0.0362941783134, 0.0035816589022, 0.0035816589022, 0.0035816589022, 0.0035816589022, 0.0035816589022, 0.0035816589022 };
 	static const double Wg_11P[11] = { -0.0131555555556, 0.0076222222222, 0.0076222222222, 0.0076222222222, 0.0076222222222, 0.0248888888889, 0.0248888888889, 0.0248888888889, 0.0248888888889, 0.0248888888889, 0.0248888888889 };
 	static const double Wg_14P[14] = {  0.0031746031746, 0.0031746031746, 0.0031746031746, 0.0031746031746, 0.0031746031746, 0.0031746031746, 0.0147649707905, 0.0147649707905, 0.0147649707905, 0.0147649707905, 0.0221397911143, 0.0221397911143, 0.0221397911143, 0.0221397911143 };

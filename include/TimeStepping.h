@@ -13,63 +13,52 @@
 // Custom Header Files
 #include "Common.h"
 #include "Domain.h"
-#include "AnalysisComp.h"
+#include "Mesh.h"
 #include "NonLinearSolver.h"
 
-/** @ingroup Processor_Module
-  * @class TimeStepping
-  *
-  * @brief Time step integration schemes.
-  * @details This class manages the time step integration scheme and handles variables for quasi-static / parabolic / hyperbolic / eigenvalue analysis.
-  * The values required for the time step integration scheme are available at LoadStep.
-  *
-  * @todo 1 - Funcionalidade para problemas parabólicos (temperatura).
-  * @todo 2 - Funcionalidade para problemas dinâmicos hiperbólicos (Newmark).
-  * @todo 3 - Funcionalidade para problemas dinâmicos hiperbólicos (HHT alpha).
-  * @todo 4 - Funcionalidade para problemas de autovalor.
-  * 
-  * @sa AnalysisComp
-  * @sa LoadStep
-  */
-class TimeStepping {
+namespace O2P2 {
+	namespace Proc {
+		/** @ingroup Processor_Module
+		  * @class TimeStepping
+		  *
+		  * @brief Time step integration schemes.
+		  * @details This class manages the time step integration scheme and handles variables for quasi-static / parabolic / hyperbolic / eigenvalue analysis.
+		  * The values required for the time step integration scheme are available at LoadStep.
+		  *
+		  * @sa Mesh
+		  * @sa LoadStep
+		  */
+		class TimeStepping {
 
-public:
+		public:
+			// Default destructor of private / protected pointers.
+			virtual ~TimeStepping() = default;
 
-    /** @brief Default destructor. */
-    virtual ~TimeStepping() = default;
+			/** Manages the time stepping integration scheme.
+			  * @param theFEModel Container of solution components.
+			  * @param theSolver Pointer to the non-linear solver.
+			  */
+			virtual void runTimeLoop(O2P2::Proc::Mesh* theFEModel, O2P2::Proc::NonLinearSolver* theSolver) = 0;
 
-    /** Manages the time stepping integration scheme.
-      * @param theDomain Container with nodal and elements information.
-      * @param theFEModel Container of solution components.
-      * @param theSolver Pointer to the non-linear solver.
-      */
-    virtual void runTimeLoop(Domain<2>* theDomain, AnalysisComp* theFEModel, NonLinearSolver* theSolver) = 0;
+		protected:
+			/** @brief Default construtor. Implemented in derived classes.  */
+			TimeStepping() { };
+		};
 
-protected:
-    /** @brief Default construtor. Implemented in derived classes.  */
-    TimeStepping( ) { };
-};
 
-/** @ingroup TimeStep
-  * @class TimeStep_QsiStatic
-  * @brief Time step integration schemes for quasi-static problems.
-  * 
-  * @todo Representação do esquema de integração quase-estático.
-  */
-class TimeStep_QsiStatic : public TimeStepping
-{
-public:
-    /** Constructor for quasi-static time stepping integration scheme. */
-    TimeStep_QsiStatic() {};
+		/** @ingroup TimeStep
+		  * @class TimeStep_QsiStatic
+		  * @brief Time step integration schemes for quasi-static problems.
+		  *
+		  */
+		class TimeStep_QsiStatic : public TimeStepping
+		{
+		public:
+			/** Constructor for quasi-static time stepping integration scheme. */
+			TimeStep_QsiStatic() {};
 
-    // Work-around to implement Quasi-Static time stepping integration for 2D and 3D problems.
-    void runTimeLoop(Domain<2>* theDomain, AnalysisComp* theFEModel, NonLinearSolver* theSolver) override {
-        PROFILE_FUNCTION();
-        this->runTimeLooping(theDomain, theFEModel, theSolver);
-    };
-
-private:
-    // Actual implementation of Quasi-Static time stepping integration. 2D AND 3D.
-    template<int nDim>
-    void runTimeLooping(Domain<nDim>* theDomain, AnalysisComp* theFEModel, NonLinearSolver* theSolver);
-};
+			// Work-around to implement Quasi-Static time stepping integration for 2D and 3D problems.
+			void runTimeLoop(O2P2::Proc::Mesh* theFEModel, O2P2::Proc::NonLinearSolver* theSolver) override;
+		};
+	} // End of Proc Namespace
+} // End of O2P2 Namespace

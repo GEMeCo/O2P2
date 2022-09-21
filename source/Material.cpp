@@ -21,7 +21,7 @@
 // Saint Venant Kirchhoff isotropic elastic material: constructor
 // 
 // ================================================================================================
-Mat_SVK_ISO::Mat_SVK_ISO(const size_t& index) : Material(index) {
+O2P2::Prep::Mat_SVK_ISO::Mat_SVK_ISO(const size_t& index) : Material(index) {
 	m_E11 = 1.;
 	m_nu12 = 0.;
 	m_Rho = 0.;
@@ -37,7 +37,7 @@ Mat_SVK_ISO::Mat_SVK_ISO(const size_t& index) : Material(index) {
 // Saint Venant Kirchhoff isotropic elastic material: constructor
 // 
 // ================================================================================================
-Mat_SVK_ISO::Mat_SVK_ISO(const size_t& index, const std::vector<double>& Param) : Material(index) {
+O2P2::Prep::Mat_SVK_ISO::Mat_SVK_ISO(const size_t& index, const std::vector<double>& Param) : Material(index) {
 
 	if (Param.size() < 2 || Param.size() > 4) {
 		LOG("\n\nMat_SVK_ISO.constructor: The number of input material parameters (" + std::to_string(Param.size()) + ") is wrong for material: " + std::to_string(index) + "\n\n\n");
@@ -60,7 +60,7 @@ Mat_SVK_ISO::Mat_SVK_ISO(const size_t& index, const std::vector<double>& Param) 
 // Saint Venant Kirchhoff isotropic elastic material
 // 
 // ================================================================================================
-void Mat_SVK_ISO::setParameters(const std::vector<double>& Param) {
+void O2P2::Prep::Mat_SVK_ISO::setParameters(const std::vector<double>& Param) {
 
 	if (Param.size() < 2 || Param.size() > 4) {
 		LOG("\n\nMat_SVK_ISO.setParameters: The number of input material parameters (" + std::to_string(Param.size()) + ") is wrong for material: " + std::to_string(this->m_index) + "\n\n\n");

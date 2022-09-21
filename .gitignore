@@ -72,8 +72,8 @@ ipch/
 [Dd]oxygen
 
 # Test Files and results
+[Vv]alidacao
 *.ogl
-/results.json
-
-*.txt
 *.log
+/results.json
+*.txt

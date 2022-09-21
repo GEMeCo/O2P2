@@ -16,38 +16,38 @@ std::ofstream logFile;
 #endif //_DEBUG
 
 std::map<AnalysisType, std::string> analysisTypeNames =
-{ {AnalysisType::STATIC,                       "Quasi-static analysis"},
-  {AnalysisType::TRANSIENT_1stORDER,           "First order transient analysis"},
-  {AnalysisType::TRANSIENT_2ndORDER_NEWMARK,   "Newmark time step integration method for second order transient analysis"},
-  {AnalysisType::TRANSIENT_2ndORDER_HHT_Alpha, "HHT alpha time step integration method for second order transient analysis"},
-  {AnalysisType::EIGENVALUE,                   "Eingevalue and Eigenvector analysis"}
+{ {AnalysisType::STATIC,						"Quasi-static analysis"},
+  {AnalysisType::TRANSIENT_1stORDER,			"First order transient analysis"},
+  {AnalysisType::TRANSIENT_2ndORDER_NEWMARK,	"Newmark time step integration method for second order transient analysis"},
+  {AnalysisType::TRANSIENT_2ndORDER_HHT_Alpha,	"HHT alpha time step integration method for second order transient analysis"},
+  {AnalysisType::EIGENVALUE,					"Eingevalue and Eigenvector analysis"}
 };
 
 std::map<ProblemType, std::string> problemTypeNames =
 { {ProblemType::MECHANICAL, "Mechanical"},
-  {ProblemType::THERMAL,    "Heat transfer"},
-  {ProblemType::COUPLED,    "Coupled thermomechanical"}
+  {ProblemType::THERMAL,	"Heat transfer"},
+  {ProblemType::COUPLED,	"Coupled thermomechanical"}
 };
 
 
 std::map<NLSolverType, std::string> NLSolverTypeNames =
-{ {NLSolverType::NEWTONRAPHSON, "Newton-Raphson Method"},
-  {NLSolverType::BFGS,          "Broyden-Fletcher-Goldfarb-Shanno Method"},
-  {NLSolverType::NEWTONWLS,     "Newton based method with Line Search"},
-  {NLSolverType::NEWTONWTR,     "Newton based method with Trust Region"}
+{ {NLSolverType::NEWTONRAPHSON,	"Newton-Raphson Method"},
+  {NLSolverType::BFGS,			"Broyden-Fletcher-Goldfarb-Shanno Method"},
+  {NLSolverType::NEWTONWLS,		"Newton based method with Line Search"},
+  {NLSolverType::NEWTONWTR,		"Newton based method with Trust Region"}
 };
 
 std::map<MaterialType, std::string> MaterialTypeNames =
-{ {MaterialType::SVK_ISO,       "Elastic isotropic, based on Saint-Venant-Kirchhof constitutive model"},
-  {MaterialType::SVK_ORT,       "Elastic orthotropic, based on Saint-Venant-Kirchhof constitutive model"},
-  {MaterialType::SVK_DAMAGE,    "Isotropic damage model, based on Saint-Venant-Kirchhof constitutive model"},
-  {MaterialType::CONCRETE,      "Isotropic damage model, based on SVK constitutive model, including creep, shinkage, AAR and DEF"},
-  {MaterialType::STEEL,         "SVK isotropic linear elastoplastic plus relaxation, presstress and losses"},
-  {MaterialType::RSD_ISO,       "Elastic isotropic, based on Rivlin-Saunders-Duster constitutive model"},
-  {MaterialType::RSD_PLASTIC,   "Elasto-Plastic isotropic, based on Rivlin-Saunders-Duster constitutive model"},
-  {MaterialType::TEMP_ISO_LIN,  "Isotropic heat transfer, with linear properties"},
-  {MaterialType::TEMP_ISO_NLIN, "Isotropic heat transfer, with nonlinear properties"},
-  {MaterialType::RSD_TP,        "For Thermomechanical problems - RSD_PLASTIC + TEMP_ISO_NLIN"}
+{ {MaterialType::SVK_ISO,		"Elastic isotropic, based on Saint-Venant-Kirchhof constitutive model"},
+  {MaterialType::SVK_ORT,		"Elastic orthotropic, based on Saint-Venant-Kirchhof constitutive model"},
+  {MaterialType::SVK_DAMAGE,	"Isotropic damage model, based on Saint-Venant-Kirchhof constitutive model"},
+  {MaterialType::CONCRETE,		"Isotropic damage model, based on SVK constitutive model, including creep, shinkage, AAR and DEF"},
+  {MaterialType::STEEL,			"SVK isotropic linear elastoplastic plus relaxation, presstress and losses"},
+  {MaterialType::RSD_ISO,		"Elastic isotropic, based on Rivlin-Saunders-Duster constitutive model"},
+  {MaterialType::RSD_PLASTIC,	"Elasto-Plastic isotropic, based on Rivlin-Saunders-Duster constitutive model"},
+  {MaterialType::TEMP_ISO_LIN,	"Isotropic heat transfer, with linear properties"},
+  {MaterialType::TEMP_ISO_NLIN,	"Isotropic heat transfer, with nonlinear properties"},
+  {MaterialType::RSD_TP,		"For Thermomechanical problems - RSD_PLASTIC + TEMP_ISO_NLIN"}
 };
 
 std::map<PlaneStateType, std::string> PlaneStateTypeNames =

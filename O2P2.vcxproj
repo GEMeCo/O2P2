@@ -28,9 +28,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>Intel(R) oneAPI DPC++ Compiler 2022</PlatformToolset>
+    <PlatformToolset>Intel C++ Compiler 2022</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <UseInteloneMKL>Parallel</UseInteloneMKL>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -61,6 +62,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>$(SolutionDir)include;$(EIGEN_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OpenMP>GenerateParallelCode</OpenMP>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -74,10 +76,11 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <SYCLWarningLevel>Level3</SYCLWarningLevel>
-      <PreprocessorDefinitions>_DEBUG;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(SolutionDir)$include;$(EIGEN_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(EIGEN_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OpenMP>GenerateParallelCode</OpenMP>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -88,11 +91,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="O2P2.cpp" />
-    <ClCompile Include="source\AnalysisComp.cpp" />
+    <ClCompile Include="O2P2_DOC.cpp" />
+    <ClCompile Include="source\Mesh.cpp" />
     <ClCompile Include="source\Common.cpp" />
     <ClCompile Include="source\Domain.cpp" />
-    <ClCompile Include="source\ElementComp.cpp" />
     <ClCompile Include="source\Material.cpp" />
+    <ClCompile Include="source\MeshElem.cpp" />
     <ClCompile Include="source\ModelBuilder.cpp" />
     <ClCompile Include="source\NonLinearSolver.cpp" />
     <ClCompile Include="source\OutputSystem.cpp" />
@@ -104,18 +108,30 @@
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\AnalysisComp.h" />
+    <ClInclude Include="include\Mesh.h" />
     <ClInclude Include="include\Common.h" />
     <ClInclude Include="include\Constraints.h" />
     <ClInclude Include="include\Domain.h" />
     <ClInclude Include="include\Element.h" />
-    <ClInclude Include="include\ElementComp.h" />
+    <ClInclude Include="include\MeshElem.h" />
+    <ClInclude Include="include\Elements\Elem_Hex27.h" />
+    <ClInclude Include="include\Elements\Elem_Hex64.h" />
+    <ClInclude Include="include\Elements\Elem_Hex8.h" />
+    <ClInclude Include="include\Elements\Elem_Lin.h" />
+    <ClInclude Include="include\Elements\Elem_Pri18.h" />
+    <ClInclude Include="include\Elements\Elem_Pri20.h" />
+    <ClInclude Include="include\Elements\Elem_Pri30.h" />
+    <ClInclude Include="include\Elements\Elem_Pri40.h" />
+    <ClInclude Include="include\Elements\Elem_Pri6.h" />
     <ClInclude Include="include\Elements\Elem_Rect12.h" />
     <ClInclude Include="include\Elements\Elem_Rect16.h" />
     <ClInclude Include="include\Elements\Elem_Rect20.h" />
     <ClInclude Include="include\Elements\Elem_Rect4.h" />
     <ClInclude Include="include\Elements\Elem_Rect8.h" />
     <ClInclude Include="include\Elements\Elem_Rect9.h" />
+    <ClInclude Include="include\Elements\Elem_Tet10.h" />
+    <ClInclude Include="include\Elements\Elem_Tet20.h" />
+    <ClInclude Include="include\Elements\Elem_Tet4.h" />
     <ClInclude Include="include\Elements\Elem_Tri10.h" />
     <ClInclude Include="include\Elements\Elem_Tri3.h" />
     <ClInclude Include="include\Elements\Elem_Tri6.h" />
@@ -133,6 +149,7 @@
     <ClInclude Include="include\Section.h" />
     <ClInclude Include="include\SolutionAlgorithm.h" />
     <ClInclude Include="include\TimeStepping.h" />
+    <ClInclude Include="include\MeshNode.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

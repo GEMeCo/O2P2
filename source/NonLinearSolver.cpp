@@ -23,121 +23,116 @@
 // Explicit template member function instantiation
 //
 // ================================================================================================
-template bool NLS_NewtonRaphson::runNonLinearSolver<AnalysisComp>(AnalysisComp* theModel, const double initialNorm, const bool output);
+template bool O2P2::Proc::NLS_NewtonRaphson::runNonLinearSolver<O2P2::Proc::Mesh>(O2P2::Proc::Mesh* theModel, const double initialNorm, const bool output);
 
 // ================================================================================================
 //
 // Implementation of Template Member Function: runNonLinearSolver
 //
-// Newton-Raphson. The concept is as follows:
-//
-// while (||x(i+1)|| / ||x(0)|| >= EPSILON) {
-//    x(i+1) = x(i) - f(x) / f'(x) 
-// }
-// 
-// Obs.:
-// x(i+1) - x(i) -> LHS = Hessian^(-1) . RHS
-// f(x) -> RHS = FExt - FInt
-// f'(x) -> Hessian
-// 
 // ================================================================================================
-template<class T> bool NLS_NewtonRaphson::runNonLinearSolver(T* theModel, const double initialNorm, const bool output)
+template<class T> bool O2P2::Proc::NLS_NewtonRaphson::runNonLinearSolver(T* theModel, const double initialNorm, const bool output)
 {
-    // Returns false if results are infeasible.
-    bool feasible = false;
+	// Returns false if results are infeasible.
+	bool feasible = false;
 
-    // Hessian is a square matrix of second-order partial derivatives of a scalar-valued function or scalar field.
-    Eigen::SparseMatrix<double> Hessian(theModel->getNumDof(), theModel->getNumDof());
+	// Hessian is a square matrix of second-order partial derivatives of a scalar-valued function or scalar field.
+	Eigen::SparseMatrix<double> Hessian(theModel->getNumDof(), theModel->getNumDof());
 
-    // Vector of independent terms, the right hand side, for system: Hessian.LHS = RHS
-    Eigen::VectorXd RHS(theModel->getNumDof());
+	// Vector of independent terms, the right hand side, for system: Hessian.LHS = RHS
+	Eigen::VectorXd RHS(theModel->getNumDof());
 
-    // Vector of dependent terms, the left hand side, for system: Hessian.LHS = RHS
-    Eigen::VectorXd LHS(theModel->getNumDof());
+	// Vector of dependent terms, the left hand side, for system: Hessian.LHS = RHS
+	Eigen::VectorXd LHS(theModel->getNumDof());
 
-    // Load vector (Neumann Boundary conditions)
-    Eigen::VectorXd FExt(theModel->getNumDof());
+	// Load vector (Neumann Boundary conditions)
+	Eigen::VectorXd FExt(theModel->getNumDof());
 
-    // Sparse solver
-    //Eigen::SparseLU<Eigen::SparseMatrix<double>> solver;
-    Eigen::PardisoLU<Eigen::SparseMatrix<double>> solver;
+	// Sparse solver
+	Eigen::PardisoLU<Eigen::SparseMatrix<double>> solver;
 
-    // Assembly load vector (from input)
-    theModel->imposeNeumannBC(FExt);
+	// Assembly load vector (from input)
+	theModel->imposeNeumannBC(FExt);
 
-    // Nonlinear iteration (third nested loop)
-    this->m_iteration = 0;
+	// Nonlinear iteration (third nested loop)
+	this->m_iteration = 0;
 
-    // The first iteration is required - the difference here is that the Hessian pattern is stablished.
-    {
-        this->m_iteration++;
+	// The first iteration is required - the difference here is that the Hessian pattern is stablished.
+	{
+		this->m_iteration++;
 
-        // The external forces do not change inside this loop
-        RHS = FExt;
+		// The external forces do not change inside this loop
+		RHS = FExt;
 
-        // Asks the template model to assemble the system of equations (RHS = FExt - FInt)
-        theModel->assembleSOE(Hessian, RHS);
+		// Asks the template model to assemble the system of equations (RHS = FExt - FInt)
+		theModel->assembleSOE(Hessian, RHS);
 
-        // Solve the system of equation
-        solver.analyzePattern(Hessian);
-        solver.factorize(Hessian);
-        if (solver.info() != Eigen::Success) {
-            LOG("Decomposition failed in iteration " + std::to_string(m_iteration));
-            throw std::invalid_argument("\n\n\nDecomposition failed!\n\n");
-        }
-        LHS = solver.solve(RHS);
+		{
+			PROFILE_SCOPE("solver");
+			// Solve the system of equation
+			solver.analyzePattern(Hessian);
+			solver.factorize(Hessian);
+			if (solver.info() != Eigen::Success) {
+				LOG("Decomposition failed in iteration " + std::to_string(m_iteration));
+				throw std::invalid_argument("\n\n\nDecomposition failed!\n\n");
+			}
+			LHS = solver.solve(RHS);
+		}
 
-        // Update trial solution
-        theModel->setTrial(LHS);
+		// Update trial solution
+		theModel->setTrial(LHS);
 
-        // Evaluates the dot product of the solution (quadratic of variation).
-        m_Norm = LHS.norm();
-        m_Norm /= initialNorm;
+		// Evaluates the dot product of the solution (quadratic of variation).
+		m_Norm = LHS.norm();
+		m_Norm /= initialNorm;
 
-        if (output) {
-            std::cout << "\nIteration: " << this->m_iteration << " Norm: " << this->m_Norm;
-            LOG("NLS_NewtonRaphson.runNonLinearSolver: Iteration: " + std::to_string(this->m_iteration) << "; Norm: " << std::scientific << this->m_Norm << std::fixed);
-        }
-    }
+		if (output) {
+			std::cout << "\nIteration: " << this->m_iteration << " Norm: " << this->m_Norm;
+			LOG("NLS_NewtonRaphson.runNonLinearSolver: Iteration: " + std::to_string(this->m_iteration) << "; Norm: " << std::scientific << this->m_Norm << std::fixed);
+		}
+	}
 
-    while (((this->m_Norm > this->m_Tolerance) && (this->m_iteration < this->m_MaxIt)) || (this->m_iteration < this->m_MinIt))
-    {
-        this->m_iteration++;
+	while (((this->m_Norm > this->m_Tolerance) && (this->m_iteration < this->m_MaxIt)) || (this->m_iteration < this->m_MinIt))
+	{
+		this->m_iteration++;
 
-        // The external forces do not change inside this loop
-        RHS = FExt;
+		// The external forces do not change inside this loop
+		RHS = FExt;
 
-        // Asks the template model to assemble the system of equations (RHS = FExt - FInt)
-        theModel->assembleSOE(Hessian, RHS);
+		// Asks the template model to assemble the system of equations (RHS = FExt - FInt)
+		theModel->assembleSOE(Hessian, RHS);
 
-        // Solve the system of equation
-        solver.analyzePattern(Hessian);
-        solver.factorize(Hessian);
-        if (solver.info() != Eigen::Success) {
-            LOG("Decomposition failed in iteration " + std::to_string(m_iteration));
-            throw std::invalid_argument("\n\n\nDecomposition failed!\n\n");
-        }
-        LHS = solver.solve(RHS);
+		{
+			PROFILE_SCOPE("solver");
 
-        // Update trial solution
-        theModel->setTrial(LHS);
+			// Solve the system of equation
+			//solver.analyzePattern(Hessian);
+			solver.factorize(Hessian);
+			if (solver.info() != Eigen::Success) {
+				LOG("Decomposition failed in iteration " + std::to_string(m_iteration));
+				throw std::invalid_argument("\n\n\nDecomposition failed!\n\n");
+			}
+			LHS = solver.solve(RHS);
+		}
 
-        // Evaluates the dot product of the solution (quadratic of variation).
-        m_Norm = LHS.norm();
-        m_Norm /= initialNorm;
+		// Update trial solution
+		theModel->setTrial(LHS);
 
-        // Evaluate current norm
-        if (output) {
-            std::cout << "\nIteration: " << this->m_iteration << " Norm: " << this->m_Norm;
-            LOG("NLS_NewtonRaphson.runNonLinearSolver: Iteration: " + std::to_string(this->m_iteration) << "; Norm: " << std::scientific << this->m_Norm << std::fixed);
-        }
-    };
+		// Evaluates the dot product of the solution (quadratic of variation).
+		m_Norm = LHS.norm();
+		m_Norm /= initialNorm;
 
-    // If convergence was attained, the solution is feasible.
-    if (this->m_Norm < this->m_Tolerance) feasible = true;
+		// Evaluate current norm
+		if (output) {
+			std::cout << "\nIteration: " << this->m_iteration << " Norm: " << this->m_Norm;
+			LOG("NLS_NewtonRaphson.runNonLinearSolver: Iteration: " + std::to_string(this->m_iteration) << "; Norm: " << std::scientific << this->m_Norm << std::fixed);
+		}
+	};
 
-    // Update commit solution
-    theModel->setCommit();
+	// If convergence was attained, the solution is feasible.
+	if (this->m_Norm < this->m_Tolerance) feasible = true;
 
-    return feasible;
+	// Update commit solution
+	theModel->setCommit();
+
+	return feasible;
 }

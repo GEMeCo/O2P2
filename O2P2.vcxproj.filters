@@ -45,9 +45,6 @@
     <ClCompile Include="source\Material.cpp">
       <Filter>Source Files\Domain Components</Filter>
     </ClCompile>
-    <ClCompile Include="source\ModelBuilder.cpp">
-      <Filter>Source Files\Domain Components</Filter>
-    </ClCompile>
     <ClCompile Include="source\SolutionAlgorithm.cpp">
       <Filter>Source Files\Solution Components</Filter>
     </ClCompile>
@@ -57,17 +54,23 @@
     <ClCompile Include="source\TimeStepping.cpp">
       <Filter>Source Files\Solution Components</Filter>
     </ClCompile>
-    <ClCompile Include="source\ElementComp.cpp">
+    <ClCompile Include="source\PostProcess.cpp">
+      <Filter>Source Files\Post-Process Components</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Mesh.cpp">
+      <Filter>Source Files\Solution Components</Filter>
+    </ClCompile>
+    <ClCompile Include="source\ModelBuilder.cpp">
+      <Filter>Source Files\Domain Components</Filter>
+    </ClCompile>
+    <ClCompile Include="source\MeshElem.cpp">
       <Filter>Source Files\Solution Components</Filter>
     </ClCompile>
     <ClCompile Include="source\OutputSystem.cpp">
       <Filter>Source Files\Post-Process Components</Filter>
     </ClCompile>
-    <ClCompile Include="source\PostProcess.cpp">
-      <Filter>Source Files\Post-Process Components</Filter>
-    </ClCompile>
-    <ClCompile Include="source\AnalysisComp.cpp">
-      <Filter>Source Files\Solution Components</Filter>
+    <ClCompile Include="O2P2_DOC.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -130,16 +133,13 @@
     <ClInclude Include="include\Section.h">
       <Filter>Header Files\Domain Components</Filter>
     </ClInclude>
-    <ClInclude Include="include\ModelBuilder.h">
-      <Filter>Header Files\Domain Components</Filter>
-    </ClInclude>
     <ClInclude Include="include\SolutionAlgorithm.h">
       <Filter>Header Files\Solution Components</Filter>
     </ClInclude>
     <ClInclude Include="include\NonLinearSolver.h">
       <Filter>Header Files\Solution Components</Filter>
     </ClInclude>
-    <ClInclude Include="include\AnalysisComp.h">
+    <ClInclude Include="include\Mesh.h">
       <Filter>Header Files\Solution Components</Filter>
     </ClInclude>
     <ClInclude Include="include\TimeStepping.h">
@@ -151,7 +151,7 @@
     <ClInclude Include="include\Constraints.h">
       <Filter>Header Files\Solution Components</Filter>
     </ClInclude>
-    <ClInclude Include="include\ElementComp.h">
+    <ClInclude Include="include\MeshElem.h">
       <Filter>Header Files\Solution Components</Filter>
     </ClInclude>
     <ClInclude Include="include\MaterialPoint.h">
@@ -162,6 +162,48 @@
     </ClInclude>
     <ClInclude Include="include\PostProcess.h">
       <Filter>Header Files\Post-Process Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Hex8.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Hex27.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Hex64.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Pri6.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Pri18.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Pri20.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Pri30.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Pri40.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Tet4.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Tet10.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Tet20.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Elements\Elem_Lin.h">
+      <Filter>Header Files\Domain Components\Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ModelBuilder.h">
+      <Filter>Header Files\Domain Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MeshNode.h">
+      <Filter>Header Files\Solution Components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
