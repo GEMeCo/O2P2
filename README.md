@@ -56,7 +56,6 @@ Citation
 Features
 --------
 - v1: Geometric nonlinear mechanical analysis with SVK constitutive model.
-	- :boom: only 2D elements;
 	- :boom: 2D and 3D elements;
 	- :boom: bar elements in 2D and 3D environments;
 	- :boom: Parallel processing enabled;
@@ -69,6 +68,7 @@ We are using the following libraries and resources:
 - [Microsoft Visual Studio Community 2022, Version 17.3.4](https://visualstudio.microsoft.com/)
 - [Intel C++ Compiler, Package ID: w_oneAPI_2022.1.0.256](https://software.intel.com/content/www/us/en/develop/tools/oneapi.html)
 - [Doxygen, version 1.9.5](https://doxygen.nl/)
+- [AcadView](https://set.eesc.usp.br/?page_id=237)
 
 Building and Running
 --------------------
