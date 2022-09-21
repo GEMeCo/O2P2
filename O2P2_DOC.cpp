@@ -19,7 +19,9 @@
   * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   * SOFTWARE.
   *
-  * You may use, distribute and even modify this code under terms of Creative Commons Attribution-NonCommerical 4.0 International license.
+  * You may use, distribute and even modify the source code under terms of Apache License 2.0.
+  * 
+  * This documentation, created by doxygen, may also be used, distributed and modified, but under  Creative Commons Attribution-NonCommerical 4.0 International license.
   * @image html CC-BY-NC.jpg width=150
   *
   * @section developers_sec Developers
@@ -29,8 +31,8 @@
   *  @author	[Alexandre Ten Cate Matté](https://lattes.cnpq.br/8144116395864291)
   *  @author	[Chiara Pinheiro Teodoro](http://lattes.cnpq.br/6999948388655115)
   *  @author	[Thiago da Silva Costa Santos](http://lattes.cnpq.br/6048758348229035)
-  *  @version   1.3.0.1
-  *  @date	  2022.09.01
+  *  @version   1.0.0
+  *  @date	  2022.09.21
   *
   * @warning None of the developers are software engineers of any sort. We are civil engineers, seeking to solve engineering problems. We know that this software has lots of bugs. We just don't have time to solve them all.
   *
@@ -45,7 +47,7 @@
   * - CARRAZEDO, R.; PACCOLA, R. R.; CODA, H. B.; SALOMÃO, R. C. Vibration and stress analysis of orthotropic laminated panels by active face prismatic finite element. Composite Structures, v. 244, n. 112254, 2020.
   * DOI: <10.1016/j.compstruct.2020.112254>
   *
-  * Current Version: 1.3.0.1 [S.l.]: SET - EESC - USP, 2022. Available at <https://github.com/GEMeCo/O2P2>\n
+  * Current Version: 1.0.0 [S.l.]: SET - EESC - USP, 2022. Available at <https://github.com/GEMeCo/O2P2>\n
   * DOI: Soon
   *
   * @copyright Licensed under Creative Commons Attribution-NonCommerical 4.0 International license
@@ -61,9 +63,9 @@
   * This program was developed with the following libraries and technologies:
   *
   *	  - Eigen C++ Libraries, Version 3.4.0
-  *	  - Microsoft Visual Studio Community 2022, Version 17.2.6
-  *	  - Intel Libraries for oneAPI, Package ID: w_oneAPI_2021.2.0.256
-  *	  - Intel C++ Compiler, Package ID: w_oneAPI_2021.2.0.256
+  *	  - Microsoft Visual Studio Community 2022, Version 17.3.4
+  *	  - Intel C++ Compiler, Package ID: w_oneAPI_2022.1.0.256
+  *   - [Doxygen, version 1.9.5](https://doxygen.nl/)
   *	  - [AcadView](https://set.eesc.usp.br/?page_id=237)
   *
   * @warning Software under development. Improper use will crash your application.
