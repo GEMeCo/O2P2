@@ -14,7 +14,7 @@
 // 
 // ================================================================================================
 #define EIGEN_USE_MKL_ALL
-#define VERSION 1.2
+#define VERSION 0.2
 
 // Custom Header Files
 #include "FEAnalysis.h"

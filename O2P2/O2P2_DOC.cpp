@@ -138,8 +138,9 @@
   * - v0.3 - an alpha version: immersed elements.
   * - v0.4 - an alpha version: thermodynamic analysis of solids (conduction).
   * - v0.5 - an alpha version: weak coupling of thermal and mechanical analysis (temperature modifying mechanical behavior).
-  * - v1.0 - an beta version: thermomechanical analysis of hyperelastic composites.
-  *
+  * - v1.0 - a beta version: thermomechanical analysis of hyperelastic composites.
+  * - v2.0 - a beta version: GUI included.
+  * 
   * 
   * 
   * 

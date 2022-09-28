@@ -61,7 +61,7 @@
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(SolutionDir)include;$(EIGEN_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)O2P2\include;$(SolutionDir)O2P2\libs\Eigen;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMP>GenerateParallelCode</OpenMP>
     </ClCompile>
     <Link>
@@ -90,66 +90,66 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="O2P2.cpp" />
-    <ClCompile Include="O2P2_DOC.cpp" />
-    <ClCompile Include="source\Mesh.cpp" />
-    <ClCompile Include="source\Common.cpp" />
-    <ClCompile Include="source\Domain.cpp" />
-    <ClCompile Include="source\Material.cpp" />
-    <ClCompile Include="source\MeshElem.cpp" />
-    <ClCompile Include="source\ModelBuilder.cpp" />
-    <ClCompile Include="source\NonLinearSolver.cpp" />
-    <ClCompile Include="source\OutputSystem.cpp" />
-    <ClCompile Include="source\PostProcess.cpp" />
-    <ClCompile Include="source\SolutionAlgorithm.cpp" />
-    <ClCompile Include="source\TimeStepping.cpp" />
+    <ClCompile Include="O2P2\O2P2.cpp" />
+    <ClCompile Include="O2P2\O2P2_DOC.cpp" />
+    <ClCompile Include="O2P2\source\Mesh.cpp" />
+    <ClCompile Include="O2P2\source\Common.cpp" />
+    <ClCompile Include="O2P2\source\Domain.cpp" />
+    <ClCompile Include="O2P2\source\Material.cpp" />
+    <ClCompile Include="O2P2\source\MeshElem.cpp" />
+    <ClCompile Include="O2P2\source\ModelBuilder.cpp" />
+    <ClCompile Include="O2P2\source\NonLinearSolver.cpp" />
+    <ClCompile Include="O2P2\source\OutputSystem.cpp" />
+    <ClCompile Include="O2P2\source\PostProcess.cpp" />
+    <ClCompile Include="O2P2\source\SolutionAlgorithm.cpp" />
+    <ClCompile Include="O2P2\source\TimeStepping.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Mesh.h" />
-    <ClInclude Include="include\Common.h" />
-    <ClInclude Include="include\Constraints.h" />
-    <ClInclude Include="include\Domain.h" />
-    <ClInclude Include="include\Element.h" />
-    <ClInclude Include="include\MeshElem.h" />
-    <ClInclude Include="include\Elements\Elem_Hex27.h" />
-    <ClInclude Include="include\Elements\Elem_Hex64.h" />
-    <ClInclude Include="include\Elements\Elem_Hex8.h" />
-    <ClInclude Include="include\Elements\Elem_Lin.h" />
-    <ClInclude Include="include\Elements\Elem_Pri18.h" />
-    <ClInclude Include="include\Elements\Elem_Pri20.h" />
-    <ClInclude Include="include\Elements\Elem_Pri30.h" />
-    <ClInclude Include="include\Elements\Elem_Pri40.h" />
-    <ClInclude Include="include\Elements\Elem_Pri6.h" />
-    <ClInclude Include="include\Elements\Elem_Rect12.h" />
-    <ClInclude Include="include\Elements\Elem_Rect16.h" />
-    <ClInclude Include="include\Elements\Elem_Rect20.h" />
-    <ClInclude Include="include\Elements\Elem_Rect4.h" />
-    <ClInclude Include="include\Elements\Elem_Rect8.h" />
-    <ClInclude Include="include\Elements\Elem_Rect9.h" />
-    <ClInclude Include="include\Elements\Elem_Tet10.h" />
-    <ClInclude Include="include\Elements\Elem_Tet20.h" />
-    <ClInclude Include="include\Elements\Elem_Tet4.h" />
-    <ClInclude Include="include\Elements\Elem_Tri10.h" />
-    <ClInclude Include="include\Elements\Elem_Tri3.h" />
-    <ClInclude Include="include\Elements\Elem_Tri6.h" />
-    <ClInclude Include="include\FEAnalysis.h" />
-    <ClInclude Include="include\IntegrationPoint.h" />
-    <ClInclude Include="include\LoadStep.h" />
-    <ClInclude Include="include\Material.h" />
-    <ClInclude Include="include\MaterialPoint.h" />
-    <ClInclude Include="include\ModelBuilder.h" />
-    <ClInclude Include="include\Node.h" />
-    <ClInclude Include="include\NonLinearSolver.h" />
-    <ClInclude Include="include\OutputSystem.h" />
-    <ClInclude Include="include\PostProcess.h" />
-    <ClInclude Include="include\Profiler.h" />
-    <ClInclude Include="include\Section.h" />
-    <ClInclude Include="include\SolutionAlgorithm.h" />
-    <ClInclude Include="include\TimeStepping.h" />
-    <ClInclude Include="include\MeshNode.h" />
+    <ClInclude Include="O2P2\include\Mesh.h" />
+    <ClInclude Include="O2P2\include\Common.h" />
+    <ClInclude Include="O2P2\include\Constraints.h" />
+    <ClInclude Include="O2P2\include\Domain.h" />
+    <ClInclude Include="O2P2\include\Element.h" />
+    <ClInclude Include="O2P2\include\MeshElem.h" />
+    <ClInclude Include="O2P2\include\Elements\Elem_Hex27.h" />
+    <ClInclude Include="O2P2\include\Elements\Elem_Hex64.h" />
+    <ClInclude Include="O2P2\include\Elements\Elem_Hex8.h" />
+    <ClInclude Include="O2P2\include\Elements\Elem_Lin.h" />
+    <ClInclude Include="O2P2\include\Elements\Elem_Pri18.h" />
+    <ClInclude Include="O2P2\include\Elements\Elem_Pri20.h" />
+    <ClInclude Include="O2P2\include\Elements\Elem_Pri30.h" />
+    <ClInclude Include="O2P2\include\Elements\Elem_Pri40.h" />
+    <ClInclude Include="O2P2\include\Elements\Elem_Pri6.h" />
+    <ClInclude Include="O2P2\include\Elements\Elem_Rect12.h" />
+    <ClInclude Include="O2P2\include\Elements\Elem_Rect16.h" />
+    <ClInclude Include="O2P2\include\Elements\Elem_Rect20.h" />
+    <ClInclude Include="O2P2\include\Elements\Elem_Rect4.h" />
+    <ClInclude Include="O2P2\include\Elements\Elem_Rect8.h" />
+    <ClInclude Include="O2P2\include\Elements\Elem_Rect9.h" />
+    <ClInclude Include="O2P2\include\Elements\Elem_Tet10.h" />
+    <ClInclude Include="O2P2\include\Elements\Elem_Tet20.h" />
+    <ClInclude Include="O2P2\include\Elements\Elem_Tet4.h" />
+    <ClInclude Include="O2P2\include\Elements\Elem_Tri10.h" />
+    <ClInclude Include="O2P2\include\Elements\Elem_Tri3.h" />
+    <ClInclude Include="O2P2\include\Elements\Elem_Tri6.h" />
+    <ClInclude Include="O2P2\include\FEAnalysis.h" />
+    <ClInclude Include="O2P2\include\IntegrationPoint.h" />
+    <ClInclude Include="O2P2\include\LoadStep.h" />
+    <ClInclude Include="O2P2\include\Material.h" />
+    <ClInclude Include="O2P2\include\MaterialPoint.h" />
+    <ClInclude Include="O2P2\include\ModelBuilder.h" />
+    <ClInclude Include="O2P2\include\Node.h" />
+    <ClInclude Include="O2P2\include\NonLinearSolver.h" />
+    <ClInclude Include="O2P2\include\OutputSystem.h" />
+    <ClInclude Include="O2P2\include\PostProcess.h" />
+    <ClInclude Include="O2P2\include\Profiler.h" />
+    <ClInclude Include="O2P2\include\Section.h" />
+    <ClInclude Include="O2P2\include\SolutionAlgorithm.h" />
+    <ClInclude Include="O2P2\include\TimeStepping.h" />
+    <ClInclude Include="O2P2\include\MeshNode.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

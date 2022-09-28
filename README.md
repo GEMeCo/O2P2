@@ -1,5 +1,6 @@
-# O2P2
-[![DOI](https://zenodo.org/badge/519514823.svg)](https://zenodo.org/badge/latestdoi/519514823)[![GitHub license](https://img.shields.io/github/license/GEMeCo/O2P2?style=for-the-badge)](https://github.com/GEMeCo/O2P2/blob/main/LICENSE) [![GitHub issues](https://img.shields.io/github/issues/GEMeCo/O2P2?style=for-the-badge)](https://github.com/GEMeCo/O2P2/issues) [![GitHub stars](https://img.shields.io/github/stars/GEMeCo/O2P2?style=for-the-badge)](https://github.com/GEMeCo/O2P2/stargazers)
+# O2P2 [![DOI](https://zenodo.org/badge/519514823.svg)](https://zenodo.org/badge/latestdoi/519514823)
+[![GitHub license](https://img.shields.io/github/license/GEMeCo/O2P2?style=for-the-badge)](https://github.com/GEMeCo/O2P2/blob/main/LICENSE) [![GitHub issues](https://img.shields.io/github/issues/GEMeCo/O2P2?style=for-the-badge)](https://github.com/GEMeCo/O2P2/issues) [![GitHub stars](https://img.shields.io/github/stars/GEMeCo/O2P2?style=for-the-badge)](https://github.com/GEMeCo/O2P2/stargazers)
+
 O2P2 is an C++ environment developed for non-linear coupled thermo-mechanical analyzes with the finite element method based on positions. It is under development at Sao Carlos School of Engineering, University of Sao Paulo.
 
 <h1 align="center">
