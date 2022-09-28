@@ -1,0 +1,3 @@
+[submodule "O2P2/libs/Eigen"]
+	path = O2P2/libs/Eigen
+	url = https://gitlab.com/libeigen/eigen
