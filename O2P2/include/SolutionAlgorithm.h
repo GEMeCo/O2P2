@@ -60,6 +60,10 @@ namespace O2P2 {
 					std::cout << "Quasi-Static ";
 					m_theTimeStep = std::make_unique<TimeStep_QsiStatic>();
 					break;
+				case AnalysisType::TRANSIENT_2ndORDER_NEWMARK:
+					std::cout << "Dynamic ";
+					m_theTimeStep = std::make_unique<TimeStep_2ndNew>();
+					break;
 				default:
 					// if none, thows an error message
 					throw std::invalid_argument("\n\n\nUndefined time integration scheme\nCheck input file\n\n\n");
@@ -177,6 +181,15 @@ namespace O2P2 {
 				size_t Dof = m_theFEModel->m_meshNode[index]->m_DofIndex + iDir;
 
 				m_theFEModel->addNeumannBC(nLS, Dof, Value, Var);
+			}
+
+			/** Sets the time stepping parameters.
+			  * @param vl1 Alfa for first order transient analysis.
+			  * @param vl2 Beta for second order transient analysis.
+			  * @param vl3 Gamma for second order transient analysis.
+			  */
+			void SetTSP(const double& vl1, const double& vl2, const double& vl3) { 
+				m_theTimeStep->SetParameters(vl1, vl2, vl3);
 			}
 
 		private:

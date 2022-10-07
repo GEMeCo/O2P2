@@ -93,7 +93,7 @@
   * @author	[Alexandre Ten Cate Matté](https://lattes.cnpq.br/8144116395864291)
   * @author	[Chiara Pinheiro Teodoro](http://lattes.cnpq.br/6999948388655115)
   * 
-  * section ack Funding and Acknowledgement
+  * @section ack Funding and Acknowledgement
   * 
   * Structural Engineering Department / University of São Paulo at São Carlos School of Engineering
   * 
@@ -126,6 +126,8 @@
   * 
   * - v0.1.1
   *   - Improved documentation (README.md and doxygen html);
+  *   - Eigen was included as submodule in git. Doxygen was thus updated.
+  * 
   * 
   * @subsection min Minor implementations
   * Each minor version is associated to new features. It creates a new release, and includes all previous patch modifications. Patch numbering is reinitated.
@@ -151,12 +153,6 @@
   *
   * @subsection pf Project file
   * The following information must be provided:
-  * - A control version of the input file, associated to current O2P2 version. Obsolete versions must be checked, for something might be missing.
-  * @verbatim
-    #VERSAO#
-    1.2
-    @endverbatim
-  *
   * - Problem Dimensionality (either 2D or 3D)
   * @verbatim
     #DIM#
@@ -173,7 +169,7 @@
     @endverbatim
   *
   * In a single line, input the following:
-  * - Time integration scheme (1 for quasi-static, the only available for now)\n
+  * - Time integration scheme (1 for quasi-static, 3 for Newmark-beta, the two available by now)\n
   * - Nonlinear Solver: (1 - Newton-Raphson)\n
   * - Type of analysis: (1 - Mechanic)\n
   * - Tolerance (double)\n
@@ -185,6 +181,16 @@
     1	1	1	0.0000001	3	10	1
     @endverbatim
   *
+  * If time integration scheme is not quasi-static, some time integration parameters are required.
+  * - alfa (for thermal problems)
+  * - beta (for Newmark-beta)
+  * - gamma (for Newmark-beta)
+  * @verbatim
+    #PIT#
+    0.  0.25 0.5
+    @endverbatim
+  *
+  * 
   * @subsection nf Node file
   * - Number of nodes
   * @verbatim

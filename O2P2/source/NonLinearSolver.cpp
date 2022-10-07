@@ -38,7 +38,7 @@ template<class T> bool O2P2::Proc::NLS_NewtonRaphson::runNonLinearSolver(T* theM
 	Eigen::VectorXd LHS(theModel->getNumDof());
 
 	// Load vector (Neumann Boundary conditions)
-	Eigen::VectorXd FExt(theModel->getNumDof());
+	Eigen::VectorXd FExt = Eigen::VectorXd::Zero(theModel->getNumDof());
 
 	// Sparse solver
 	Eigen::PardisoLU<Eigen::SparseMatrix<double>> solver;

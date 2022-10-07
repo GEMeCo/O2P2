@@ -100,6 +100,13 @@ namespace O2P2 {
 			  */
 			void setTimeStep(const int& timeStep) { this->m_curTimeStep = timeStep; }
 
+			/** Sets the current timestep and Newmark-beta parameters.
+			  * @param timeStep Current timestep under process.
+			  * @param beta First Newmark-beta parameter, associated to displacement.
+			  * @param gamm Second Newmark-beta parameter, associated to velocity.
+			  */
+			virtual void setTimeStep(const int& timeStep, const double& beta, const double& gamma) = 0;
+
 			/** Update trial solution.
 			  * @param LHS Left hand side vector with current trial solution.
 			  */
@@ -125,7 +132,7 @@ namespace O2P2 {
 			/** Impose Neumann Boundary Conditions to the vector of independent terms (external forces).
 			  * @param RHS Right hand side vector to impose the Neumann boundary conditions.
 			  */
-			void imposeNeumannBC(Eigen::VectorXd& RHS);
+			virtual void imposeNeumannBC(Eigen::VectorXd& RHS) = 0;
 
 		public:
 			/** @brief Vector with Dirichlet boundary conditions - if there is a BC imposed, then it is equal to 0. Otherwise, it is 1. */
@@ -162,47 +169,30 @@ namespace O2P2 {
 
 
 		/**
-		  * @class Mesh_Mec
+		  * @class Mesh_MQS
 		  *
-		  * @brief Container of solution components for mechanical problems.
+		  * @brief Container of solution components for mechanical quasi-static problems.
 		  * @details This class holds vectors of solution and analysis components: Load Steps, DOF, System of equation, and such.
 		  *
 		  * @tparam nDim The dimensionality of the problem. It is either 2 or 3 (bidimensional or tridimensional).
 		  */
 		template<int nDim>
-		class Mesh_Mec : public Mesh
+		class Mesh_MQS : public Mesh
 		{
 		private:
-			Mesh_Mec() = delete;
+			Mesh_MQS() = delete;
 
 		public:
 			/** Constructor for container of solution components.
-			  * @param theDomain Container with nodaland elements information.
-			  * @param vOut  Reference to post-process container.
+			  * @param theDomain Container with nodal and elements information.
+			  * @param vOut Reference to post-process container.
 			  */
-			explicit Mesh_Mec(O2P2::Prep::Domain<nDim>* theDomain, O2P2::Post::PostProcess* vOut) : Mesh(vOut) {
-				m_meshNode.reserve(theDomain->m_nNodes);
-				m_meshElem.reserve(theDomain->m_nElem);
+			explicit Mesh_MQS(O2P2::Prep::Domain<nDim>* theDomain, O2P2::Post::PostProcess* vOut) : Mesh(vOut) {
+				this->m_meshNode.reserve(theDomain->m_nNodes);
+				this->m_meshElem.reserve(theDomain->m_nElem);
 
-				// Generates a mesh node for each domain node
-				for (std::shared_ptr<O2P2::Prep::Node<nDim>>& node : theDomain->getNode()) {
-					// Index of DOF for current node
-					// For now, each node has nDim DOF
-					size_t iDof = node->m_index * nDim;
-					m_meshNode.emplace_back(std::make_shared<O2P2::Proc::Comp::MeshNode_MQ<nDim>>(iDof, node->getInitPos()));
-					addDOF(m_meshNode.back()->getNumDOF());
-				}
-
-				// Generates a mesh element for each domain element
-				for (std::shared_ptr<O2P2::Prep::Elem::Element<nDim>>& elem : theDomain->getElem()) {
-
-					std::vector<std::shared_ptr<O2P2::Proc::Comp::MeshNode>> conect(elem->getNumNodes());
-
-					for (int i = 0; i < elem->getNumNodes(); i++) {
-						conect[i] = m_meshNode[elem->getConectivity(i)->m_index];
-					}
-					m_meshElem.emplace_back(std::make_unique<O2P2::Proc::Comp::MeshElem_SVK<nDim>>(elem, conect));
-				}
+				this->DomainNodesToMesh(theDomain);
+				this->DomainElemToMesh(theDomain);
 
 				// Initial norm (required by Non-linear Solver)
 				for (auto& x0 : theDomain->getNode()) {
@@ -214,7 +204,7 @@ namespace O2P2 {
 			}
 
 			// Default destructor of private / protected pointers.
-			~Mesh_Mec() = default;
+			~Mesh_MQS() = default;
 
 			// Assemble the system of equation, made by the Hessian matrix and the right hand side vector.
 			void assembleSOE(Eigen::SparseMatrix<double>& Hessian, Eigen::VectorXd& RHS) override;
@@ -224,6 +214,109 @@ namespace O2P2 {
 
 			// Update commit solution.
 			void setCommit() override;
+
+			// Sets the current timestep and Newmark-beta parameters.
+			void setTimeStep(const int& timeStep, const double& beta, const double& gamma) override {
+				O2P2::Proc::Mesh::setTimeStep(timeStep);
+			};
+
+			//Impose Neumann Boundary Conditions to the vector of independent terms (external forces).
+			void imposeNeumannBC(Eigen::VectorXd& RHS) override;
+
+		protected:
+			// Generates a mesh node for each domain node
+			void DomainNodesToMesh(O2P2::Prep::Domain<nDim>* theDomain) {
+				for (std::shared_ptr<O2P2::Prep::Node<nDim>>& node : theDomain->getNode()) {
+					// Index of DOF for current node
+					// For now, each node has nDim DOF
+					size_t iDof = node->m_index * nDim;
+					this->m_meshNode.emplace_back(std::make_shared<O2P2::Proc::Comp::MeshNode_MQS<nDim>>(iDof, node->getInitPos()));
+					addDOF(this->m_meshNode.back()->getNumDOF());
+				}
+			}
+
+			// Generates a mesh element for each domain element
+			void DomainElemToMesh(O2P2::Prep::Domain<nDim>* theDomain) {
+				for (std::shared_ptr<O2P2::Prep::Elem::Element<nDim>>& elem : theDomain->getElem()) {
+
+					std::vector<std::shared_ptr<O2P2::Proc::Comp::MeshNode>> conect(elem->getNumNodes());
+
+					for (int i = 0; i < elem->getNumNodes(); i++) {
+						conect[i] = this->m_meshNode[elem->getConectivity(i)->m_index];
+					}
+					this->m_meshElem.emplace_back(std::make_unique<O2P2::Proc::Comp::MeshElem_SVK<nDim>>(elem, conect));
+				}
+			}
 		};
+
+
+		/**
+		  * @class Mesh_MD
+		  *
+		  * @brief Container of solution components for mechanical dynamic problems.
+		  * @details This class holds vectors of solution and analysis components: Load Steps, DOF, System of equation, and such.
+		  *
+		  * @tparam nDim The dimensionality of the problem. It is either 2 or 3 (bidimensional or tridimensional).
+		  */
+		template<int nDim>
+		class Mesh_MD : public Mesh_MQS<nDim>
+		{
+		private:
+			Mesh_MD() = delete;
+
+		public:
+			/** Constructor for container of solution components.
+			  * @param theDomain Container with nodal and elements information.
+			  * @param vOut Reference to post-process container.
+			  */
+			explicit Mesh_MD(O2P2::Prep::Domain<nDim>* theDomain, O2P2::Post::PostProcess* vOut) : Mesh_MQS<nDim>(theDomain, vOut) { 
+				v_Qs.resize(this->m_TotalDof);
+				v_Rs.resize(this->m_TotalDof);
+
+				m_beta = 0;
+				m_gamma = 0;
+			}
+
+			// Default destructor of private / protected pointers.
+			~Mesh_MD() = default;
+
+			// Assemble the system of equation, made by the Hessian matrix and the right hand side vector.
+			void assembleSOE(Eigen::SparseMatrix<double>& Hessian, Eigen::VectorXd& RHS) override;
+
+			// Update trial solution.
+			void setTrial(Eigen::VectorXd& LHS) override;
+
+			// Update commit solution.
+			void setCommit() override;
+
+			// Sets the current timestep and Newmark-beta parameters.
+			void setTimeStep(const int& timeStep, const double& beta, const double& gamma) override;
+
+			//Impose Neumann Boundary Conditions to the vector of independent terms (external forces).
+			void imposeNeumannBC(Eigen::VectorXd& RHS) override;
+
+		protected:
+			// Generates a mesh node for each domain node
+			void DomainNodesToMesh(O2P2::Prep::Domain<nDim>* theDomain) {
+				for (std::shared_ptr<O2P2::Prep::Node<nDim>>& node : theDomain->getNode()) {
+					// Index of DOF for current node
+					// For now, each node has nDim DOF
+					size_t iDof = node->m_index * nDim;
+					this->m_meshNode.emplace_back(std::make_shared<O2P2::Proc::Comp::MeshNode_MD<nDim>>(iDof, node->getInitPos()));
+					this->addDOF(this->m_meshNode.back()->getNumDOF());
+				}
+			}
+
+		protected:
+			// Dynamic contribution from previous step
+			Eigen::VectorXd v_Qs;
+
+			// Dynamic contribution from previous step
+			Eigen::VectorXd v_Rs;
+
+			// Time integration parameters
+			double m_beta, m_gamma;
+		};
+
 	} // End of Proc Namespace
 } // End of O2P2 Namespace

@@ -198,7 +198,27 @@ template<int nDim> std::unique_ptr<O2P2::Proc::SolutionAlgorithm> O2P2::ModelBui
 	LOG("ModelBuilder.initAnalyzer: Maximum number of iterations: " << std::to_string(MaxIt));
 	LOG("ModelBuilder.initAnalyzer: Tolerance for NonLinear Process: " << std::scientific << Tol << std::fixed);
 
-	return std::make_unique<O2P2::Proc::SolutionAlgorithm>(m_AnalysisType, NLSolverType(iSl - 1), m_ProblemType, NumLS, MinIt, MaxIt, Tol);
+	// Stores a temporary unique_ptr of SolutionAlgorithm
+	std::unique_ptr<O2P2::Proc::SolutionAlgorithm> theAnalyzer = std::make_unique<O2P2::Proc::SolutionAlgorithm>(m_AnalysisType, NLSolverType(iSl - 1), m_ProblemType, NumLS, MinIt, MaxIt, Tol);
+
+	// Reads Time integration parameters, if any
+	stFlag = "#PIT#";
+
+	LOG("ModelBuilder.initAnalyzer: Reading flag " << stFlag);
+
+	while (stLine.compare(0, stFlag.size(), stFlag)) {
+		std::getline(fileProj, stLine);
+		if (fileProj.eof()) {
+			LOG("\n\nModelBuilder.initAnalyzer: Reading Error!\nFlag " << stFlag << " not found\n\n\n");
+			throw std::invalid_argument("\n\n\nReading Error!\nFlag " + stFlag + " not found\n\n\n");
+		}
+	}
+
+	double vl1, vl2, vl3;
+	fileProj >> vl1 >> vl2 >> vl3;
+	theAnalyzer->SetTSP(vl1, vl2, vl3);
+
+	return std::move(theAnalyzer);
 }
 
 

@@ -55,25 +55,26 @@ namespace O2P2 {
 				/** Retrieve current commited position.
 				  * @return pointer to nodal commited position (with size nDim).
 				  */
-				virtual const double* getCurrent() = 0;
+				virtual const double* getCurPos() = 0;
 
 				/** Retrieve current trial position.
 				  * @return pointer to nodal trial position (with size nDim).
 				  */
-				virtual const double* getTrial() = 0;
+				virtual const double* getTrialPos() = 0;
 
 				/** Retrieve current nodal temperature.
 				  * @return double with nodal temperature.
 				  */
-				const double& getCurrentTemp() { return m_Tp; }
+				const double& getCurTemp() { return m_Tp; }
 
 				/** Retrieve current trial nodal temperature.
 				  * @return double with nodal trial temperature.
 				  */
 				const double& getTrialTemp() { return m_Tp; }
 
-				/** Update trial position.
-				  * @param dPos Increase in the trial position (with size nDim).
+				/** Update trial position / velocity / acceleration.
+				  * @param dPos Increase in the trial position and new values for velociy and acceleration (in a single vector, and only if applied).
+				  * @warning The size of dPos is not validated anywhere. Undoubtedly will lead to access error, if you don't know what you are doing. 
 				  */
 				virtual void updateTrial(const double dPos[]) = 0;
 
@@ -99,7 +100,7 @@ namespace O2P2 {
 
 
 			/**
-			  * @class MeshNode_MQ
+			  * @class MeshNode_MQS
 			  *
 			  * @brief Mesh node, a Solution component, for mechanical quasi-static problems.
 			  * @details The solution node component for mechanical quasi-static problems includes current position (trial and commit).
@@ -107,22 +108,22 @@ namespace O2P2 {
 			  * @tparam nDim The dimensionality of the problem. It is either 2 or 3 (bidimensional or tridimensional).
 			  */
 			template<int nDim>
-			class MeshNode_MQ : public MeshNode
+			class MeshNode_MQS : public MeshNode
 			{
 			private:
-				MeshNode_MQ() = delete;
+				MeshNode_MQS() = delete;
 
 			public:
-				/** Constructor for node objects for quasi-static mechanical problems.
+				/** Constructor for node objects of quasi-static mechanical problems.
 				  * @param index Node DOF index (the first one).
-				  * @param InitPos Initial position of the corresponding geometry node. Use to initialize trial position.
+				  * @param InitPos Initial position of the corresponding geometry node. Used to initialize trial position.
 				  * @param Tp Initial temperature.
 				  */
-				explicit MeshNode_MQ(const size_t& index, const std::array<double, nDim>& InitPos, const double Tp = 0.)
+				explicit MeshNode_MQS(const size_t& index, const std::array<double, nDim>& InitPos, const double Tp = 0.)
 					: MeshNode(index, Tp), v_Ytrial(InitPos), v_Ycommit(InitPos) { }
 
 				// Default destructor of private / protected pointers.
-				~MeshNode_MQ() = default;
+				~MeshNode_MQS() = default;
 
 				// Return a string with current position for printing.
 				const std::string print() const override {
@@ -135,10 +136,10 @@ namespace O2P2 {
 				}
 
 				// Function to retrieve current nodal coordinates.
-				const double* getCurrent() override { return this->v_Ycommit.data(); }
+				const double* getCurPos() override { return this->v_Ycommit.data(); }
 
 				// Function to retrieve current trial nodal coordinates.
-				const double* getTrial() override { return this->v_Ytrial.data(); }
+				const double* getTrialPos() override { return this->v_Ytrial.data(); }
 
 				// Function to increase trial position.
 				void updateTrial(const double dPos[]) override {
@@ -147,7 +148,7 @@ namespace O2P2 {
 					}
 				}
 
-				// Function to commit trial position to commit position (current).
+				// Function to commit trial position to current.
 				void setCurrent() override { this->v_Ycommit = this->v_Ytrial; }
 
 				/** @return the number of DOF per node.
@@ -161,6 +162,99 @@ namespace O2P2 {
 				/** @brief Commit current position. */
 				std::array<double, nDim> v_Ycommit;
 			};
+
+
+			/**
+			  * @class MeshNode_MD
+			  *
+			  * @brief Mesh node, a Solution component, for mechanical dynamic problems.
+			  * @details The solution node component for mechanical dynamic problems includes current position (trial and commit), and previous and current (timestep) velocity and accelarion.
+			  *
+			  * @tparam nDim The dimensionality of the problem. It is either 2 or 3 (bidimensional or tridimensional).
+			  */
+			template<int nDim>
+			class MeshNode_MD : public MeshNode_MQS<nDim>
+			{
+			private:
+				MeshNode_MD() = delete;
+
+			public:
+				/** Constructor for node objects of dynamic mechanical problems.
+				  * @param index Node DOF index (only the first one).
+				  * @param InitPos Initial position of the corresponding geometry node. Used to initialize trial position.
+				  * @param Tp Initial temperature.
+				  */
+				explicit MeshNode_MD(const size_t& index, const std::array<double, nDim>& InitPos, const double Tp = 0.)
+					: MeshNode_MQS<nDim>(index, InitPos, Tp) {
+					v_Vp.fill(0);
+					v_Vc.fill(0);
+					v_Ap.fill(0);
+					v_Ac.fill(0);
+				}
+
+				// Default destructor of private / protected pointers.
+				~MeshNode_MD() = default;
+
+				// Function to retrieve current nodal coordinates.
+				const double* getCurPos() override { return this->v_Ycommit.data(); }
+
+				// Function to retrieve current trial nodal coordinates.
+				const double* getTrialPos() override { return this->v_Ytrial.data(); }
+
+				/** Retrieve previous velocity.
+				  * @return pointer to nodal previous velocity (with size nDim).
+				  */
+				const double* getPrevVel() { return v_Vp.data(); };
+
+				/** Retrieve current velocity.
+				  * @return pointer to nodal current velocity (with size nDim).
+				  */
+				const double* getCurVel() { return v_Vc.data(); };
+
+				/** Retrieve previous acceleration.
+				  * @return pointer to nodal previous acceleration (with size nDim).
+				  */
+				const double* getPrevAcc() { return v_Ap.data(); };
+
+				/** Retrieve current acceleration.
+				  * @return pointer to nodal current acceleration (with size nDim).
+				  */
+				const double* getCurAcc() { return v_Ac.data(); };
+
+				// Update trial position, velocity and acceleration.
+				void updateTrial(const double dPos[]) override {
+					for (int i = 0; i < nDim; ++i) {
+						this->v_Ytrial[i] = dPos[i];
+						this->v_Vc[i] = dPos[nDim + i];
+						this->v_Ac[i] = dPos[2 * nDim + i];
+					}
+				}
+
+				// Function to commit trial position, velocity and acceleration to current.
+				void setCurrent() override { 
+					this->v_Ycommit = this->v_Ytrial;
+					this->v_Vp = this->v_Vc;
+					this->v_Ap = this->v_Ac;
+				}
+
+				/** @return the number of DOF per node.
+				  */
+				const int getNumDOF() override { return nDim; };
+
+			protected:
+				/** @brief Previous velocity. */
+				std::array<double, nDim> v_Vp;
+
+				/** @brief Current velocity. */
+				std::array<double, nDim> v_Vc;
+
+				/** @brief Previous acceleration. */
+				std::array<double, nDim> v_Ap;
+
+				/** @brief Current acceleration. */
+				std::array<double, nDim> v_Ac;
+			};
+
 		} // End of Comp Namespace
 	} // End of Proc Namespace
 } // End of O2P2 Namespace

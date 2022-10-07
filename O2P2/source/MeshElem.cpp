@@ -169,18 +169,15 @@ Eigen::MatrixXd O2P2::Proc::Comp::MeshElem_SVK<3>::getConstitutiveMatrix()
 	// Downcasting to solid element.
 	O2P2::Prep::Elem::ElementSolid* pElem = static_cast<O2P2::Prep::Elem::ElementSolid*>(m_pElem.get());
 
-	// Pointer to the material
-	auto pMat = pElem->getMaterial();
-
 	// Should also downcast to SVK material
-	O2P2::Prep::Mat_SVK_ISO* pSVK_Mat = static_cast<O2P2::Prep::Mat_SVK_ISO*>(pMat);
+	O2P2::Prep::Mat_SVK_ISO* pMat = static_cast<O2P2::Prep::Mat_SVK_ISO*>(pElem->getMaterial());
 
 	// Size of Constitutive matrix
 	int nVoigt = 3 * nElDim - 3;
 
-	double Yg = pSVK_Mat->getLongitudinalModulus();
-	double nu = pSVK_Mat->getPoisson();
-	double G = pSVK_Mat->getTransversalModulus();
+	double Yg = pMat->getLongitudinalModulus();
+	double nu = pMat->getPoisson();
+	double G = pMat->getTransversalModulus();
 
 	Eigen::MatrixXd E(nVoigt, nVoigt);
 	E.setZero();
@@ -266,7 +263,7 @@ void O2P2::Proc::Comp::MeshElem_SVK<2>::getContribution_SVK_ISO<1>(Eigen::Matrix
 			int m = 0;
 
 			for (auto& node : v_Conect) {
-				F1(j, 0) += node->getTrial()[j] * *(m_pElem->getShapeDerivative() + n + m);
+				F1(j, 0) += node->getTrialPos()[j] * *(m_pElem->getShapeDerivative() + n + m);
 				m++;
 			}
 		}
@@ -397,7 +394,7 @@ void O2P2::Proc::Comp::MeshElem_SVK<nDim>::getContribution_SVK_ISO(Eigen::Matrix
 				auto node = v_Conect[m];
 
 				for (int k = 0; k < nDim; ++k) {
-					F1(j, k) += node->getTrial()[j] * *(pShape + p + m * nDim + k);
+					F1(j, k) += node->getTrialPos()[j] * *(pShape + p + m * nDim + k);
 				}
 			}
 		}
@@ -529,3 +526,41 @@ void O2P2::Proc::Comp::MeshElem_SVK<nDim>::getContribution_SVK_ISO(Eigen::Matrix
 
 	return;
 };
+
+
+// ================================================================================================
+//
+// Implementation of MeshElem_SVK Member Function: addMassContrib
+//
+// ================================================================================================
+template<int nDim>
+void O2P2::Proc::Comp::MeshElem_SVK<nDim>::addMassContrib(const double& mult, Eigen::MatrixXd& Hessian)
+{
+	// Pointer to the first Shape Fuctions Derivative (const static)
+	auto pShape = m_pElem->getShapeFc();
+	auto pWeight = m_pElem->getWeight();
+
+	auto nNodes = m_pElem->getNumNodes();
+	auto nIP = m_pElem->getNumIP();
+
+	// Contribution from each material point
+	for (int i = 0; i < nIP; ++i) {
+
+		// Local mass matrix
+		Eigen::MatrixXd M = Eigen::MatrixXd::Zero(nDim, nDim);
+
+		// Some pointer arithmetic is required
+		// p and numInt are related to current integration point and weighting numerical integration
+		int p = i * nNodes;
+		double numInt = mult * *(pWeight + i) * m_matPoint[i]->getJacobian();
+
+		for (int j = 0; j < nNodes; ++j) {
+			for (int k = 0; k < nNodes; ++k) {
+				// nDim is considered the number of DOF per node
+				for (int m = 0; m < nDim; ++m) {
+					Hessian(j*nDim + m, k*nDim + m) += *(pShape + p + j) * *(pShape + p + k) * numInt;
+				}
+			}
+		}
+	}
+}

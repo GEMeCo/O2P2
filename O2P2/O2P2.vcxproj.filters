@@ -33,43 +33,43 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="O2P2\O2P2.cpp">
+    <ClCompile Include="O2P2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="O2P2\source\Common.cpp">
+    <ClCompile Include="source\Common.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="O2P2\source\Domain.cpp">
+    <ClCompile Include="source\Domain.cpp">
       <Filter>Source Files\Domain Components</Filter>
     </ClCompile>
-    <ClCompile Include="O2P2\source\Material.cpp">
+    <ClCompile Include="source\Material.cpp">
       <Filter>Source Files\Domain Components</Filter>
     </ClCompile>
-    <ClCompile Include="O2P2\source\SolutionAlgorithm.cpp">
+    <ClCompile Include="source\SolutionAlgorithm.cpp">
       <Filter>Source Files\Solution Components</Filter>
     </ClCompile>
-    <ClCompile Include="O2P2\source\NonLinearSolver.cpp">
+    <ClCompile Include="source\NonLinearSolver.cpp">
       <Filter>Source Files\Solution Components</Filter>
     </ClCompile>
-    <ClCompile Include="O2P2\source\TimeStepping.cpp">
+    <ClCompile Include="source\TimeStepping.cpp">
       <Filter>Source Files\Solution Components</Filter>
     </ClCompile>
-    <ClCompile Include="O2P2\source\PostProcess.cpp">
+    <ClCompile Include="source\PostProcess.cpp">
       <Filter>Source Files\Post-Process Components</Filter>
     </ClCompile>
-    <ClCompile Include="O2P2\source\Mesh.cpp">
+    <ClCompile Include="source\Mesh.cpp">
       <Filter>Source Files\Solution Components</Filter>
     </ClCompile>
-    <ClCompile Include="O2P2\source\ModelBuilder.cpp">
+    <ClCompile Include="source\ModelBuilder.cpp">
       <Filter>Source Files\Domain Components</Filter>
     </ClCompile>
-    <ClCompile Include="O2P2\source\MeshElem.cpp">
+    <ClCompile Include="source\MeshElem.cpp">
       <Filter>Source Files\Solution Components</Filter>
     </ClCompile>
-    <ClCompile Include="O2P2\source\OutputSystem.cpp">
+    <ClCompile Include="source\OutputSystem.cpp">
       <Filter>Source Files\Post-Process Components</Filter>
     </ClCompile>
-    <ClCompile Include="O2P2\O2P2_DOC.cpp">
+    <ClCompile Include="O2P2_DOC.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -79,130 +79,130 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="O2P2\include\Common.h">
+    <ClInclude Include="include\Common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Profiler.h">
+    <ClInclude Include="include\Profiler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\FEAnalysis.h">
+    <ClInclude Include="include\FEAnalysis.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Domain.h">
+    <ClInclude Include="include\Domain.h">
       <Filter>Header Files\Domain Components</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Elements\Elem_Rect4.h">
+    <ClInclude Include="include\Elements\Elem_Rect4.h">
       <Filter>Header Files\Domain Components\Elements</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Elements\Elem_Rect8.h">
+    <ClInclude Include="include\Elements\Elem_Rect8.h">
       <Filter>Header Files\Domain Components\Elements</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Elements\Elem_Rect9.h">
+    <ClInclude Include="include\Elements\Elem_Rect9.h">
       <Filter>Header Files\Domain Components\Elements</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Elements\Elem_Rect12.h">
+    <ClInclude Include="include\Elements\Elem_Rect12.h">
       <Filter>Header Files\Domain Components\Elements</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Elements\Elem_Rect16.h">
+    <ClInclude Include="include\Elements\Elem_Rect16.h">
       <Filter>Header Files\Domain Components\Elements</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Elements\Elem_Rect20.h">
+    <ClInclude Include="include\Elements\Elem_Rect20.h">
       <Filter>Header Files\Domain Components\Elements</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Elements\Elem_Tri3.h">
+    <ClInclude Include="include\Elements\Elem_Tri3.h">
       <Filter>Header Files\Domain Components\Elements</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Elements\Elem_Tri6.h">
+    <ClInclude Include="include\Elements\Elem_Tri6.h">
       <Filter>Header Files\Domain Components\Elements</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Elements\Elem_Tri10.h">
+    <ClInclude Include="include\Elements\Elem_Tri10.h">
       <Filter>Header Files\Domain Components\Elements</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\IntegrationPoint.h">
+    <ClInclude Include="include\IntegrationPoint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Element.h">
+    <ClInclude Include="include\Element.h">
       <Filter>Header Files\Domain Components</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Node.h">
+    <ClInclude Include="include\Node.h">
       <Filter>Header Files\Domain Components</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Material.h">
+    <ClInclude Include="include\Material.h">
       <Filter>Header Files\Domain Components</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Section.h">
+    <ClInclude Include="include\Section.h">
       <Filter>Header Files\Domain Components</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\SolutionAlgorithm.h">
+    <ClInclude Include="include\SolutionAlgorithm.h">
       <Filter>Header Files\Solution Components</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\NonLinearSolver.h">
+    <ClInclude Include="include\NonLinearSolver.h">
       <Filter>Header Files\Solution Components</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Mesh.h">
+    <ClInclude Include="include\Mesh.h">
       <Filter>Header Files\Solution Components</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\TimeStepping.h">
+    <ClInclude Include="include\TimeStepping.h">
       <Filter>Header Files\Solution Components</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\LoadStep.h">
+    <ClInclude Include="include\LoadStep.h">
       <Filter>Header Files\Solution Components</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Constraints.h">
+    <ClInclude Include="include\Constraints.h">
       <Filter>Header Files\Solution Components</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\MeshElem.h">
+    <ClInclude Include="include\MeshElem.h">
       <Filter>Header Files\Solution Components</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\MaterialPoint.h">
+    <ClInclude Include="include\MaterialPoint.h">
       <Filter>Header Files\Solution Components</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\OutputSystem.h">
+    <ClInclude Include="include\OutputSystem.h">
       <Filter>Header Files\Post-Process Components</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\PostProcess.h">
+    <ClInclude Include="include\PostProcess.h">
       <Filter>Header Files\Post-Process Components</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Elements\Elem_Hex8.h">
+    <ClInclude Include="include\Elements\Elem_Hex8.h">
       <Filter>Header Files\Domain Components\Elements</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Elements\Elem_Hex27.h">
+    <ClInclude Include="include\Elements\Elem_Hex27.h">
       <Filter>Header Files\Domain Components\Elements</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Elements\Elem_Hex64.h">
+    <ClInclude Include="include\Elements\Elem_Hex64.h">
       <Filter>Header Files\Domain Components\Elements</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Elements\Elem_Pri6.h">
+    <ClInclude Include="include\Elements\Elem_Pri6.h">
       <Filter>Header Files\Domain Components\Elements</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Elements\Elem_Pri18.h">
+    <ClInclude Include="include\Elements\Elem_Pri18.h">
       <Filter>Header Files\Domain Components\Elements</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Elements\Elem_Pri20.h">
+    <ClInclude Include="include\Elements\Elem_Pri20.h">
       <Filter>Header Files\Domain Components\Elements</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Elements\Elem_Pri30.h">
+    <ClInclude Include="include\Elements\Elem_Pri30.h">
       <Filter>Header Files\Domain Components\Elements</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Elements\Elem_Pri40.h">
+    <ClInclude Include="include\Elements\Elem_Pri40.h">
       <Filter>Header Files\Domain Components\Elements</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Elements\Elem_Tet4.h">
+    <ClInclude Include="include\Elements\Elem_Tet4.h">
       <Filter>Header Files\Domain Components\Elements</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Elements\Elem_Tet10.h">
+    <ClInclude Include="include\Elements\Elem_Tet10.h">
       <Filter>Header Files\Domain Components\Elements</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Elements\Elem_Tet20.h">
+    <ClInclude Include="include\Elements\Elem_Tet20.h">
       <Filter>Header Files\Domain Components\Elements</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\Elements\Elem_Lin.h">
+    <ClInclude Include="include\Elements\Elem_Lin.h">
       <Filter>Header Files\Domain Components\Elements</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\ModelBuilder.h">
+    <ClInclude Include="include\ModelBuilder.h">
       <Filter>Header Files\Domain Components</Filter>
     </ClInclude>
-    <ClInclude Include="O2P2\include\MeshNode.h">
+    <ClInclude Include="include\MeshNode.h">
       <Filter>Header Files\Solution Components</Filter>
     </ClInclude>
   </ItemGroup>

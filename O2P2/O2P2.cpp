@@ -14,7 +14,6 @@
 // 
 // ================================================================================================
 #define EIGEN_USE_MKL_ALL
-#define VERSION 0.2
 
 // Custom Header Files
 #include "FEAnalysis.h"
@@ -72,30 +71,9 @@ int main(int argc, char** args)
 			throw std::invalid_argument("\n\n\nAn exception was thrown when opening file " + stArquivo + "\n\n\n");
 		}
 
-		// Line from file
-		std::string stLine;
-		std::string stFlag = "#VERSAO#";
-
-		// Output log in debug mode
-		LOG("\nmain: Reading flag " + stFlag);
-
-		while (stLine.compare(0, stFlag.size(), stFlag)) {
-			std::getline(file, stLine);
-			if (file.eof()) {
-				LOG("\n\nModelBuilder.populateElements: Reading Error!\nFlag " << stFlag << " not found\n\n\n");
-				throw std::invalid_argument("\n\n\nReading Error!\nFlag " + stFlag + " not found\n\n\n");
-			}
-		}
-
-		float nVer;
-		file >> nVer;
-
-		if (nVer < VERSION) {
-			throw std::invalid_argument("\n\n\nObsolete version of problem file.\nUpdate input file and check problem input.\nSomething may be missing\n\n");
-		}
-
 		// Look up for flags
-		stFlag = "#DIM#";
+		std::string stLine;
+		std::string stFlag = "#DIM#";
 
 		// Output log in debug mode
 		LOG("\nmain: Reading flag " + stFlag);

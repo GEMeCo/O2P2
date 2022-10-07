@@ -45,10 +45,19 @@ namespace O2P2 {
 				// Default destructor of private / protected pointers.
 				virtual ~MeshElem() = default;
 
+				/** @return a reference to the elements Material object. */
+				O2P2::Prep::Material* getMaterial() { return m_pElem->getMaterial(); }
+
 				/** Prepare element contribution.
 				  * @param Hessian Element contribution to the hessian matrix.
 				  */
 				virtual void getContribution(Eigen::MatrixXd& Hessian) = 0;
+
+				/** Prepare element inertia contribution to hessian matrix.
+				  * @param mult Multiplier of the mass matrix (such as Damping and Density, which are not included).
+				  * @param Hessian Elemental hessian matrix.
+				  */
+				virtual void addMassContrib(const double& mult, Eigen::MatrixXd& Hessian) = 0;
 
 			protected:
 				/** Constructor for mechanical analysis elements, for SVK material model.
@@ -120,6 +129,9 @@ namespace O2P2 {
 				// Prepare element contribution.
 				void getContribution(Eigen::MatrixXd& Hessian) override;
 
+				// Add element mass contribution to the Hessian.
+				void addMassContrib(const double& mult, Eigen::MatrixXd& Hessian) override;
+
 			protected:
 				/** @brief Populates the material point vector. */
 				void setMaterialPoint();
@@ -132,7 +144,7 @@ namespace O2P2 {
 				  */
 				double getYoungModulus();
 
-				/** Prepare element contribution fo SVK_ISO material.
+				/** Prepare element contribution of SVK_ISO material.
 				  * @param Hessian Element contribution to the hessian matrix.
 				  *
 				  * @tparam nElDim The dimensionality of the element. It can be 1, 2 or 3 (linear, plane or solid).
