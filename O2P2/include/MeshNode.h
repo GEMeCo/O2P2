@@ -153,7 +153,7 @@ namespace O2P2 {
 
 				/** @return the number of DOF per node.
 				  */
-				const int getNumDOF() override { return nDim; };
+				const int getNumDOF() override { return nDim; }
 
 			protected:
 				/** @brief Trial current position. */
@@ -204,22 +204,41 @@ namespace O2P2 {
 				/** Retrieve previous velocity.
 				  * @return pointer to nodal previous velocity (with size nDim).
 				  */
-				const double* getPrevVel() { return v_Vp.data(); };
+				const double* getPrevVel() { return v_Vp.data(); }
 
 				/** Retrieve current velocity.
 				  * @return pointer to nodal current velocity (with size nDim).
 				  */
-				const double* getCurVel() { return v_Vc.data(); };
+				const double* getCurVel() { return v_Vc.data(); }
 
 				/** Retrieve previous acceleration.
 				  * @return pointer to nodal previous acceleration (with size nDim).
 				  */
-				const double* getPrevAcc() { return v_Ap.data(); };
+				const double* getPrevAcc() { return v_Ap.data(); }
 
 				/** Retrieve current acceleration.
 				  * @return pointer to nodal current acceleration (with size nDim).
 				  */
-				const double* getCurAcc() { return v_Ac.data(); };
+				const double* getCurAcc() { return v_Ac.data(); }
+
+				/** Initiates velocity.
+				  * @param Dir Direction of the imposed velocity.
+				  * @param value Imposed velocity.
+				  */
+				void setVel(int Dir, double value) { 
+					this->v_Vp[Dir] = value;
+					this->v_Vc[Dir] = value;
+				}
+
+				/** Initiates acceleration.
+				  * @param Dir Direction of the imposed acceleration.
+				  * @param value Imposed acceleration.
+				  */
+				void setAcc(int Dir, double value) {
+					this->v_Ap[Dir] = value;
+					this->v_Ac[Dir] = value;
+				}
+
 
 				// Update trial position, velocity and acceleration.
 				void updateTrial(const double dPos[]) override {
@@ -239,7 +258,7 @@ namespace O2P2 {
 
 				/** @return the number of DOF per node.
 				  */
-				const int getNumDOF() override { return nDim; };
+				const int getNumDOF() override { return nDim; }
 
 			protected:
 				/** @brief Previous velocity. */

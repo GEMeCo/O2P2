@@ -10,8 +10,14 @@ O2P2 is an C++ environment developed for non-linear coupled thermo-mechanical an
 ## Copyright Information:
 :ballot_box_with_check: This program is free software: you can redistribute it and/or modify it under the terms of the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
+:ballot_box_with_check: Redistributions of source code must retain the above copyright notice, this list of conditions and the disclaimer.
+
+:ballot_box_with_check: Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the disclaimer in the documentation and/or other materials provided with the distribution.
+
 :ballot_box_with_check: This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 It is provided "AS IS". In no event shall the authors be liable for any claim, damages or other liability, whether in an action of contract, tort or otherwire, arising from, out of or in connection with the software or the use of other dealing in the software.
+
+:ballot_box_with_check: Neither the name of the copyright holder nor the names of any other contributors may be used to endorse or promote products derived from this software without specific prior written permission.
 
 :ballot_box_with_check: This is a research software. There are neither pre-processor nor post-processor (so far). Output was made only for displacements, using AcadView. You may find it [here](https://set.eesc.usp.br/?page_id=237).
 
@@ -60,6 +66,9 @@ Citation
 
 Features
 --------
+- v0.2.0: Dynamic mechanical analysis.
+    -  :boom: Newmark-beta time step integration method.
+
 - v0.1.0: Geometric nonlinear mechanical analysis with SVK constitutive model.
     - :boom: Geometrically nonlinear mechanical analysis using the Finite Element Method based on Positions;
     - :boom: Bi and Tridimensional environments;

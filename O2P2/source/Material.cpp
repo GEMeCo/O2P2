@@ -19,8 +19,6 @@
 O2P2::Prep::Mat_SVK_ISO::Mat_SVK_ISO(const size_t& index) : Material(index) {
 	m_E11 = 1.;
 	m_nu12 = 0.;
-	m_Rho = 0.;
-	m_Damp = 0.;
 
 	m_G12 = 0.;
 	m_Bulk = 0.;
@@ -41,8 +39,8 @@ O2P2::Prep::Mat_SVK_ISO::Mat_SVK_ISO(const size_t& index, const std::vector<doub
 	m_E11 = Param.at(0);
 	m_nu12 = Param.at(1);
 
-	m_Rho = (Param.size() > 2) ? Param.at(2) : 0.;
-	m_Damp = (Param.size() > 3) ? Param.at(3) : 0;
+	this->m_Rho = (Param.size() > 2) ? Param.at(2) : 1.;
+	this->m_Damp = (Param.size() > 3) ? Param.at(3) : 0;
 
 	m_G12 = m_E11 / (2. * (1. + m_nu12));
 	m_Bulk = m_E11 / (3. * (1. - 2. * m_nu12));
@@ -64,8 +62,8 @@ void O2P2::Prep::Mat_SVK_ISO::setParameters(const std::vector<double>& Param) {
 	m_E11 = Param.at(0);
 	m_nu12 = Param.at(1);
 
-	m_Rho = (Param.size() > 2) ? Param.at(2) : 0.;
-	m_Damp = (Param.size() > 3) ? Param.at(3) : 0;
+	this->m_Rho = (Param.size() > 2) ? Param.at(2) : 1.;
+	this->m_Damp = (Param.size() > 3) ? Param.at(3) : 0;
 
 	m_G12 = m_E11 / (2. * (1. + m_nu12));
 	m_Bulk = m_E11 / (3. * (1. - 2. * m_nu12));

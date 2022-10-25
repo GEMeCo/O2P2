@@ -34,7 +34,7 @@ template<class T> bool O2P2::Proc::NLS_NewtonRaphson::runNonLinearSolver(T* theM
 	// Vector of independent terms, the right hand side, for system: Hessian.LHS = RHS
 	Eigen::VectorXd RHS(theModel->getNumDof());
 
-	// Vector of dependent terms, the left hand side, for system: Hessian.LHS = RHS
+	// Vector of solution, the left hand side, for system: Hessian.LHS = RHS
 	Eigen::VectorXd LHS(theModel->getNumDof());
 
 	// Load vector (Neumann Boundary conditions)

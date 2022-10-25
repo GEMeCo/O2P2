@@ -161,10 +161,7 @@ namespace O2P2 {
 			  * @sa Mesh
 			  */
 			void addDirichletBC(const int& nLS, const size_t& index, const int& iDir, const double& Value, const double Var[]) {
-				// Check node container for current DOF
-				size_t Dof = m_theFEModel->m_meshNode[index]->m_DofIndex + iDir;
-
-				m_theFEModel->addDirichletBC(nLS, Dof, Value, Var);
+				m_theFEModel->addDirichletBC(nLS, index, iDir, Value, Var);
 			}
 
 			/** Add a Boundary Condition of Neumann type to a Load Step.
@@ -177,10 +174,7 @@ namespace O2P2 {
 			  * @sa Mesh
 			  */
 			void addNeumannBC(const int& nLS, const size_t& index, const int& iDir, const double& Value, const double Var[]) {
-				// Check node container for current DOF
-				size_t Dof = m_theFEModel->m_meshNode[index]->m_DofIndex + iDir;
-
-				m_theFEModel->addNeumannBC(nLS, Dof, Value, Var);
+				m_theFEModel->addNeumannBC(nLS, index, iDir, Value, Var);
 			}
 
 			/** Sets the time stepping parameters.

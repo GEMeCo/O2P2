@@ -74,11 +74,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="README.md">
-      <Filter>Resource Files</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="include\Common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -205,5 +200,10 @@
     <ClInclude Include="include\MeshNode.h">
       <Filter>Header Files\Solution Components</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

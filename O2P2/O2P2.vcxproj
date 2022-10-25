@@ -109,9 +109,6 @@
     <ClCompile Include="source\TimeStepping.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="README.md" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="include\Mesh.h" />
     <ClInclude Include="include\Common.h" />
     <ClInclude Include="include\Constraints.h" />
@@ -154,6 +151,9 @@
     <ClInclude Include="include\SolutionAlgorithm.h" />
     <ClInclude Include="include\TimeStepping.h" />
     <ClInclude Include="include\MeshNode.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -65,22 +65,30 @@ namespace O2P2 {
 			}
 
 			/** Add a Boundary Condition of Dirichlet type to a Load Step.
-			  * @param nLS Number of the load step to receive the BC.
-			  * @param Dof Degree of Freedom with imposed boundary condition.
+			  * @param nLS Number of the load step to recieve the BC.
+			  * @param index Node container index with imposed boundary condition.
+			  * @param iDir  Direction of the imposed boundary condition.
 			  * @param Value Value of the boundary condition.
 			  * @param Var Time behavior, for a quadratic polinomial(var[0] + var[1].t + var[2].t ^ 2).
 			  */
-			void addDirichletBC(const int& nLS, const size_t& Dof, const double& Value, const double Var[]) {
+			void addDirichletBC(const int& nLS, const size_t& index, const int& iDir, const double& Value, const double Var[]) {
+				// Check node container for current DOF
+				size_t Dof = m_meshNode[index]->m_DofIndex + iDir;
+
 				m_LoadStep.at(nLS)->addDirichletBC(Dof, Value, Var);
 			}
 
 			/** Add a Boundary Condition of Neumann type to a Load Step.
-			  * @param nLS Number of the load step to receive the BC.
-			  * @param Dof Degree of Freedom with imposed boundary condition.
+			  * @param nLS Number of the load step to recieve the BC.
+			  * @param index Node container index with imposed boundary condition.
+			  * @param iDir  Direction of the imposed boundary condition.
 			  * @param Value Value of the boundary condition.
 			  * @param Var Time behavior, for a quadratic polinomial(var[0] + var[1].t + var[2].t ^ 2).
 			  */
-			void addNeumannBC(const int& nLS, const size_t& Dof, const double& Value, const double Var[]) {
+			void addNeumannBC(const int& nLS, const size_t& index, const int& iDir, const double& Value, const double Var[]) {
+				// Check node container for current DOF
+				size_t Dof = m_meshNode[index]->m_DofIndex + iDir;
+
 				m_LoadStep.at(nLS)->addNeumannBC(Dof, Value, Var);
 			}
 
@@ -114,6 +122,9 @@ namespace O2P2 {
 
 			/** Once solution is achieved, commit it. */
 			virtual void setCommit() = 0;
+
+			/** Set initial acceleration. */
+			void setAccel() {};
 
 			/** @return a pointer to the current load step.
 			  */
@@ -280,6 +291,20 @@ namespace O2P2 {
 			// Default destructor of private / protected pointers.
 			~Mesh_MD() = default;
 
+			// Add a Boundary Condition of Dirichlet type to a Load Step.
+			// Also imposes a initial velocity to the node.
+			void addDirichletBC(const int& nLS, const size_t& index, const int& iDir, const double& Value, const double Var[]) {
+				if (nLS == 0) {
+					// Get a downcast pointer to the MD node
+					O2P2::Proc::Comp::MeshNode_MD<nDim>* node = static_cast<O2P2::Proc::Comp::MeshNode_MD<nDim>*>(this->m_meshNode[index].get());
+
+					// The velocity is the derivative of the displacement
+					node->setVel(iDir, Value * Var[1]);
+				}
+
+				O2P2::Proc::Mesh::addDirichletBC(nLS, index, iDir, Value, Var);
+			}
+
 			// Assemble the system of equation, made by the Hessian matrix and the right hand side vector.
 			void assembleSOE(Eigen::SparseMatrix<double>& Hessian, Eigen::VectorXd& RHS) override;
 
@@ -291,6 +316,9 @@ namespace O2P2 {
 
 			// Sets the current timestep and Newmark-beta parameters.
 			void setTimeStep(const int& timeStep, const double& beta, const double& gamma) override;
+
+			// Set initial acceleration.
+			void setAccel();
 
 			//Impose Neumann Boundary Conditions to the vector of independent terms (external forces).
 			void imposeNeumannBC(Eigen::VectorXd& RHS) override;

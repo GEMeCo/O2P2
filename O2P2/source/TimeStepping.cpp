@@ -49,8 +49,8 @@ void O2P2::Proc::TimeStep_QsiStatic::runTimeLoop(O2P2::Proc::Mesh* theFEModel, O
 void O2P2::Proc::TimeStep_2ndNew::runTimeLoop(O2P2::Proc::Mesh* theFEModel, O2P2::Proc::NonLinearSolver* theSolver) {
 	PROFILE_FUNCTION();
 
-	// At the beggining of the first load step, the initial acceleration must be evaluated
-
+	// At the beggining of the first load step (at which currentTime is zero), the initial acceleration must be evaluated
+	if (theFEModel->m_currentTime == 0.) theFEModel->setAccel();
 
 	// Loop on time step
 	for (int timeIt = 0; timeIt < theFEModel->getLoadStep()->m_NumSteps; ++timeIt) {
@@ -66,9 +66,6 @@ void O2P2::Proc::TimeStep_2ndNew::runTimeLoop(O2P2::Proc::Mesh* theFEModel, O2P2
 		// Setup current analysis time step
 		// Also evaluate the dynamic contribution from previous step (v_Qs and v_Rs)
 		theFEModel->setTimeStep(timeIt, m_beta, m_gamma);
-
-		// There is a inertia contribution in the external force, which uses Qs and Rs within runNLS
-		
 
 		// Call loop of non-linear solver
 		bool feasible = theSolver->runNLS(theFEModel, theFEModel->m_initialNorm, true);

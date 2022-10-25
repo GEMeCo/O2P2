@@ -285,11 +285,11 @@ template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::imposeNeumannBC(Eigen::Vector
 			// Matrices sizes
 			int nDof = elem->m_nDof;
 
-			// Local element matrix
+			// Local element mass matrix
 			Eigen::MatrixXd elemMat = Eigen::MatrixXd::Zero(nDof, nDof);
 
-			// Pointer to the material, but downcast to SVK material
-			O2P2::Prep::Mat_SVK_ISO* pMat = static_cast<O2P2::Prep::Mat_SVK_ISO*>(elem->getMaterial());
+			// Pointer to the material
+			O2P2::Prep::Material* pMat = elem->getMaterial();
 
 			double Rho = pMat->getDensity();
 			double Cm = pMat->getDamping();
@@ -309,7 +309,7 @@ template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::imposeNeumannBC(Eigen::Vector
 					
 					for (int k = 0; k < nDof; ++k) {
 						double mass = elemMat(i * nDof + k, j * nDof + k);
-						double yt = elem->v_Conect[j]->getTrialPos()[3];
+						double yt = elem->v_Conect[j]->getTrialPos()[k];
 						elem->m_elFor(i * nDof + k) += mass * v_Qs(nodeDof + k) - mass * yt / (m_beta * dt * dt) - mass * Cm * v_Rs(nodeDof + k)
 							- mass * Cm * yt * m_gamma / (m_beta * dt) + mass * Cm * v_Qs(nodeDof + k) * m_gamma * dt;
 					}
@@ -373,8 +373,8 @@ template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::assembleSOE(Eigen::SparseMatr
 			// Add mass contribution (this is only needed in Dynamic processes)
 			// This is the difference from Quasi-Static
 
-			// Pointer to the material, but downcast to SVK material
-			O2P2::Prep::Mat_SVK_ISO* pMat = static_cast<O2P2::Prep::Mat_SVK_ISO*>(elem->getMaterial());
+			// Pointer to the material
+			O2P2::Prep::Material* pMat = elem->getMaterial();
 
 			double Rho = pMat->getDensity();
 			double Cm = pMat->getDamping();
@@ -513,4 +513,149 @@ template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::setCommit()
 
 	// Send the information to the post-process container.
 	this->m_PostPt->addSolution(this->m_currentTime, Sol);
+}
+
+
+// ================================================================================================
+//
+// Implementation of Template Member Function (2D and 3D): setAccel
+//
+// ================================================================================================
+template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::setAccel()
+{
+	PROFILE_FUNCTION();
+	LOG("Mesh_MD.setAccel: Set initial acceleration");
+
+	std::for_each(std::execution::par, this->m_meshElem.begin(), this->m_meshElem.end(),
+		// Execute this lambda function in parallel
+		[&](auto& elem)
+		{
+			// Matrices sizes
+			int nDof = elem->m_nDof;
+
+			// Local element mass matrix
+			Eigen::MatrixXd elemMat = Eigen::MatrixXd::Zero(nDof, nDof);
+
+			// Get element contribution for the initial force
+			// Although the local hessiam matrix is evaluated, is not required - Only the internal force is needed (saved in elem->m_elFor)
+			elem->getContribution(elemMat);
+
+			// Set the elemental Hessian to zero
+			elemMat.setZero();
+
+			// Pointer to the material
+			O2P2::Prep::Material* pMat = elem->getMaterial();
+
+			double Rho = pMat->getDensity();
+			double Cm = pMat->getDamping();
+
+			// Evaluate element mass matrix
+			elem->addMassContrib(Rho, elemMat);
+
+			// Damping force
+			elem->m_elFor.setZero();
+
+			// Creates an auxiliary vector
+			Eigen::VectorXd va(elem->m_nDof);
+
+			// Register the velocity in the auxiliary vector
+			int i = 0;
+			for (auto& node : elem->v_Conect) {
+				O2P2::Proc::Comp::MeshNode_MD<nDim>* pNode = static_cast<O2P2::Proc::Comp::MeshNode_MD<nDim>*>(node.get());
+
+				for (int j = 0; j < nDim; ++j) {
+					va(i + j) = pNode->getPrevVel()[j];
+					i++;
+				}
+			}
+
+			// Evaluates the elemental damping force
+			elem->m_elFor -= Cm * elemMat * va;
+
+			// Register element mass contribution to local triplet
+			for (int i = 0; i < elem->v_Conect.size(); ++i) {
+				for (int j = 0; j < nDim; ++j) {
+					// Global dof 1
+					size_t gdof1 = elem->v_Conect.at(i)->m_DofIndex + j;
+					// local dof 1
+					size_t ldof1 = i * nDim + j;
+
+					for (int k = 0; k < elem->v_Conect.size(); ++k) {
+						for (int l = 0; l < nDim; ++l) {
+							// Global dof 2
+							size_t gdof2 = elem->v_Conect.at(k)->m_DofIndex + l;
+							// local dof 1
+							size_t ldof2 = k * nDim + l;
+
+							elem->m_elHes.push_back(Eigen::Triplet<double>(
+								static_cast<int>(gdof2),
+								static_cast<int>(gdof1),
+								elemMat(ldof2, ldof1)));
+						}
+					}
+				}
+			}
+
+		}
+	);
+
+	// Got what I need from the element, now lets creates the global matrix and vetors
+	Eigen::SparseMatrix<double> GlMass(getNumDof(), getNumDof());
+
+	// Vector of independent terms, the right hand side
+	Eigen::VectorXd RHS = Eigen::VectorXd::Zero(getNumDof());
+
+	// Vector of solution, the left hand side
+	Eigen::VectorXd LHS = Eigen::VectorXd::Zero(getNumDof());
+
+	// Sparse solver
+	Eigen::PardisoLU<Eigen::SparseMatrix<double>> solver;
+
+	// Add element contribution to global system
+	std::vector<Eigen::Triplet<double>> gl_triplets;
+
+	for (auto& elem : this->m_meshElem) {
+		std::move(elem->m_elHes.begin(), elem->m_elHes.end(), std::back_inserter(gl_triplets));
+		elem->m_elHes.clear();
+
+		// Add element contribution to the right hand side vector
+		for (int i = 0; i < elem->v_Conect.size(); ++i) {
+			for (int j = 0; j < nDim; ++j) {
+				// global dof
+				size_t gdof = elem->v_Conect.at(i)->m_DofIndex + j;
+				// Local dof
+				size_t ldof = i * nDim + j;
+
+				RHS(gdof) -= elem->m_elFor(ldof);
+			}
+		}
+
+		// Lets clean for next use
+		elem->m_elFor.setZero();
+	}
+
+	GlMass.setFromTriplets(gl_triplets.begin(), gl_triplets.end());
+
+	// Find the inverse of GlMass (with very high memory cost)
+	solver.compute(GlMass);
+
+	Eigen::SparseMatrix<double> Identity(getNumDof(), getNumDof());
+	Identity.setIdentity();
+
+	auto GlMassInv = solver.solve(Identity);
+
+	// Still need the external forces at t = 0
+	for (auto& NBC : m_LoadStep[0]->v_NeumannBC) {
+		RHS(NBC->m_Dof) += NBC->m_Value * (NBC->m_TimeVar[0];
+	}
+
+	// Finally evaluates the initial acceleration
+	// Acc = M^-1.RHS
+	LHS = GlMassInv * RHS;
+
+	for (int i = 0; i < this->m_meshNode.size(); i++) {
+		for (int j = 0; j < this->m_meshNode[i]->getNumDOF(); j++) {
+			this->m_meshNode[i].setAcc(j, LHS(this->m_meshNode[i].m_DofIndex + j));
+		}
+	}
 }

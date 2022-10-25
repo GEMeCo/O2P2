@@ -7,11 +7,17 @@
   * @section first_sec Copyright Information
   * 
   * @copyright Licensed under [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
-  * 
+  *
+  * Redistributions of source code must retain the above copyright notice, this list of conditions and the disclaimer.
+  *
+  * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the disclaimer in the documentation and/or other materials provided with the distribution.
+  *
   * This program is free software: you can redistribute it and/or modify it under the terms of the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
   * 
   * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
   * It is provided "AS IS". In no event shall the authors be liable for any claim, damages or other liability, whether in an action of contract, tort or otherwire, arising from, out of or in connection with the software or the use of other dealing in the software.
+  * 
+  * Neither the name of the copyright holder nor the names of any other contributors may be used to endorse or promote products derived from this software without specific prior written permission.
   * 
   * This is a research software. There are neither pre-processor nor post-processor (so far). Output was made only for displacements, using AcadView. You may find it [here](https://set.eesc.usp.br/?page_id=237).
   * 
@@ -28,7 +34,7 @@
   * @section citation How to cite
   * Whether it was used in whole or parts, citation is a must! Our software is under development, and a proper presentation paper is underway.
   * 
-  * Our software is in Zenodo - thus, we got a DOI: [doi.org/10.5281/zenodo.7102199](https://doi.org/10.5281/zenodo.7102199)
+  * Our software is in Zenodo - thus, we got a DOI: [doi.org/10.5281/zenodo.7102198](https://doi.org/10.5281/zenodo.7102198)
   * 
   * Nevertheless, if you may, please cite the following papers (since they were used for validations):
   * 
@@ -40,6 +46,9 @@
   * DOI: <10.1016/j.compstruct.2020.112254>
   * 
   * @section features Features
+  * - v0.2.0: Dynamic mechanical analysis.
+  *   -  Newmark-beta time step integration method.
+  * 
   * - v0.1.0: Geometric nonlinear mechanical analysis with SVK constitutive model.
   *   - Geometrically nonlinear mechanical analysis using the Finite Element Method based on Positions;
   *   - Bi and Tridimensional environments;
@@ -104,13 +113,12 @@
   *
   * @image html cnpq.png width=150
   *
-  * 
   * @page versioning Versions, updates and fixes
   *
   * These page provides the current features available for each release, and some features planned ahead.
   * 
   * @section vers Current version and features
-  * @version 0.1.0
+  * @version 0.2.0
   * @date 2022.09.21
   * 
   * @subsection fea Current features
@@ -118,6 +126,7 @@
   * - Bi and Tridimensional environments;
   * - Linear, plane and solid finite elements;
   * - SVK hyperelastic constitutive model;
+  * - Quasi-static and dynamic mechanical analysis;
   * - Parallel processing using standard C++ functions;
   * - Output .ogl files for post-process in [AcadView](https://set.eesc.usp.br/?page_id=237).
   *
@@ -136,7 +145,6 @@
   * The first major update will be the first release, after software goes gold.
   * 
   * @section pln Planned stages of development (and releases)
-  * - v0.2 - an alpha version: dynamic analysis of mechanical problems.
   * - v0.3 - an alpha version: immersed elements.
   * - v0.4 - an alpha version: thermodynamic analysis of solids (conduction).
   * - v0.5 - an alpha version: weak coupling of thermal and mechanical analysis (temperature modifying mechanical behavior).
@@ -373,6 +381,7 @@
   * @brief Time step integration schemes
   * @details The following time integrantion schemes are available:
   * - Quasi-static time integration scheme.
+  * - Newmark-beta time step integration method for second order transient analysis.
   * - That's all, so far.
   *
   * @defgroup NLSolver Nonlinear solver schemes

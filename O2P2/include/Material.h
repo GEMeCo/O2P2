@@ -43,6 +43,12 @@ namespace O2P2 {
 			virtual ~Material() = default;
 
 		public:
+			/** @return Density. */
+			double getDensity() { return m_Rho; }
+
+			/** @return Damping ratio. */
+			double getDamping() { return m_Damp; }
+
 			/** Set the material parameters.
 			 * @param Param Vector with the material properties.
 			*/
@@ -54,6 +60,13 @@ namespace O2P2 {
 		public:
 			/** @brief Index of the material for output purposes */
 			size_t m_index;
+
+		protected:
+			/** @brief Density */
+			double m_Rho = 1.;
+
+			/** @brief Damping ratio */
+			double m_Damp = 0.;
 		};
 
 
@@ -101,12 +114,6 @@ namespace O2P2 {
 			/** @return Poisson's ratio. */
 			double getPoisson() { return m_nu12; }
 
-			/** @return Density. */
-			double getDensity() { return m_Rho; }
-
-			/** @return Damping ratio. */
-			double getDamping() { return m_Damp; }
-
 			// Return the material type associated to current object.
 			MaterialType getMaterialType() const override { return MaterialType::SVK_ISO; }
 
@@ -125,12 +132,6 @@ namespace O2P2 {
 
 			/** @brief Poisson's ratio or Second Lamé parameter */
 			double m_nu12;
-
-			/** @brief Density */
-			double m_Rho;
-
-			/** @brief Damping ratio */
-			double m_Damp;
 
 			/** @brief Shear modulus / Transversal elastic modulus */
 			double m_G12;
