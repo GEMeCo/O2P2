@@ -54,7 +54,7 @@ Citation
 --------
   Whether it was used in whole or parts, citation is a must! Our software is under development, and a proper presentation paper is underway.
 
-  Our software is in Zenodo - thus, we got a DOI: [doi.org/10.5281/zenodo.7102199](https://doi.org/10.5281/zenodo.7102199)
+  Our software is in Zenodo - thus, we got a DOI: [doi.org/10.5281/zenodo.7102198](https://doi.org/10.5281/zenodo.7102198)
   
   Nevertheless, if you may, please cite the one following papers (as they were used for initial validations):
   - :green_book: CARRAZEDO, R.; CODA, H. B. Triangular based prismatic finite element for the analysis of orthotropic laminated beams, plates and shells. Composite Structures, v. 168, p. 234-246, 2017.
@@ -67,7 +67,7 @@ Citation
 Features
 --------
 - v0.2.0: Dynamic mechanical analysis.
-    -  :boom: Newmark-beta time step integration method.
+    - :boom: Newmark-beta time step integration method.
 
 - v0.1.0: Geometric nonlinear mechanical analysis with SVK constitutive model.
     - :boom: Geometrically nonlinear mechanical analysis using the Finite Element Method based on Positions;
@@ -90,9 +90,9 @@ We are using the following libraries, resources and technologies:
 Building and Running
 --------------------
 1. Clone the source code
-`git clone https://github.com/GEMeCo/O2P2.git`
+`git clone --recursive https://github.com/GEMeCo/O2P2.git`
 
-2. Install development dependencies and resources. Just check above.
+2. This will install development dependencies and resources. Nevertheless, check above for missing resources.
 
 3. We provided the .vsxproj file. Some configuration may be needed. Good luck :innocent:.
 

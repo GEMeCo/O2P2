@@ -204,6 +204,7 @@ template<int nDim> std::unique_ptr<O2P2::Proc::SolutionAlgorithm> O2P2::ModelBui
 	// Reads Time integration parameters, if any
 	stFlag = "#PIT#";
 
+	LOG("\nModelBuilder.initAnalyzer: Time Integration Parameters");
 	LOG("ModelBuilder.initAnalyzer: Reading flag " << stFlag);
 
 	while (stLine.compare(0, stFlag.size(), stFlag)) {
@@ -217,6 +218,10 @@ template<int nDim> std::unique_ptr<O2P2::Proc::SolutionAlgorithm> O2P2::ModelBui
 	double vl1, vl2, vl3;
 	fileProj >> vl1 >> vl2 >> vl3;
 	theAnalyzer->SetTSP(vl1, vl2, vl3);
+
+	LOG("ModelBuilder.initAnalyzer: Alfa (1st order): " << vl1);
+	LOG("ModelBuilder.initAnalyzer: Beta (2nd order): " << vl2);
+	LOG("ModelBuilder.initAnalyzer: Gamma (2nd order): " << vl3);
 
 	return std::move(theAnalyzer);
 }

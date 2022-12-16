@@ -71,10 +71,10 @@
   * 
   * 1. Clone the source code:
   * @verbatim
-    git clone https://github.com/GEMeCo/O2P2.git
+    git clone --recursive https://github.com/GEMeCo/O2P2.git
     @endverbatim
   * 
-  * 2. Install dependencies and resources. Just check above.
+  * 2. This will install development dependencies and resources. Nevertheless, check above for missing resources.
   * 
   * 3. We provided the .vsxproj file. Some configuration may be needed. Good luck.
   * 
@@ -137,9 +137,11 @@
   *   - Improved documentation (README.md and doxygen html);
   *   - Eigen was included as submodule in git. Doxygen was thus updated.
   * 
-  * 
   * @subsection min Minor implementations
   * Each minor version is associated to new features. It creates a new release, and includes all previous patch modifications. Patch numbering is reinitated.
+  * 
+  * - v0.2.0: Dynamic mechanical analysis.
+  *   - Newmark-beta time step integration method.
   *
   * @subsection maj Major changes
   * The first major update will be the first release, after software goes gold.
@@ -147,7 +149,7 @@
   * @section pln Planned stages of development (and releases)
   * - v0.3 - an alpha version: immersed elements.
   * - v0.4 - an alpha version: thermodynamic analysis of solids (conduction).
-  * - v0.5 - an alpha version: weak coupling of thermal and mechanical analysis (temperature modifying mechanical behavior).
+  * - v0.5 - an alpha version: weak coupling of thermal and mechanical analysis (temperature modifying mechanical behavior but not the other way around).
   * - v1.0 - a beta version: thermomechanical analysis of hyperelastic composites.
   * - v2.0 - a beta version: GUI included.
   * 

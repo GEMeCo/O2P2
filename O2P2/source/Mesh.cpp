@@ -556,7 +556,7 @@ template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::setAccel()
 			elem->m_elFor.setZero();
 
 			// Creates an auxiliary vector
-			Eigen::VectorXd va(elem->m_nDof);
+			Eigen::VectorXd va(nDof);
 
 			// Register the velocity in the auxiliary vector
 			int i = 0;
@@ -565,8 +565,8 @@ template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::setAccel()
 
 				for (int j = 0; j < nDim; ++j) {
 					va(i + j) = pNode->getPrevVel()[j];
-					i++;
 				}
+				i++;
 			}
 
 			// Evaluates the elemental damping force
@@ -600,13 +600,13 @@ template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::setAccel()
 	);
 
 	// Got what I need from the element, now lets creates the global matrix and vetors
-	Eigen::SparseMatrix<double> GlMass(getNumDof(), getNumDof());
+	Eigen::SparseMatrix<double> GlMass(this->m_TotalDof, this->m_TotalDof);
 
 	// Vector of independent terms, the right hand side
-	Eigen::VectorXd RHS = Eigen::VectorXd::Zero(getNumDof());
+	Eigen::VectorXd RHS = Eigen::VectorXd::Zero(this->m_TotalDof);
 
 	// Vector of solution, the left hand side
-	Eigen::VectorXd LHS = Eigen::VectorXd::Zero(getNumDof());
+	Eigen::VectorXd LHS = Eigen::VectorXd::Zero(this->m_TotalDof);
 
 	// Sparse solver
 	Eigen::PardisoLU<Eigen::SparseMatrix<double>> solver;
@@ -639,14 +639,14 @@ template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::setAccel()
 	// Find the inverse of GlMass (with very high memory cost)
 	solver.compute(GlMass);
 
-	Eigen::SparseMatrix<double> Identity(getNumDof(), getNumDof());
+	Eigen::SparseMatrix<double> Identity(this->m_TotalDof, this->m_TotalDof);
 	Identity.setIdentity();
 
 	auto GlMassInv = solver.solve(Identity);
 
 	// Still need the external forces at t = 0
-	for (auto& NBC : m_LoadStep[0]->v_NeumannBC) {
-		RHS(NBC->m_Dof) += NBC->m_Value * (NBC->m_TimeVar[0];
+	for (auto& NBC : this->m_LoadStep[0]->v_NeumannBC) {
+		RHS(NBC->m_Dof) += NBC->m_Value * (NBC->m_TimeVar[0]);
 	}
 
 	// Finally evaluates the initial acceleration
@@ -655,7 +655,10 @@ template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::setAccel()
 
 	for (int i = 0; i < this->m_meshNode.size(); i++) {
 		for (int j = 0; j < this->m_meshNode[i]->getNumDOF(); j++) {
-			this->m_meshNode[i].setAcc(j, LHS(this->m_meshNode[i].m_DofIndex + j));
+			// Donwcast node to set the acceleration
+			O2P2::Proc::Comp::MeshNode_MD<nDim>* pNode = static_cast<O2P2::Proc::Comp::MeshNode_MD<nDim>*>(this->m_meshNode[i].get());
+
+			pNode->setAcc(j, LHS(pNode->m_DofIndex + j));
 		}
 	}
 }

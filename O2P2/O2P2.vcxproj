@@ -65,7 +65,7 @@
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(SolutionDir)O2P2\include;$(SolutionDir)O2P2\libs\Eigen;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)O2P2\include;$(SolutionDir)O2P2\Libs\Eigen;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMP>GenerateParallelCode</OpenMP>
     </ClCompile>
     <Link>
@@ -83,7 +83,7 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(SolutionDir)O2P2\include;$(SolutionDir)O2P2\libs\Eigen;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)O2P2\include;$(SolutionDir)O2P2\Libs\Eigen;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMP>GenerateParallelCode</OpenMP>
     </ClCompile>
     <Link>

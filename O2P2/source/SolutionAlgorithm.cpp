@@ -33,13 +33,22 @@ bool O2P2::Proc::SolutionAlgorithm::initFEM(O2P2::Prep::Domain<nDim>* theDomain,
 	LOG("\nSolutionAlgorithm.initFEModel: Basic Definitions");
 	LOG("SolutionAlgorithm.initFEModel: Initiating DOF Mapping system");
 
-	switch (m_AnalysisType) {
+	switch (m_AnalysisType)
+	{
 	case AnalysisType::STATIC:
+	{
 		m_theFEModel = std::make_unique<O2P2::Proc::Mesh_MQS<nDim>>(theDomain, thePost);
+		O2P2::Proc::Mesh_MQS<nDim>* theModel = static_cast<O2P2::Proc::Mesh_MQS<nDim>*>(m_theFEModel.get());
+		theModel->initMesh(theDomain);
 		break;
+	}
 	case AnalysisType::TRANSIENT_2ndORDER_NEWMARK:
+	{
 		m_theFEModel = std::make_unique<O2P2::Proc::Mesh_MD<nDim>>(theDomain, thePost);
+		O2P2::Proc::Mesh_MD<nDim>* theModel = static_cast<O2P2::Proc::Mesh_MD<nDim>*>(m_theFEModel.get());
+		theModel->initMesh(theDomain);
 		break;
+	}
 	default:
 		// if none, thows an error message
 		throw std::invalid_argument("\n\n\nUndefined time integration scheme\nCheck input file\n\n\n");

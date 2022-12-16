@@ -29,14 +29,23 @@
 int main(int argc, char** args)
 {
 	std::string stProj;			  // Project
-	std::string stArquivo;		   // Input File
+	std::string stArquivo;		  // Input File
 	std::ifstream file;			  // Input File Stream
 
 	// Jabá
 	std::cout << "Copyright(C) 2022 Rogerio Carrazedo - All Rights Reserved." << std::endl
-		<< "Structural Engineering Department / University of Sao Paulo at Sao Carlos School of Engineering." << std::endl << std::endl
-		<< "This program comes with ABSOLUTELY NO WARRANTY." << std::endl
-		<< "This is a free software. You are welcome to redistribute it under conditions stablished in the license." << std::endl << std::endl;
+		<< "Structural Engineering Department" << std::endl
+		<< "University of Sao Paulo at Sao Carlos School of Engineering." << std::endl << std::endl
+		<< "This program is free: you can redistribute it under the terms of the License." << std::endl << std::endl
+		<< "This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;" << std::endl
+		<< "Without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE." << std::endl << std::endl
+		<< "It is provided \"AS IS\"." << std::endl
+		<< "In no event shall the authors be liable for any claim, damages or other liability," << std::endl
+		<< "whether in an action of contract, tort or otherwire, arising from, out of or in " << std::endl
+		<< "connection with the software or the use of other dealing in the software." << std::endl << std::endl
+		<< "Neither the name of the copyright holder nor the names of any other contributors" << std::endl
+		<< "may be used to endorse or promote products derived from this software without" << std::endl
+		<< "specific prior written permission." << std::endl << std::endl;
 
 	// --------------------------------------------------------------------------------------------
 	// Check if program call has the project name

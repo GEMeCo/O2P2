@@ -124,7 +124,7 @@ namespace O2P2 {
 			virtual void setCommit() = 0;
 
 			/** Set initial acceleration. */
-			void setAccel() {};
+			virtual void setAccel() {};
 
 			/** @return a pointer to the current load step.
 			  */
@@ -202,9 +202,6 @@ namespace O2P2 {
 				this->m_meshNode.reserve(theDomain->m_nNodes);
 				this->m_meshElem.reserve(theDomain->m_nElem);
 
-				this->DomainNodesToMesh(theDomain);
-				this->DomainElemToMesh(theDomain);
-
 				// Initial norm (required by Non-linear Solver)
 				for (auto& x0 : theDomain->getNode()) {
 					for (double coord : x0->getInitPos()) {
@@ -229,13 +226,19 @@ namespace O2P2 {
 			// Sets the current timestep and Newmark-beta parameters.
 			void setTimeStep(const int& timeStep, const double& beta, const double& gamma) override {
 				O2P2::Proc::Mesh::setTimeStep(timeStep);
-			};
+			}
 
 			//Impose Neumann Boundary Conditions to the vector of independent terms (external forces).
 			void imposeNeumannBC(Eigen::VectorXd& RHS) override;
 
+			// Initiates mesh elements and nodes.
+			void initMesh(O2P2::Prep::Domain<nDim>* theDomain) {
+				this->DomainNodesToMesh(theDomain);
+				this->DomainElemToMesh(theDomain);
+			}
+
 		protected:
-			// Generates a mesh node for each domain node
+			// Generates a mesh node from each domain node
 			void DomainNodesToMesh(O2P2::Prep::Domain<nDim>* theDomain) {
 				for (std::shared_ptr<O2P2::Prep::Node<nDim>>& node : theDomain->getNode()) {
 					// Index of DOF for current node
@@ -281,9 +284,6 @@ namespace O2P2 {
 			  * @param vOut Reference to post-process container.
 			  */
 			explicit Mesh_MD(O2P2::Prep::Domain<nDim>* theDomain, O2P2::Post::PostProcess* vOut) : Mesh_MQS<nDim>(theDomain, vOut) { 
-				v_Qs.resize(this->m_TotalDof);
-				v_Rs.resize(this->m_TotalDof);
-
 				m_beta = 0;
 				m_gamma = 0;
 			}
@@ -318,10 +318,19 @@ namespace O2P2 {
 			void setTimeStep(const int& timeStep, const double& beta, const double& gamma) override;
 
 			// Set initial acceleration.
-			void setAccel();
+			void setAccel() override;
 
 			//Impose Neumann Boundary Conditions to the vector of independent terms (external forces).
 			void imposeNeumannBC(Eigen::VectorXd& RHS) override;
+
+			// Initiates mesh elements and nodes.
+			void initMesh(O2P2::Prep::Domain<nDim>* theDomain) {
+				this->DomainNodesToMesh(theDomain);
+				Mesh_MQS<nDim>::DomainElemToMesh(theDomain);
+
+				v_Qs.resize(this->m_TotalDof);
+				v_Rs.resize(this->m_TotalDof);
+			}
 
 		protected:
 			// Generates a mesh node for each domain node
