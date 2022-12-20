@@ -267,10 +267,10 @@ template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::setTimeStep(const int& timeSt
 
 // ================================================================================================
 //
-// Implementation of Mesh Member Function: imposeNeumannBC
+// Implementation of Mesh Member Function: imposeInertiaBC
 //
 // ================================================================================================
-template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::imposeNeumannBC(Eigen::VectorXd& RHS)
+template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::imposeInertiaBC(Eigen::VectorXd& RHS)
 {
 	PROFILE_FUNCTION();
 
@@ -307,8 +307,8 @@ template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::imposeNeumannBC(Eigen::Vector
 					int nDof = elem->v_Conect[j]->getNumDOF();
 					size_t nodeDof = elem->v_Conect[j]->m_DofIndex;
 					
+					double mass = elemMat(i * nDof, j * nDof);
 					for (int k = 0; k < nDof; ++k) {
-						double mass = elemMat(i * nDof + k, j * nDof + k);
 						double yt = elem->v_Conect[j]->getTrialPos()[k];
 						elem->m_elFor(i * nDof + k) += mass * v_Qs(nodeDof + k) - mass * yt / (m_beta * dt * dt) - mass * Cm * v_Rs(nodeDof + k)
 							- mass * Cm * yt * m_gamma / (m_beta * dt) + mass * Cm * v_Qs(nodeDof + k) * m_gamma * dt;
@@ -329,13 +329,10 @@ template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::imposeNeumannBC(Eigen::Vector
 				// Local dof
 				size_t ldof = i * nDim + j;
 
-				RHS(gdof) = elem->m_elFor(ldof);
+				RHS(gdof) += elem->m_elFor(ldof);
 			}
 		}
 	}
-
-	// The rest of the external forces is just the same as Quasi-static
-	Mesh_MQS<nDim>::imposeNeumannBC(RHS);
 }
 
 
@@ -350,6 +347,9 @@ template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::assembleSOE(Eigen::SparseMatr
 
 	// Every new iteration requires Hessian to be populated
 	Hessian.setZero();
+
+	// Impose inertia to RHS
+	imposeInertiaBC(RHS);
 
 	// time step
 	double dt = this->m_LoadStep[this->m_curLoadStep]->m_TimeStep;
@@ -452,7 +452,7 @@ template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::assembleSOE(Eigen::SparseMatr
 // ================================================================================================
 template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::setTrial(Eigen::VectorXd& LHS)
 {
-	//LOG("Mesh_MQS.setTrial: Updating trial solution to nodes");
+	//LOG("Mesh_MD.setTrial: Updating trial solution to nodes");
 	double* sol = new double[nDim*3];
 
 	// time step
@@ -467,11 +467,11 @@ template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::setTrial(Eigen::VectorXd& LHS
 		//for (int j = 0; j < node->m_nDOF; ++j) {
 		for (int j = 0; j < nDim; ++j) {
 			// New position
-			sol[i] = pNode->getCurPos()[j] + LHS(pNode->m_DofIndex + j);
+			sol[i] = pNode->getTrialPos()[j] + LHS(pNode->m_DofIndex + j);
 			// Update acceleration
 			sol[2 * nDim + i] = sol[i] / (m_beta * dt * dt) - v_Qs(pNode->m_DofIndex + j);
 			// Update velocity
-			sol[nDim + i] = pNode->getPrevVel()[j] + dt * (1. - m_gamma) * pNode->getPrevAcc()[j] + dt * m_gamma * pNode->getCurAcc()[j];
+			sol[nDim + i] = pNode->getPrevVel()[j] + dt * (1. - m_gamma) * pNode->getPrevAcc()[j] + dt * m_gamma * sol[2 * nDim + i];
 			i++;
 		}
 
@@ -639,11 +639,6 @@ template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::setAccel()
 	// Find the inverse of GlMass (with very high memory cost)
 	solver.compute(GlMass);
 
-	Eigen::SparseMatrix<double> Identity(this->m_TotalDof, this->m_TotalDof);
-	Identity.setIdentity();
-
-	auto GlMassInv = solver.solve(Identity);
-
 	// Still need the external forces at t = 0
 	for (auto& NBC : this->m_LoadStep[0]->v_NeumannBC) {
 		RHS(NBC->m_Dof) += NBC->m_Value * (NBC->m_TimeVar[0]);
@@ -651,7 +646,7 @@ template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::setAccel()
 
 	// Finally evaluates the initial acceleration
 	// Acc = M^-1.RHS
-	LHS = GlMassInv * RHS;
+	LHS = solver.solve(RHS);
 
 	for (int i = 0; i < this->m_meshNode.size(); i++) {
 		for (int j = 0; j < this->m_meshNode[i]->getNumDOF(); j++) {

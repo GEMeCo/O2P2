@@ -228,7 +228,7 @@ namespace O2P2 {
 				O2P2::Proc::Mesh::setTimeStep(timeStep);
 			}
 
-			//Impose Neumann Boundary Conditions to the vector of independent terms (external forces).
+			// Impose Neumann Boundary Conditions to the vector of independent terms (external forces).
 			void imposeNeumannBC(Eigen::VectorXd& RHS) override;
 
 			// Initiates mesh elements and nodes.
@@ -320,8 +320,10 @@ namespace O2P2 {
 			// Set initial acceleration.
 			void setAccel() override;
 
-			//Impose Neumann Boundary Conditions to the vector of independent terms (external forces).
-			void imposeNeumannBC(Eigen::VectorXd& RHS) override;
+			// Impose Neumann Boundary Conditions to the vector of independent terms (external forces).
+			void imposeNeumannBC(Eigen::VectorXd& RHS) override {
+				Mesh_MQS<nDim>::imposeNeumannBC(RHS);
+			};
 
 			// Initiates mesh elements and nodes.
 			void initMesh(O2P2::Prep::Domain<nDim>* theDomain) {
@@ -343,6 +345,9 @@ namespace O2P2 {
 					this->addDOF(this->m_meshNode.back()->getNumDOF());
 				}
 			}
+
+			// Impose Inertial forces to the vector of independent terms.
+			void imposeInertiaBC(Eigen::VectorXd& RHS);
 
 		protected:
 			// Dynamic contribution from previous step
