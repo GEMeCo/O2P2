@@ -2,7 +2,7 @@
 // 
 // This file is part of O2P2, an object oriented environment for the positional FEM
 //
-// Copyright(C) 2022 Rogerio Carrazedo - All Rights Reserved.
+// Copyright(C) 2023 GEMeCO - All Rights Reserved.
 // 
 // This source code form is subject to the terms of the Apache License 2.0.
 // If a copy of Apache License 2.0 was not distributed with this file, you can obtain one at
@@ -11,19 +11,17 @@
 // ================================================================================================
 #pragma once
 
-// C++ standard libraries
-#include <array>				// Standard array manipulation (fixed size)
-#include <vector>				// Standard vector manipulation
-#include <iomanip>				// Required by ios (stream)
+// Custom Header Files
+#include "Common.h"
 
 namespace O2P2 {
 	namespace Prep {
 		/** @ingroup PreProcessor_Module
 		  * @class Node
-		  *
+		  * 
 		  * @brief Geometry node, a Domain component.
 		  * @details Contains the initial position and an inverse indexing matrix, with the elements connected to the node.
-		  *
+		  * 
 		  * @tparam nDim The dimensionality of the problem. It is either 2 or 3 (bidimensional or tridimensional).
 		  */
 		template<int nDim>
@@ -34,59 +32,59 @@ namespace O2P2 {
 
 		public:
 			/** Constructor for node objects.
-			  * @param index Node index.
-			  * @param InitPos Initial position of the geometry node.
-			  * @param Tp Initial temperature.
-			  */
-			explicit Node(const size_t& index, const std::array<double, nDim>& InitPos, const double Tp = 0.)
-				: m_index(index), m_Tp(Tp), v_X(InitPos) {	}
+			* @param index Node index.
+			* @param initPos Initial position of the geometry node.
+			* @param Tp Initial temperature.
+			*/
+			explicit Node(const size_t& index, const std::array<double, nDim>& initPos, const double Tp = 0.)
+				: mv_index(index), mv_Tp(Tp), mv_x(initPos) {}
 
 			// Default destructor of private / protected pointers.
 			~Node() = default;
 
 			/** Overloading operator << to stream the node coordinates. */
 			friend std::ostream& operator<<(std::ostream& stream, Node<nDim> const& node) {
-				for (auto& x : node.v_X) {
+				for (auto& x : node.mv_x) {
 					stream << formatFixed << x;
 				}
 				return stream;
 			}
-
-			/** Whenever an element points to the node, the inverse indexing (v_IncInv) registers the element index container.
+			
+			/** Whenever an element points to the node, the inverse indexing registers the element index container.
 			  * @param idx Container index number of the element that is pointing to the node.
 			  */
-			void addConecToElem(const size_t& idx) {
-				this->v_InvInc.push_back(idx);
+			void addConectToElem(const size_t& idx) {
+				this->mv_invInc.push_back(idx);
 			}
 
 			/** Retrieve initial nodal coordinates.
 			  * @return standard array with nodal initial coordinates.
 			  */
-			const std::array<double, nDim>& getInitPos() const { return this->v_X; }
-
+			const std::array<double, nDim>& getInitPos() const { return this->mv_x; }
 
 			/** Retrieve the inverse indexing - elements that are connected to the node.
 			  * @return standard vector with elements connected to the node.
 			  */
-			const std::vector<size_t>& getInvInc() { return this->v_InvInc; }
+			const std::vector<size_t>& getInvInc() const { return this->mv_invInc; }
 
-			/** Retrieve initial nodal temperature.
+			/** Retrieve initial temperature.
 			  * @return double with nodal temperature.
 			  */
-			const double& getInitialTemp() { return m_Tp; }
+			const double& getInitialTemp() const { return this->mv_Tp; }
 
-			/** @brief Node index. */
-			size_t m_index;
+		public:
+			/** @brief Node index */
+			size_t mv_index;
 
 		private:
 			/** @brief Initial temperature. */
-			double m_Tp;
+			double mv_Tp;
 
 			/** @brief Initial coordinates. */
-			std::array<double, nDim> v_X;
+			std::array<double, nDim> mv_x;
 
-			/** @brief Inverse indexing (elements index). */
-			std::vector<size_t> v_InvInc;
+			/** @brief Inverse indexing. */
+			std::vector<size_t> mv_invInc;
 		};
 	} // End of Prep Namespace
 } // End of O2P2 Namespace

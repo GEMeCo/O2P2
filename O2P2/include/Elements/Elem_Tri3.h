@@ -2,7 +2,7 @@
 // 
 // This file is part of O2P2, an object oriented environment for the positional FEM
 //
-// Copyright(C) 2022 Rogerio Carrazedo - All Rights Reserved.
+// Copyright(C) 2023 GEMeCO - All Rights Reserved.
 // 
 // This source code form is subject to the terms of the Apache License 2.0.
 // If a copy of Apache License 2.0 was not distributed with this file, you can obtain one at
@@ -48,8 +48,8 @@ namespace O2P2 {
 				// Output function for AcadView, based on element index.
 				const std::string printByIndex_AV(const size_t add) const override {
 					std::stringstream msg;
-					msg << "2 1 " << this->v_Conect[0]->m_index + add << " " << this->v_Conect[1]->m_index + add << " "
-						<< this->v_Conect[2]->m_index + add << " " << this->m_Mat->m_index << "\n";
+					msg << "2 1 " << this->mv_Conect[0]->mv_index + add << " " << this->mv_Conect[1]->mv_index + add << " "
+						<< this->mv_Conect[2]->mv_index + add << " " << this->mv_Mat->mv_index << "\n";
 					return msg.str();
 				}
 
@@ -57,35 +57,35 @@ namespace O2P2 {
 				const std::string printByAdder_AV(const size_t add) const override {
 					std::stringstream msg;
 					msg << "2 1 " << (1 + add) << " " << (2 + add) << " " << (3 + add) << " "
-						<< this->m_Mat->m_index << "\n";
+						<< this->mv_Mat->mv_index << "\n";
 					return msg.str();
 				}
 
 				// Evaluates shape function in the point.
-				Eigen::VectorXd getShapeFcOnPoint(const double* Point) override;
+				std::vector<double> getShapeFcOnPoint(const double* Point) override;
 
 				// Evaluates the derivative of shape function in the point.
-				Eigen::MatrixXd getShapeDerivOnPoint(const double* Point) override;
+				std::vector<double> getShapeDerivOnPoint(const double* Point) override;
 
 				// Returns the number of nodes of current element.
-				int getNumNodes() override { return m_NumNodes; }
+				int getNumNodes() override { return mv_numNodes; }
 
 				// Returns the number of faces of current element.
-				int getNumFaces() override { return m_NumFaces; }
+				int getNumFaces() override { return mv_numFaces; }
 
 				/** Verifies dimensionless coordinates from input - if it is immersed on the element.
 				  * @return True if input falls within the element.
 				  * @param xsi Trial dimensionless coordinates.
 				  */
-				bool evaluateXsi(const std::array<double, m_Dim> xsi) override {
+				inline bool evaluateXsi(const std::array<double, mv_Dim> xsi) override {
 
-					std::array<double, m_Dim + 1> new_xsi = {};
+					std::array<double, mv_Dim + 1> new_xsi = {};
 
-					for (int i = 0; i < m_Dim; ++i) {
+					for (int i = 0; i < mv_Dim; ++i) {
 						new_xsi.at(i) = xsi.at(i);
-						new_xsi.at(m_Dim) -= xsi.at(i);
+						new_xsi.at(mv_Dim) -= xsi.at(i);
 					}
-					new_xsi.at(m_Dim) += 1.;
+					new_xsi.at(mv_Dim) += 1.;
 
 					const auto [min, max] = std::minmax_element(new_xsi.begin(), new_xsi.end());
 					if (*max < 1.000001 && *min > -0.000001) return true;
@@ -98,10 +98,10 @@ namespace O2P2 {
 
 			protected:
 				/** @brief Number of Nodes */
-				static const int m_NumNodes{ 3 };
+				static const int mv_numNodes{ 3 };
 
 				/** @brief Number of Faces */
-				static const int m_NumFaces{ 1 };
+				static const int mv_numFaces{ 1 };
 			};
 
 
@@ -128,29 +128,29 @@ namespace O2P2 {
 					: Elem_Tri3(Material, Section) { }
 
 				// Return a vector with values on the integration points currently known in the element' nodes.
-				Eigen::VectorXd getValueOnIPs(const double* value) override;
+				std::vector<double> getValueOnIPs(const double* value) override;
 
-				// Returns a pointer to the first element of the shape functions (with size [nIP][m_NumNodes]).
-				double const* getShapeFc() const override { return &m_Psi[0][0]; }
+				// Returns a pointer to the first element of the shape functions (with size [nIP][mv_numNodes]).
+				double const* getShapeFc() const override { return &mv_Psi[0][0]; }
 
-				// Returns a pointer to the first element of the derivative of shape functions (with size [nIP][m_NumNodes][m_Dim]).
-				double const* getShapeDerivative() const override { return &m_DPsi[0][0][0]; }
+				// Returns a pointer to the first element of the derivative of shape functions (with size [nIP][mv_numNodes][mv_Dim]).
+				double const* getShapeDerivative() const override { return &mv_DPsi[0][0][0]; }
 
 				// Returns a pointer to the weight of the integation points (with size [nIP]).
-				double const* getWeight() const override { return m_weight; }
+				double const* getWeight() const override { return mv_weight; }
 
 				// Returns the number of integration points of current element.
 				int getNumIP() override { return nIP; }
 
 			private:
 				// Weights for numerical integration
-				static const double* m_weight;
+				static const double* mv_weight;
 
 				// Shape functions
-				static const double m_Psi[nIP][m_NumNodes];
+				static const double mv_Psi[nIP][mv_numNodes];
 
 				// Shape functions derivative
-				static const double m_DPsi[nIP][m_NumNodes][m_Dim];
+				static const double mv_DPsi[nIP][mv_numNodes][mv_Dim];
 			};
 		} // End of Elem Namespace
 	} // End of Prep Namespace
@@ -163,14 +163,14 @@ namespace O2P2 {
 // Shape functions evaluated on Point
 // 
 // ================================================================================================
-inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Tri3::getShapeFcOnPoint(const double* Point) {
-	Eigen::VectorXd Psi(3);
+inline std::vector<double> O2P2::Prep::Elem::Elem_Tri3::getShapeFcOnPoint(const double* Point) {
+	std::vector<double> mi_Psi(3);
 
-	Psi(0) = 1. - Point[0] - Point[1];
-	Psi(1) = Point[0];
-	Psi(2) = Point[1];
+	mi_Psi.at(0) = 1. - Point[0] - Point[1];
+	mi_Psi.at(1) = Point[0];
+	mi_Psi.at(2) = Point[1];
 
-	return Psi;
+	return mi_Psi;
 };
 
 // ================================================================================================
@@ -179,18 +179,18 @@ inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Tri3::getShapeFcOnPoint(const doub
 // Shape functions derivative evaluated on Point
 // 
 // ================================================================================================
-inline Eigen::MatrixXd O2P2::Prep::Elem::Elem_Tri3::getShapeDerivOnPoint(const double* Point) {
-	Eigen::MatrixXd DPsi(3, 2);
+inline std::vector<double> O2P2::Prep::Elem::Elem_Tri3::getShapeDerivOnPoint(const double* Point) {
+	std::vector<double> mi_DPsi(3 * 2);
 
-	DPsi(0, 0) = -1.;
-	DPsi(1, 0) = 1.;
-	DPsi(2, 0) = 0.;
+	mi_DPsi.at(0) = -1.;
+	mi_DPsi.at(1) = 1.;
+	mi_DPsi.at(2) = 0.;
 
-	DPsi(0, 1) = -1.;
-	DPsi(1, 1) = 0.;
-	DPsi(2, 1) = 1.;
+	mi_DPsi.at(3) = -1.;
+	mi_DPsi.at(4) = 0.;
+	mi_DPsi.at(5) = 1.;
 
-	return DPsi;
+	return mi_DPsi;
 };
 
 // ================================================================================================
@@ -203,36 +203,36 @@ inline void O2P2::Prep::Elem::Elem_Tri3::setGeomProperties() {
 
 	const int nVertices = 3;
 
-	// Allocate an array with size m_Dim to which m_Centroid points to.
-	m_Centroid = std::make_unique<double[]>(m_Dim);
+	// Allocate an array with size mv_Dim to which mv_Centroid points to.
+	mv_Centroid = std::make_unique<double[]>(mv_Dim);
 
 	// Create a temporary array with the vertices of the polygon
-	std::array<O2P2::Prep::Node<m_Dim>*, nVertices> vertices;
-	vertices[0] = v_Conect[0].get();
-	vertices[1] = v_Conect[1].get();
-	vertices[2] = v_Conect[2].get();
+	std::array<O2P2::Prep::Node<mv_Dim>*, nVertices> vertices;
+	vertices[0] = mv_Conect[0].get();
+	vertices[1] = mv_Conect[1].get();
+	vertices[2] = mv_Conect[2].get();
 
 	// Memory requested by make_unique is not empty
-	for (int i = 0; i < m_Dim; i++) m_Centroid[i] = 0.;
+	for (int i = 0; i < mv_Dim; i++) mv_Centroid[i] = 0.;
 
 	for (auto& node : vertices) {
-		std::array<double, m_Dim> x = node->getInitPos();
+		std::array<double, mv_Dim> x = node->getInitPos();
 
-		for (int i = 0; i < m_Dim; i++) m_Centroid[i] += x[i];
+		for (int i = 0; i < mv_Dim; i++) mv_Centroid[i] += x[i];
 	}
 
 	// Finishing up
-	for (int i = 0; i < m_Dim; i++) m_Centroid[i] /= nVertices;
+	for (int i = 0; i < mv_Dim; i++) mv_Centroid[i] /= nVertices;
 
 	// Distance from centroid to vertices
 	double dist[nVertices] = {};
 	int i = 0;
 
 	for (auto& node : vertices) {
-		std::array<double, m_Dim> x = node->getInitPos();
+		std::array<double, mv_Dim> x = node->getInitPos();
 
-		for (int j = 0; j < m_Dim; j++) {
-			dist[i] += (m_Centroid[j] - x[j]) * (m_Centroid[j] - x[j]);
+		for (int j = 0; j < mv_Dim; j++) {
+			dist[i] += (mv_Centroid[j] - x[j]) * (mv_Centroid[j] - x[j]);
 		}
 		dist[i] = std::sqrt(dist[i]);
 
@@ -240,7 +240,7 @@ inline void O2P2::Prep::Elem::Elem_Tri3::setGeomProperties() {
 	}
 
 	// Since centroid is not the circumcenter, the radius is related to the minimum bounding circle
-	m_Radius = *std::max_element(dist, dist + nVertices);
+	mv_Radius = *std::max_element(dist, dist + nVertices);
 };
 
 
@@ -251,18 +251,18 @@ inline void O2P2::Prep::Elem::Elem_Tri3::setGeomProperties() {
 // 
 // ================================================================================================
 template<int nIP>
-inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Tri3_IP<nIP>::getValueOnIPs(const double* value) {
+inline std::vector<double> O2P2::Prep::Elem::Elem_Tri3_IP<nIP>::getValueOnIPs(const double* value) {
 
 	// return value
-	Eigen::VectorXd valueOnIp = Eigen::VectorXd::Zero(this->m_NumNodes);
+	std::vector<double> mi_valueOnIp(nIP, 0.);
 
 	for (int i = 0; i < nIP; i++) {
-		for (int j = 0; j < this->m_NumNodes; j++) {
-			valueOnIp(i) += value[i] * m_Psi[i][j];
+		for (int j = 0; j < this->mv_numNodes; j++) {
+			mi_valueOnIp.at(i) += value[i] * mv_Psi[i][j];
 		}
 	}
 
-	return valueOnIp;
+	return mi_valueOnIp;
 };
 
 
@@ -271,34 +271,34 @@ inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Tri3_IP<nIP>::getValueOnIPs(const 
 // Weights for numerical integration
 //
 // ================================================================================================
-template<> const double* O2P2::Prep::Elem::Elem_Tri3_IP<1>::m_weight = &Hammer2D::Wg_1P[0];
-template<> const double* O2P2::Prep::Elem::Elem_Tri3_IP<3>::m_weight = &Hammer2D::Wg_3P[0];
-template<> const double* O2P2::Prep::Elem::Elem_Tri3_IP<4>::m_weight = &Hammer2D::Wg_4P[0];
-template<> const double* O2P2::Prep::Elem::Elem_Tri3_IP<6>::m_weight = &Hammer2D::Wg_6P[0];
-template<> const double* O2P2::Prep::Elem::Elem_Tri3_IP<7>::m_weight = &Hammer2D::Wg_7P[0];
-template<> const double* O2P2::Prep::Elem::Elem_Tri3_IP<12>::m_weight = &Hammer2D::Wg_12P[0];
-template<> const double* O2P2::Prep::Elem::Elem_Tri3_IP<13>::m_weight = &Hammer2D::Wg_13P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Tri3_IP<1>::mv_weight = &Hammer2D::Wg_1P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Tri3_IP<3>::mv_weight = &Hammer2D::Wg_3P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Tri3_IP<4>::mv_weight = &Hammer2D::Wg_4P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Tri3_IP<6>::mv_weight = &Hammer2D::Wg_6P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Tri3_IP<7>::mv_weight = &Hammer2D::Wg_7P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Tri3_IP<12>::mv_weight = &Hammer2D::Wg_12P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Tri3_IP<13>::mv_weight = &Hammer2D::Wg_13P[0];
 
 // ================================================================================================
 //
 // Shape functions
 //
 // ================================================================================================
-template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<1>::m_Psi[1][m_NumNodes] = {
+template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<1>::mv_Psi[1][mv_numNodes] = {
 	{1. - Hammer2D::Qsi_1P[0][0] - Hammer2D::Qsi_1P[0][1], Hammer2D::Qsi_1P[0][0], Hammer2D::Qsi_1P[0][1]} };
 
-template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<3>::m_Psi[3][m_NumNodes] = {
+template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<3>::mv_Psi[3][mv_numNodes] = {
 	{1. - Hammer2D::Qsi_3P[0][0] - Hammer2D::Qsi_3P[0][1], Hammer2D::Qsi_3P[0][0], Hammer2D::Qsi_3P[0][1]},
 	{1. - Hammer2D::Qsi_3P[1][0] - Hammer2D::Qsi_3P[1][1], Hammer2D::Qsi_3P[1][0], Hammer2D::Qsi_3P[1][1]},
 	{1. - Hammer2D::Qsi_3P[2][0] - Hammer2D::Qsi_3P[2][1], Hammer2D::Qsi_3P[2][0], Hammer2D::Qsi_3P[2][1]} };
 
-template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<4>::m_Psi[4][m_NumNodes] = {
+template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<4>::mv_Psi[4][mv_numNodes] = {
 	{1. - Hammer2D::Qsi_4P[0][0] - Hammer2D::Qsi_4P[0][1], Hammer2D::Qsi_4P[0][0], Hammer2D::Qsi_4P[0][1]},
 	{1. - Hammer2D::Qsi_4P[1][0] - Hammer2D::Qsi_4P[1][1], Hammer2D::Qsi_4P[1][0], Hammer2D::Qsi_4P[1][1]},
 	{1. - Hammer2D::Qsi_4P[2][0] - Hammer2D::Qsi_4P[2][1], Hammer2D::Qsi_4P[2][0], Hammer2D::Qsi_4P[2][1]},
 	{1. - Hammer2D::Qsi_4P[3][0] - Hammer2D::Qsi_4P[3][1], Hammer2D::Qsi_4P[3][0], Hammer2D::Qsi_4P[3][1]} };
 
-template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<6>::m_Psi[6][m_NumNodes] = {
+template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<6>::mv_Psi[6][mv_numNodes] = {
 	{1. - Hammer2D::Qsi_6P[0][0] - Hammer2D::Qsi_6P[0][1], Hammer2D::Qsi_6P[0][0], Hammer2D::Qsi_6P[0][1]},
 	{1. - Hammer2D::Qsi_6P[1][0] - Hammer2D::Qsi_6P[1][1], Hammer2D::Qsi_6P[1][0], Hammer2D::Qsi_6P[1][1]},
 	{1. - Hammer2D::Qsi_6P[2][0] - Hammer2D::Qsi_6P[2][1], Hammer2D::Qsi_6P[2][0], Hammer2D::Qsi_6P[2][1]},
@@ -306,7 +306,7 @@ template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<6>::m_Psi[6][m_NumNodes] 
 	{1. - Hammer2D::Qsi_6P[4][0] - Hammer2D::Qsi_6P[4][1], Hammer2D::Qsi_6P[4][0], Hammer2D::Qsi_6P[4][1]},
 	{1. - Hammer2D::Qsi_6P[5][0] - Hammer2D::Qsi_6P[5][1], Hammer2D::Qsi_6P[5][0], Hammer2D::Qsi_6P[5][1]} };
 
-template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<7>::m_Psi[7][m_NumNodes] = {
+template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<7>::mv_Psi[7][mv_numNodes] = {
 	{1. - Hammer2D::Qsi_7P[0][0] - Hammer2D::Qsi_7P[0][1], Hammer2D::Qsi_7P[0][0], Hammer2D::Qsi_7P[0][1]},
 	{1. - Hammer2D::Qsi_7P[1][0] - Hammer2D::Qsi_7P[1][1], Hammer2D::Qsi_7P[1][0], Hammer2D::Qsi_7P[1][1]},
 	{1. - Hammer2D::Qsi_7P[2][0] - Hammer2D::Qsi_7P[2][1], Hammer2D::Qsi_7P[2][0], Hammer2D::Qsi_7P[2][1]},
@@ -315,7 +315,7 @@ template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<7>::m_Psi[7][m_NumNodes] 
 	{1. - Hammer2D::Qsi_7P[5][0] - Hammer2D::Qsi_7P[5][1], Hammer2D::Qsi_7P[5][0], Hammer2D::Qsi_7P[5][1]},
 	{1. - Hammer2D::Qsi_7P[6][0] - Hammer2D::Qsi_7P[6][1], Hammer2D::Qsi_7P[6][0], Hammer2D::Qsi_7P[6][1]} };
 
-template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<12>::m_Psi[12][m_NumNodes] = {
+template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<12>::mv_Psi[12][mv_numNodes] = {
 	{1. - Hammer2D::Qsi_12P[0][0] - Hammer2D::Qsi_12P[0][1], Hammer2D::Qsi_12P[0][0], Hammer2D::Qsi_12P[0][1]},
 	{1. - Hammer2D::Qsi_12P[1][0] - Hammer2D::Qsi_12P[1][1], Hammer2D::Qsi_12P[1][0], Hammer2D::Qsi_12P[1][1]},
 	{1. - Hammer2D::Qsi_12P[2][0] - Hammer2D::Qsi_12P[2][1], Hammer2D::Qsi_12P[2][0], Hammer2D::Qsi_12P[2][1]},
@@ -329,7 +329,7 @@ template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<12>::m_Psi[12][m_NumNodes
 	{1. - Hammer2D::Qsi_12P[10][0] - Hammer2D::Qsi_12P[10][1], Hammer2D::Qsi_12P[10][0], Hammer2D::Qsi_12P[10][1]},
 	{1. - Hammer2D::Qsi_12P[11][0] - Hammer2D::Qsi_12P[11][1], Hammer2D::Qsi_12P[11][0], Hammer2D::Qsi_12P[11][1]} };
 
-template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<13>::m_Psi[13][m_NumNodes] = {
+template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<13>::mv_Psi[13][mv_numNodes] = {
 	{1. - Hammer2D::Qsi_13P[0][0] - Hammer2D::Qsi_13P[0][1], Hammer2D::Qsi_13P[0][0], Hammer2D::Qsi_13P[0][1]},
 	{1. - Hammer2D::Qsi_13P[1][0] - Hammer2D::Qsi_13P[1][1], Hammer2D::Qsi_13P[1][0], Hammer2D::Qsi_13P[1][1]},
 	{1. - Hammer2D::Qsi_13P[2][0] - Hammer2D::Qsi_13P[2][1], Hammer2D::Qsi_13P[2][0], Hammer2D::Qsi_13P[2][1]},
@@ -349,30 +349,21 @@ template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<13>::m_Psi[13][m_NumNodes
 // Shape functions derivative
 //
 // ================================================================================================
-template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<1>::m_DPsi[1][m_NumNodes][m_Dim] = {
+template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<1>::mv_DPsi[1][mv_numNodes][mv_Dim] = {
 	{ {-1., -1.}, {1., 0.}, {0., 1.} } };
 
-template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<3>::m_DPsi[3][m_NumNodes][m_Dim] = {
-	{ {-1., -1.}, {1., 0.}, {0., 1.} },
-	{ {-1., -1.}, {1., 0.}, {0., 1.} },
-	{ {-1., -1.}, {1., 0.}, {0., 1.} } };
-
-template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<4>::m_DPsi[4][m_NumNodes][m_Dim] = {
-	{ {-1., -1.}, {1., 0.}, {0., 1.} },
+template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<3>::mv_DPsi[3][mv_numNodes][mv_Dim] = {
 	{ {-1., -1.}, {1., 0.}, {0., 1.} },
 	{ {-1., -1.}, {1., 0.}, {0., 1.} },
 	{ {-1., -1.}, {1., 0.}, {0., 1.} } };
 
-template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<6>::m_DPsi[6][m_NumNodes][m_Dim] = {
-	{ {-1., -1.}, {1., 0.}, {0., 1.} },
-	{ {-1., -1.}, {1., 0.}, {0., 1.} },
+template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<4>::mv_DPsi[4][mv_numNodes][mv_Dim] = {
 	{ {-1., -1.}, {1., 0.}, {0., 1.} },
 	{ {-1., -1.}, {1., 0.}, {0., 1.} },
 	{ {-1., -1.}, {1., 0.}, {0., 1.} },
 	{ {-1., -1.}, {1., 0.}, {0., 1.} } };
 
-template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<7>::m_DPsi[7][m_NumNodes][m_Dim] = {
-	{ {-1., -1.}, {1., 0.}, {0., 1.} },
+template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<6>::mv_DPsi[6][mv_numNodes][mv_Dim] = {
 	{ {-1., -1.}, {1., 0.}, {0., 1.} },
 	{ {-1., -1.}, {1., 0.}, {0., 1.} },
 	{ {-1., -1.}, {1., 0.}, {0., 1.} },
@@ -380,12 +371,7 @@ template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<7>::m_DPsi[7][m_NumNodes]
 	{ {-1., -1.}, {1., 0.}, {0., 1.} },
 	{ {-1., -1.}, {1., 0.}, {0., 1.} } };
 
-template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<12>::m_DPsi[12][m_NumNodes][m_Dim] = {
-	{ {-1., -1.}, {1., 0.}, {0., 1.} },
-	{ {-1., -1.}, {1., 0.}, {0., 1.} },
-	{ {-1., -1.}, {1., 0.}, {0., 1.} },
-	{ {-1., -1.}, {1., 0.}, {0., 1.} },
-	{ {-1., -1.}, {1., 0.}, {0., 1.} },
+template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<7>::mv_DPsi[7][mv_numNodes][mv_Dim] = {
 	{ {-1., -1.}, {1., 0.}, {0., 1.} },
 	{ {-1., -1.}, {1., 0.}, {0., 1.} },
 	{ {-1., -1.}, {1., 0.}, {0., 1.} },
@@ -394,7 +380,21 @@ template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<12>::m_DPsi[12][m_NumNode
 	{ {-1., -1.}, {1., 0.}, {0., 1.} },
 	{ {-1., -1.}, {1., 0.}, {0., 1.} } };
 
-template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<13>::m_DPsi[13][m_NumNodes][m_Dim] = {
+template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<12>::mv_DPsi[12][mv_numNodes][mv_Dim] = {
+	{ {-1., -1.}, {1., 0.}, {0., 1.} },
+	{ {-1., -1.}, {1., 0.}, {0., 1.} },
+	{ {-1., -1.}, {1., 0.}, {0., 1.} },
+	{ {-1., -1.}, {1., 0.}, {0., 1.} },
+	{ {-1., -1.}, {1., 0.}, {0., 1.} },
+	{ {-1., -1.}, {1., 0.}, {0., 1.} },
+	{ {-1., -1.}, {1., 0.}, {0., 1.} },
+	{ {-1., -1.}, {1., 0.}, {0., 1.} },
+	{ {-1., -1.}, {1., 0.}, {0., 1.} },
+	{ {-1., -1.}, {1., 0.}, {0., 1.} },
+	{ {-1., -1.}, {1., 0.}, {0., 1.} },
+	{ {-1., -1.}, {1., 0.}, {0., 1.} } };
+
+template<> const double O2P2::Prep::Elem::Elem_Tri3_IP<13>::mv_DPsi[13][mv_numNodes][mv_Dim] = {
 	{ {-1., -1.}, {1., 0.}, {0., 1.} },
 	{ {-1., -1.}, {1., 0.}, {0., 1.} },
 	{ {-1., -1.}, {1., 0.}, {0., 1.} },

@@ -2,7 +2,7 @@
 // 
 // This file is part of O2P2, an object oriented environment for the positional FEM
 //
-// Copyright(C) 2022 Rogerio Carrazedo - All Rights Reserved.
+// Copyright(C) 2023 GEMeCO - All Rights Reserved.
 // 
 // This source code form is subject to the terms of the Apache License 2.0.
 // If a copy of Apache License 2.0 was not distributed with this file, you can obtain one at
@@ -11,7 +11,7 @@
 // ================================================================================================
 #pragma once
 
-// Standard libraries
+// Custom Header Files
 #include "Common.h"
 
 namespace O2P2 {
@@ -31,8 +31,8 @@ namespace O2P2 {
 			/** Constructor for cross section objects.
 			  * @param sec Cross sectional area / thickness.
 			  */
-			Section(const double& sec) : m_section(sec) {
-				m_PlaneState = PlaneStateType::PLANE_STRESS;
+			Section(const double& sec) : mv_section(sec) {
+				mv_PlaneState = PlaneStateType::PLANE_STRESS;
 			};
 
 			/** Constructor for cross section objects.
@@ -40,23 +40,23 @@ namespace O2P2 {
 			  * @param thick Thickness of the plane element.
 			  */
 			Section(const PlaneStateType& PS, const double& thick)
-				: m_section(thick), m_PlaneState(PS) { }
+				: mv_section(thick), mv_PlaneState(PS) { }
 
 			// Default destructor of private / protected pointers.
-			virtual ~Section() = default;
+			~Section() = default;
 
 			/** @return Cross sectional area / thickness. */
-			double getSection() { return m_section; }
+			double getSection() { return mv_section; }
 
 			/** @return Plane state type. */
-			PlaneStateType getPS() { return m_PlaneState; }
+			PlaneStateType getPS() { return mv_PlaneState; }
 
 		private:
 			/** @brief Cross sectional area for truss elements and thickness for plane elements. */
-			double m_section;
+			double mv_section;
 
 			/** @brief Plane state for plane elements (Stress or Strain Plane State) */
-			PlaneStateType m_PlaneState;
+			PlaneStateType mv_PlaneState;
 		};
 	} // End of Prep Namespace
 } // End of O2P2 Namespace

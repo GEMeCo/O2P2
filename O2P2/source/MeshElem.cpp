@@ -2,7 +2,7 @@
 // 
 // This file is part of O2P2, an object oriented environment for the positional FEM
 //
-// Copyright(C) 2022 Rogerio Carrazedo - All Rights Reserved.
+// Copyright(C) 2023 GEMeCO - All Rights Reserved.
 // 
 // This source code form is subject to the terms of the Apache License 2.0.
 // If a copy of Apache License 2.0 was not distributed with this file, you can obtain one at
@@ -22,6 +22,9 @@ template class O2P2::Proc::Comp::MeshElem_SVK<3>;
 template void O2P2::Proc::Comp::MeshElem_SVK<2>::setMaterialPoint();
 template void O2P2::Proc::Comp::MeshElem_SVK<3>::setMaterialPoint();
 
+template void O2P2::Proc::Comp::MeshElem_SVK<2>::setIndexing();
+template void O2P2::Proc::Comp::MeshElem_SVK<3>::setIndexing();
+
 // ================================================================================================
 //
 // Implementation of Template Member Function: setMaterialPoint
@@ -29,35 +32,50 @@ template void O2P2::Proc::Comp::MeshElem_SVK<3>::setMaterialPoint();
 // ================================================================================================
 template<int nDim> void O2P2::Proc::Comp::MeshElem_SVK<nDim>::setMaterialPoint()
 {
-	int nIP = m_pElem->getNumIP();
-	int nElDim = m_pElem->getDIM();
-	
+	int mi_nIP = mv_pElem->getNumIP();
+	int mi_nElDim = mv_pElem->getDIM();
+
 	// The BaseElement pointer does not have access to getConectivity
 	// thus, must cast it to a derived class
-	O2P2::Prep::Elem::Element<nDim>* pElem = static_cast<O2P2::Prep::Elem::Element<nDim>*> (m_pElem.get());
+	O2P2::Prep::Elem::Element<nDim>* mi_pElem = static_cast<O2P2::Prep::Elem::Element<nDim>*>(mv_pElem.get());
 
 	// One material point for each integration point
-	for (int i = 0; i < nIP; ++i) {
+	for (int i = 0; i < mi_nIP; ++i) {
 		// Once created, evaluates F0 (Ref. Jacobian)
-		Eigen::MatrixXd F0 = Eigen::MatrixXd::Zero(nDim, nElDim);
+		M2S2::Dyadic2N mi_F0(nDim);
 
 		// Some pointer arithmetic is required
-		int n = i * m_pElem->getNumNodes() * nDim;
+		int n = i * mv_pElem->getNumNodes() * nDim;
 
 		for (int j = 0; j < nDim; ++j) {
-			for (int m = 0; m < m_pElem->getNumNodes(); ++m) {
-				auto node = pElem->getConectivity(m);
+			for (int m = 0; m < mv_pElem->getNumNodes(); ++m) {
+				auto mi_pNode = mi_pElem->getConectivity(m);
 
-				for (int k = 0; k < nElDim; ++k) {
-					F0(j, k) += node->getInitPos()[j] * *(m_pElem->getShapeDerivative() + n + m*nElDim + k);
+				for (int k = 0; k < mi_nElDim; ++k) {
+					mi_F0(j, k) += mi_pNode->getInitPos()[j] * *(mv_pElem->getShapeDerivative() + n + m * mi_nElDim + k);
 				}
 			}
 		}
 
 		// Record the Jacobian Matrix on every Material (Integration) point
-		this->m_matPoint.emplace_back(std::make_unique<O2P2::Proc::Comp::MaterialPoint>(F0));
+		this->mv_matPoint.emplace_back(std::make_unique<O2P2::Proc::Comp::MaterialPoint>(mi_F0));
 	}
-};
+}
+
+// ================================================================================================
+//
+// Implementation of Template Member Function: setIndexing
+//
+// ================================================================================================
+template<int nDim>
+void O2P2::Proc::Comp::MeshElem_SVK<nDim>::setIndexing()
+{
+	for (int i = 0; i < mv_conect.size(); ++i) {
+		for (int j = 0; j < nDim; ++j) {
+			mv_elIndex.push_back(mv_conect.at(i)->mv_DofIndex + j);
+		}
+	}
+}
 
 
 // ================================================================================================
@@ -65,144 +83,24 @@ template<int nDim> void O2P2::Proc::Comp::MeshElem_SVK<nDim>::setMaterialPoint()
 // Implementation of MeshElem_SVK Member Function: getYoungModulus
 //
 // ================================================================================================
-template<int nDim>
-double O2P2::Proc::Comp::MeshElem_SVK<nDim>::getYoungModulus()
+template<int nDim> double O2P2::Proc::Comp::MeshElem_SVK<nDim>::getYoungModulus()
 {
-	assert((m_pElem->getDIM() == 1) && "MeshElem_SVK<nDim>::getYoungModulus() should only be used with linear elements");
+	assert((mv_pElem->getDIM() == 1) && "MeshElem_SVK<nDim>::getYoungModulus() should only be used with linear elements");
 
 	// Downcasting to linear element.
-	O2P2::Prep::Elem::ElementLinear<nDim>* pElem = static_cast<O2P2::Prep::Elem::ElementLinear<nDim>*> (m_pElem.get());
+	O2P2::Prep::Elem::ElementLinear<nDim>* mi_pElem = static_cast<O2P2::Prep::Elem::ElementLinear<nDim>*>(mv_pElem.get());
 
 	// Pointer to section
-	auto pSec = pElem->getSection();
+	auto mi_pSec = mi_pElem->getSection();
 
 	// Pointer to the material
-	auto pMat = pElem->getMaterial();
+	auto mi_pMat = mi_pElem->getMaterial();
 
 	// Should also downcast to SVK material
-	O2P2::Prep::Mat_SVK_ISO* pSVK_Mat = static_cast<O2P2::Prep::Mat_SVK_ISO*> (pMat);
+	O2P2::Prep::Mat_SVK_ISO* mi_pSVK = static_cast<O2P2::Prep::Mat_SVK_ISO*>(mi_pMat);
 
-	double E = pSVK_Mat->getLongitudinalModulus() * pSec->getSection();
-
-	return E;
+	return mi_pSVK->getLongitudinalModulus() * mi_pSec->getSection();
 }
-
-
-// ================================================================================================
-//
-// Specialization of MeshElem_SVK Member Function (2D only): getConstitutiveMatrix
-//
-// ================================================================================================
-template<>
-Eigen::MatrixXd O2P2::Proc::Comp::MeshElem_SVK<2>::getConstitutiveMatrix()
-{
-	// Dimensionality of the element
-	auto nElDim = m_pElem->getDIM();
-
-	// Downcasting to plane element.
-	O2P2::Prep::Elem::ElementPlane* pElem = static_cast<O2P2::Prep::Elem::ElementPlane*> (m_pElem.get());
-
-	// Pointer to section
-	auto pSec = pElem->getSection();
-
-	// Plane State Type
-	auto PS = pSec->getPS();
-
-	// Thickness
-	auto tk = pSec->getSection();
-
-	// Pointer to the material
-	auto pMat = pElem->getMaterial();
-
-	// Should also downcast to SVK material
-	O2P2::Prep::Mat_SVK_ISO* pSVK_Mat = static_cast<O2P2::Prep::Mat_SVK_ISO*> (pMat);
-
-	// Size of Constitutive matrix
-	int nVoigt = 3 * nElDim - 3;
-
-	double Yg = pSVK_Mat->getLongitudinalModulus();
-	double nu = pSVK_Mat->getPoisson();
-	double G = pSVK_Mat->getTransversalModulus();
-
-	Eigen::MatrixXd E(nVoigt, nVoigt);
-	E.setZero();
-
-	if (PS == PlaneStateType::PLANE_STRESS) {
-
-		double Aux = Yg / (1. - nu * nu);
-
-		E(0, 0) = Aux;
-		E(1, 1) = Aux;
-
-		E(0, 1) = nu * Aux;
-		E(1, 0) = E(0, 1);
-
-		E(2, 2) = G * 2.;
-	}
-	else {
-		double Aux = Yg / ((1. - 2. * nu) * (1. + nu));
-
-		E(0, 0) = (1. - nu) * Aux;
-		E(1, 1) = (1. - nu) * Aux;
-
-		E(0, 1) = nu * Aux;
-		E(1, 0) = E(0, 1);
-
-		E(2, 2) = G * 2.;
-	}
-
-	return E * tk;
-};
-
-
-// ================================================================================================
-//
-// Specialization of MeshElem_SVK Member Function (3D only): getConstitutiveMatrix
-//
-// ================================================================================================
-template<>
-Eigen::MatrixXd O2P2::Proc::Comp::MeshElem_SVK<3>::getConstitutiveMatrix()
-{
-	// Dimensionality of the element
-	auto nElDim = m_pElem->getDIM();
-
-	// Downcasting to solid element.
-	O2P2::Prep::Elem::ElementSolid* pElem = static_cast<O2P2::Prep::Elem::ElementSolid*>(m_pElem.get());
-
-	// Should also downcast to SVK material
-	O2P2::Prep::Mat_SVK_ISO* pMat = static_cast<O2P2::Prep::Mat_SVK_ISO*>(pElem->getMaterial());
-
-	// Size of Constitutive matrix
-	int nVoigt = 3 * nElDim - 3;
-
-	double Yg = pMat->getLongitudinalModulus();
-	double nu = pMat->getPoisson();
-	double G = pMat->getTransversalModulus();
-
-	Eigen::MatrixXd E(nVoigt, nVoigt);
-	E.setZero();
-
-	double Aux = Yg / (1. + nu) / (1. - 2 * nu);
-
-	E(0, 0) = Aux * (1 - nu);
-	E(1, 1) = E(0, 0);
-	E(2, 2) = E(0, 0);
-
-	E(0, 1) = nu * Aux;
-	E(0, 2) = E(0, 1);
-
-	E(1, 0) = E(0, 1);
-	E(1, 2) = E(0, 1);
-
-	E(2, 0) = E(0, 1);
-	E(2, 1) = E(0, 1);
-
-	E(3, 3) = G * 2.;
-	E(4, 4) = G * 2.;
-	E(5, 5) = G * 2.;
-
-	return E;
-};
 
 
 // ================================================================================================
@@ -211,68 +109,184 @@ Eigen::MatrixXd O2P2::Proc::Comp::MeshElem_SVK<3>::getConstitutiveMatrix()
 //
 // ================================================================================================
 template<int nDim>
-void O2P2::Proc::Comp::MeshElem_SVK<nDim>::getContribution(Eigen::MatrixXd& Hessian)
+void O2P2::Proc::Comp::MeshElem_SVK<nDim>::getContribution()
 {
-	auto pMat = m_pElem->getMaterial();
-	auto nElDim = m_pElem->getDIM();
+	auto mi_pMat = mv_pElem->getMaterial();
+	auto mi_nElDim = mv_pElem->getDIM();
 
-	if (nElDim == 1) {
-		if (pMat->getMaterialType() == MaterialType::SVK_ISO)
-			this->getContribution_SVK_ISO<1>(Hessian);
+	if (mi_nElDim == 1) {
+		if (mi_pMat->getMaterialType() == MaterialType::SVK_ISO)
+			this->getContribution_SVK<1>();
 	}
 
-	if (nElDim == 2) {
-		if (pMat->getMaterialType() == MaterialType::SVK_ISO)
-			this->getContribution_SVK_ISO<2>(Hessian);
+	if (mi_nElDim == 2) {
+		if (mi_pMat->getMaterialType() == MaterialType::SVK_ISO)
+			this->getContribution_SVK<2>();
 	}
 
-	if (nElDim == 3) {
-		if (pMat->getMaterialType() == MaterialType::SVK_ISO)
-			this->getContribution_SVK_ISO<3>(Hessian);
+	if (mi_nElDim == 3) {
+		if (mi_pMat->getMaterialType() == MaterialType::SVK_ISO)
+			this->getContribution_SVK<3>();
 	}
-};
+}
 
 
 // ================================================================================================
 //
-// Specialization of MeshElem_SVK Member Function: getContribution_SVK_ISO
+// Specialization of MeshElem_SVK Member Function for 1D elem in 2D environment: getContribution 
 //
 // ================================================================================================
 template<> template<>
-void O2P2::Proc::Comp::MeshElem_SVK<2>::getContribution_SVK_ISO<1>(Eigen::MatrixXd& Hessian)
+void O2P2::Proc::Comp::MeshElem_SVK<2>::getContribution_SVK<1>()
 {
 	// Pointer to the first Shape Fuctions Derivative (const static)
-	auto pShape = m_pElem->getShapeDerivative();
-	auto pWeight = m_pElem->getWeight();
+	auto mi_pShape = mv_pElem->getShapeDerivative();
+	auto mi_pWeight = mv_pElem->getWeight();
 
-	auto nNodes = m_pElem->getNumNodes();
-	auto nIP = m_pElem->getNumIP();
+	auto mi_nNodes = mv_pElem->getNumNodes();
+	auto mi_nIP = mv_pElem->getNumIP();
 
 	const int nDim = 2;
 
 	// One material point for each integration point
-	for (int i = 0; i < nIP; ++i) {
-
+	for (int i = 0; i < mi_nIP; ++i) {
+		
 		// For fiber elements, F0 and F1 holds the initial and current length in each direction
-		Eigen::MatrixXd F1 = Eigen::MatrixXd::Zero(nDim, 1);
+		M2S2::Dyadic2N mi_F1(nDim);
 
 		// Some pointer arithmetic is required
-		int n = i * m_pElem->getNumNodes() * nDim;
+		int n = i * mi_nNodes * nDim;
 
 		for (int j = 0; j < nDim; ++j) {
 			int m = 0;
 
-			for (auto& node : v_Conect) {
-				F1(j, 0) += node->getTrialPos()[j] * *(m_pElem->getShapeDerivative() + n + m);
+			for (auto& node : mv_conect) {
+				mi_F1(j, 0) += node->getTrialPos()[j] * *(mi_pShape + n + m);
 				m++;
 			}
 		}
 
-		double dA0 = m_matPoint[i]->getJacobian();
+		double dA0 = mv_matPoint.at(i)->getJacobian();
 		double dA1 = 0.;
 
 		for (int j = 0; j < nDim; ++j) {
-			dA1 += F1(j, 0) * F1(j, 0);
+			dA1 += mi_F1(j, 0) * mi_F1(j, 0);
+		}
+		
+		// Green-Lagrange Strain
+		double L = 0.5 * (dA1 - dA0) * dA0;
+
+		// Elasticity properties
+		double E = this->getYoungModulus();
+		
+		// Second Piola-Kirchhoff Stress
+		double S = E * L;
+
+		// Green-Lagrange Strain Derivative
+		std::vector<double> dLdy(nDim);
+		for (int j = 0; j < nDim; ++j) {
+			dLdy.at(j) = mi_F1(j, 0) * mi_F1(j, 0) * dA0;
+		}
+
+		// Green-Lagrange Strain Second Derivative
+		// It is the same in every direction, and equal to dA0
+		double d2Ldy2 = dA0;
+
+		// Specific energy derivative
+		double dU2dy = S * d2Ldy2;
+
+		// Weight for Gauss point and Jacobian
+		double numInt = *(mi_pWeight + i) * this->mv_matPoint.at(i)->getJacobian();
+
+		// Integration of the specific energy derivative = internal force
+		for (int j = 0; j < mi_nNodes; ++j) {
+			mv_elFor.at(j) += dU2dy * *(mi_pShape + n + j) * numInt;
+		}
+
+		// Auxiliary for Hessian matrix
+		M2S2::MatrixS mi_Ha(nDim);
+
+		for (int j = 0; j < nDim; ++j) {
+			for (int k = j; k < nDim; ++k) {
+				mi_Ha(j, k) = E * dLdy.at(j) * dLdy.at(k);
+			}
+			mi_Ha(j, j) += S * d2Ldy2;
+		}
+
+		// First part of Hessian
+		M2S2::MatrixX H1(nDim, nDim * mi_nNodes);
+
+		// Kronecker delta
+		M2S2::Dyadic2S I = M2S2::Dyadic2S::identity(nDim);
+
+		for (int j = 0; j < nDim; ++j) {
+			for (int k = 0; k < nDim; ++k) {
+				for (int l = 0; l < nDim; ++l) {
+					for (int m = 0; m < nDim; ++m) {
+						H1(l, j * nDim + k) += mi_Ha(l, m) * I(m, k) * *(mi_pShape + n + j);
+					}
+				}
+			}
+		}
+
+		// Local Hessian
+		for (int j = 0; j < mi_nNodes; ++j) {
+			for (int k = 0; k < nDim; ++k) {
+
+				for (int l = 0; l < mi_nNodes; ++l) {
+					for (int m = 0; m < nDim; ++m) {
+
+						for (int o = 0; o < nDim; ++o) {
+							mv_elHes.at(j * mi_nNodes + k, l * mi_nNodes + m) += *(mi_pShape + n + j) * I(o, k) * H1(o, l * mi_nNodes + m) * numInt;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+
+// ================================================================================================
+//
+// Specialization of MeshElem_SVK Member Function for 1D elem in 2D environment: getContribution 
+//
+// ================================================================================================
+template<> template<>
+void O2P2::Proc::Comp::MeshElem_SVK<3>::getContribution_SVK<1>()
+{
+	// Pointer to the first Shape Fuctions Derivative (const static)
+	auto mi_pShape = mv_pElem->getShapeDerivative();
+	auto mi_pWeight = mv_pElem->getWeight();
+
+	auto mi_nNodes = mv_pElem->getNumNodes();
+	auto mi_nIP = mv_pElem->getNumIP();
+
+	const int nDim = 2;
+
+	// One material point for each integration point
+	for (int i = 0; i < mi_nIP; ++i) {
+
+		// For fiber elements, F0 and F1 holds the initial and current length in each direction
+		M2S2::Dyadic2N mi_F1(nDim);
+
+		// Some pointer arithmetic is required
+		int n = i * mi_nNodes * nDim;
+
+		for (int j = 0; j < nDim; ++j) {
+			int m = 0;
+
+			for (auto& node : mv_conect) {
+				mi_F1(j, 0) += node->getTrialPos()[j] * *(mi_pShape + n + m);
+				m++;
+			}
+		}
+
+		double dA0 = mv_matPoint.at(i)->getJacobian();
+		double dA1 = 0.;
+
+		for (int j = 0; j < nDim; ++j) {
+			dA1 += mi_F1(j, 0) * mi_F1(j, 0);
 		}
 
 		// Green-Lagrange Strain
@@ -285,10 +299,9 @@ void O2P2::Proc::Comp::MeshElem_SVK<2>::getContribution_SVK_ISO<1>(Eigen::Matrix
 		double S = E * L;
 
 		// Green-Lagrange Strain Derivative
-		Eigen::VectorXd dLdy = Eigen::VectorXd::Zero(nDim);
-
+		std::vector<double> dLdy(nDim);
 		for (int j = 0; j < nDim; ++j) {
-			dLdy(j) = F1(j, 0) * F1(j, 0) * dA0;
+			dLdy.at(j) = mi_F1(j, 0) * mi_F1(j, 0) * dA0;
 		}
 
 		// Green-Lagrange Strain Second Derivative
@@ -296,51 +309,51 @@ void O2P2::Proc::Comp::MeshElem_SVK<2>::getContribution_SVK_ISO<1>(Eigen::Matrix
 		double d2Ldy2 = dA0;
 
 		// Specific energy derivative
-		double dUedy = S * d2Ldy2;
+		double dU2dy = S * d2Ldy2;
 
 		// Weight for Gauss point and Jacobian
-		double numInt = *(pWeight + i) * this->m_matPoint[i]->getJacobian();
+		double numInt = *(mi_pWeight + i) * this->mv_matPoint.at(i)->getJacobian();
 
 		// Integration of the specific energy derivative = internal force
-		for (int j = 0; j < nNodes; ++j) {
-			m_elFor(j) += dUedy * *(pShape + n + j) * numInt;
+		for (int j = 0; j < mi_nNodes; ++j) {
+			mv_elFor.at(j) += dU2dy * *(mi_pShape + n + j) * numInt;
 		}
 
 		// Auxiliary for Hessian matrix
-		Eigen::MatrixXd auxH = Eigen::MatrixXd::Zero(nDim, nDim);
+		M2S2::MatrixS mi_Ha(nDim);
 
 		for (int j = 0; j < nDim; ++j) {
-			for (int k = 0; k < nDim; ++k) {
-				auxH(j, k) = E * dLdy(j) * dLdy(k);
+			for (int k = j; k < nDim; ++k) {
+				mi_Ha(j, k) = E * dLdy.at(j) * dLdy.at(k);
 			}
-			auxH(j, j) += S * d2Ldy2;
+			mi_Ha(j, j) += S * d2Ldy2;
 		}
 
 		// First part of Hessian
-		Eigen::MatrixXd H1 = Eigen::MatrixXd::Zero(nDim, nDim * nNodes);
+		M2S2::MatrixX H1(nDim, nDim * mi_nNodes);
 
 		// Kronecker delta
-		Eigen::MatrixXd I = Eigen::MatrixXd::Identity(nDim, nDim);
+		M2S2::Dyadic2S I = M2S2::Dyadic2S::identity(nDim);
 
-		for (int j = 0; j < nNodes; ++j) {
+		for (int j = 0; j < nDim; ++j) {
 			for (int k = 0; k < nDim; ++k) {
 				for (int l = 0; l < nDim; ++l) {
 					for (int m = 0; m < nDim; ++m) {
-						H1(l, j * nDim + k) += auxH(l, m) * I(m, k) * *(pShape + n + j);
+						H1(l, j * nDim + k) += mi_Ha(l, m) * I(m, k) * *(mi_pShape + n + j);
 					}
 				}
 			}
 		}
 
 		// Local Hessian
-		for (int j = 0; j < nNodes; ++j) {
+		for (int j = 0; j < mi_nNodes; ++j) {
 			for (int k = 0; k < nDim; ++k) {
 
-				for (int l = 0; l < nNodes; ++l) {
+				for (int l = 0; l < mi_nNodes; ++l) {
 					for (int m = 0; m < nDim; ++m) {
 
 						for (int o = 0; o < nDim; ++o) {
-							Hessian(j * nNodes + k, l * nNodes + m) += *(pShape + n + j) * I(o, k) * H1(o, l * nNodes + m) * numInt;
+							mv_elHes.at(j * mi_nNodes + k, l * mi_nNodes + m) += *(mi_pShape + n + j) * I(o, k) * H1(o, l * mi_nNodes + m) * numInt;
 						}
 					}
 				}
@@ -349,102 +362,108 @@ void O2P2::Proc::Comp::MeshElem_SVK<2>::getContribution_SVK_ISO<1>(Eigen::Matrix
 	}
 }
 
+
 // ================================================================================================
 //
 // Implementation of MeshElem_SVK Member Function: getContribution_SVK_ISO
 //
 // ================================================================================================
 template<int nDim> template<int nElDim>
-void O2P2::Proc::Comp::MeshElem_SVK<nDim>::getContribution_SVK_ISO(Eigen::MatrixXd& Hessian)
+void O2P2::Proc::Comp::MeshElem_SVK<nDim>::getContribution_SVK()
 {
 	// Pointer to the first Shape Fuctions Derivative (const static)
-	auto pShape = m_pElem->getShapeDerivative();
-	auto pWeight = m_pElem->getWeight();
+	auto mi_pShape = mv_pElem->getShapeDerivative();
+	auto mi_pWeight = mv_pElem->getWeight();
 
-	auto nNodes = m_pElem->getNumNodes();
-	auto nIP = m_pElem->getNumIP();
+	auto mi_nNodes = mv_pElem->getNumNodes();
+	auto mi_nIP = mv_pElem->getNumIP();
 
-	// Matrices sizes
-	const int nVoigt = 3 * nDim - 3;
-	const int nDof = nNodes * nDim;
+	auto mi_pMat = mv_pElem->getMaterial();
 
 	// Elasticity tensor in material description
-	Eigen::MatrixXd E(nVoigt, nVoigt);
-	E = this->getConstitutiveMatrix();
+	M2S2::Dyadic4C E(nDim);
+	E = mi_pMat->getConstitutiveMatrix(nDim);
 
-	// Contribution from each material point
-	for (int i = 0; i < nIP; ++i) {
+	if (nElDim == 2) {
+		// Downcasting to plane element.
+		O2P2::Prep::Elem::ElementPlane* mi_pElem = static_cast<O2P2::Prep::Elem::ElementPlane*>(mv_pElem.get());
+
+		// Pointer to section
+		auto mi_pSec = mi_pElem->getSection();
+
+		// Thickness
+		auto mi_tk = mi_pSec->getSection();
+
+		E *= mi_tk;
+	}
+
+	const int mi_nDof = mi_nNodes * nDim;
+	const int mi_nVoigt = 3 * nDim - 3;
+
+	// One material point for each integration point
+	for (int i = 0; i < mi_nIP; ++i) {
+
 		// Deformation gradient from undeformed to non-dimensional space
-		Eigen::MatrixXd F0i(nDim, nDim);
-
-		// The reference jacobian matrix is already inversed in the material point.
-		F0i = m_matPoint[i]->getJacobianMatrix();
+		M2S2::Dyadic2N F0(nDim);
+		F0 = mv_matPoint.at(i)->getJacobianMatrix();
 
 		// Deformation gradient from deformed to non-dimensional space
-		Eigen::MatrixXd F1 = Eigen::MatrixXd::Zero(nDim, nDim);
+		M2S2::Dyadic2N F1(nDim);
 
 		// Some pointer arithmetic is required
 		// p and numInt are related to current integration point and weighting numerical integration
-		int p = i * nDof;
-		double numInt = *(pWeight + i) * m_matPoint[i]->getJacobian();
+		int p = i * mi_nDof;
+		double numInt = *(mi_pWeight + i) * this->mv_matPoint.at(i)->getJacobian();
 
 		for (int j = 0; j < nDim; ++j) {
-
-			for (int m = 0; m < m_pElem->getNumNodes(); ++m) {
-				auto node = v_Conect[m];
+			for (int m = 0; m < mi_nNodes; ++m) {
+				auto node = mv_conect.at(m);
 
 				for (int k = 0; k < nDim; ++k) {
-					F1(j, k) += node->getTrialPos()[j] * *(pShape + p + m * nDim + k);
+					F1.at(j, k) += node->getTrialPos()[j] * *(mi_pShape + p + m * nDim + k);
 				}
 			}
 		}
 
 		// Deformation gradient
-		Eigen::MatrixXd F(nDim, nDim);
+		M2S2::Dyadic2N F(nDim);
 
 		// evaluate F = F1 * F0i (F0i -> inverse of jacobian matrix)
-		F = F1 * F0i;
+		F = F1 * F0;
 
 		// Right Cauchy-Green (or Green deformation tensor)
-		Eigen::MatrixXd C(nDim, nDim);
-		C = F.transpose() * F;
+		M2S2::Dyadic2S C(nDim);
+		C = F.getATA();
 
-		// Green-Lagrange Strain in Voigt notation
-		Eigen::VectorXd L(nVoigt);
-
-		for (int j = 0; j < nDim; ++j) {
-			L(j) = 0.5 * (C(j, j) - 1.);
-
-			for (int k = j + 1; k < nDim; ++k) {
-				int l = nVoigt - j - k;
-				L(l) = 0.5 * C(j, k);
-			}
-		}
+		// Green-Lagrange Strain
+		M2S2::Dyadic2S L(nDim);
+		L = 0.5 * (C - M2S2::Dyadic2S::identity(nDim));
 
 		// Second Piola-Kirchhoff Stress
-		Eigen::VectorXd S(nVoigt);
+		M2S2::Dyadic2S S(nDim);
 		S = E * L;
+		auto SM = S.getVoigtMnenomics();
 
 		// Green-Lagrange Strain Derivative
-		Eigen::MatrixXd dLdy = Eigen::MatrixXd::Zero(nVoigt, nDof);
+		// Notice that dLdy is written in Voigt notation with mnemonic rule
+		M2S2::MatrixX dLdy(mi_nVoigt, mi_nDof);
 
-		// Some pointer arithmetic is required
-		for (int r = 0; r < nNodes; ++r) {
+		for (int r = 0; r < mi_nNodes; ++r) {
 			for (int d = 0; d < nDim; ++d) {
-				int curDof = r * nDim + d;
+				int mi_curDof = r * nDim + d;
 
 				for (int m = 0; m < nDim; ++m) {
 					int n = m;
 
 					for (int j = 0; j < nDim; ++j) {
-						dLdy(m, curDof) += 0.5 * (F(d, m) * F0i(j, n) * *(pShape + p + r * nDim + j) + F0i(j, m) * F(d, n) * *(pShape + p + r * nDim + j));
+						dLdy(m, mi_curDof) += 0.5 * (F(d, m) * F0(j, n) * *(mi_pShape + p + r * nDim + j) + F0(j, m) * F(d, n) * *(mi_pShape + p + r * nDim + j));
 					}
 
 					for (n = m + 1; n < nDim; ++n) {
-						int l = nVoigt - m - n;
+						int l = mi_nVoigt - m - n;
 
 						for (int j = 0; j < nDim; ++j) {
-							dLdy(l, curDof) += 0.5 * (F(d, m) * F0i(j, n) * *(pShape + p + r * nDim + j) + F0i(j, m) * F(d, n) * *(pShape + p + r * nDim + j));
+							dLdy(l, mi_curDof) += 0.5 * (F(d, m) * F0(j, n) * *(mi_pShape + p + r * nDim + j) + F0(j, m) * F(d, n) * *(mi_pShape + p + r * nDim + j));
 						}
 					}
 				}
@@ -452,58 +471,56 @@ void O2P2::Proc::Comp::MeshElem_SVK<nDim>::getContribution_SVK_ISO(Eigen::Matrix
 				// Specific energy derivative - it is a vector, but we are not going to use it again.
 				double dUedy = 0;
 
-				for (int j = 0; j < nVoigt; ++j) {
-					dUedy += S(j) * dLdy(j, curDof);
+				for (int j = 0; j < mi_nVoigt; ++j) {
+					dUedy += SM.at(j) * dLdy(j, mi_curDof);
 				}
 
-				for (int j = nDim; j < nVoigt; ++j) {
-					dUedy += S(j) * dLdy(j, curDof);
+				for (int j = nDim; j < mi_nVoigt; ++j) {
+					dUedy += SM.at(j) * dLdy(j, mi_curDof);
 				}
 
 				// Integration of the specific energy derivative = internal force
-				m_elFor(curDof) += dUedy * numInt;
+				mv_elFor.at(mi_curDof) += dUedy * numInt;
 			}
 		}
 
-		Eigen::MatrixXd temporary(nVoigt, nDof);
-
-		// The transversal modulus must be multiplied by 2 only here for Hessian
-		// since I am disregarding the last terms (thus reducing all vector/matrices sizes).
-		for (int j = nDim; j < nVoigt; ++j) {
-			E(j, j) = E(j, j) * 2.;
-		}
-
-		temporary = E * dLdy;
-		temporary *= numInt;
-		Hessian += dLdy.transpose() * temporary;
-
-		// Returning the transversal modulus for its original value
-		for (int j = nDim; j < nVoigt; ++j) {
-			E(j, j) = E(j, j) * 0.5;
+		//Hessian += dLdy.transpose() * E * dLdy * numInt;
+		for (int j = 0; j < mi_nDof; ++j) {
+			for (int k = j; k < mi_nDof; ++k) {
+				for (int l = 0; l < nDim; ++l) {
+					for (int m = l; m < nDim; ++m) {
+						mv_elHes.at(j, k) += dLdy.at(m, j) * E.at(m, l) * dLdy.at(l, k) * numInt;
+					}
+				}
+				for (int l = nDim; l < mi_nVoigt; ++l) {
+					for (int m = l; m < mi_nVoigt; ++m) {
+						mv_elHes.at(j, k) += 2. * dLdy.at(m, j) * E.at(m, l) * dLdy.at(l, k) * numInt;
+					}
+				}
+			}
 		}
 
 		// Green-Lagrange Strain Second Derivative
-		for (int j = 0; j < nDof; j = j + nDim) {
-			for (int k = 0; k < nDof; k = k + nDim) {
-				//Eigen::VectorXd d2Ldy2 = Eigen::VectorXd::Zero(nVoigt);
-				double d2Ldy2[nVoigt];
+		for (int j = 0; j < mi_nDof; j = j + nDim) {
+			for (int k = 0; k < mi_nDof; k = k + nDim) {
+				double d2Ldy2[mi_nVoigt];
 
 				for (int m = 0; m < nDim; ++m) {
 					d2Ldy2[m] = 0.;
 
 					for (int n = 0; n < nDim; ++n) {
 						for (int o = 0; o < nDim; ++o) {
-							d2Ldy2[m] += (F0i(n, m) * *(pShape + p + j + n)) * (F0i(o, m) * *(pShape + p + k + o));
+							d2Ldy2[m] += (F0(n, m) * *(mi_pShape + p + j + n)) * (F0(o, m) * *(mi_pShape + p + k + o));
 						}
 					}
 
 					for (int n = m + 1; n < nDim; ++n) {
-						int v = nVoigt - m - n;
+						int  v = mi_nVoigt - m - n;
 						d2Ldy2[v] = 0.;
 
 						for (int l = 0; l < nDim; ++l) {
 							for (int o = 0; o < nDim; ++o) {
-								d2Ldy2[v] += (F0i(l, m) * *(pShape + p + j + l)) * (F0i(o, n) * *(pShape + p + k + o));
+								d2Ldy2[v] += (F0(l, m) * *(mi_pShape + p + j + l)) * (F0(o, n) * *(mi_pShape + p + k + o));
 							}
 						}
 					}
@@ -511,54 +528,37 @@ void O2P2::Proc::Comp::MeshElem_SVK<nDim>::getContribution_SVK_ISO(Eigen::Matrix
 
 				for (int m = 0; m < nDim; ++m) {
 					for (int n = 0; n < nDim; ++n) {
-						Hessian(j + n, k + n) += S(m) * d2Ldy2[m] * numInt;
+						if (j <= k) mv_elHes.at(j + n, k + n) += SM.at(m) * d2Ldy2[m] * numInt;
 					}
 				}
 
-				for (int m = nDim; m < nVoigt; ++m) {
+				for (int m = nDim; m < mi_nVoigt; ++m) {
 					for (int n = 0; n < nDim; ++n) {
-						Hessian(j + n, k + n) += 2. * S(m) * d2Ldy2[m] * numInt;
+						if (j <= k) mv_elHes.at(j + n, k + n) += 2. * SM.at(m) * d2Ldy2[m] * numInt;
 					}
 				}
 			}
 		}
 	}
+}
 
-	return;
-};
-
-
-// ================================================================================================
-//
-// Implementation of MeshElem_SVK Member Function: addMassContrib
-//
-// ================================================================================================
 template<int nDim>
-void O2P2::Proc::Comp::MeshElem_SVK<nDim>::addMassContrib(const double& mult, Eigen::MatrixXd& Hessian)
+void O2P2::Proc::Comp::MeshElem_SVK<nDim>::addMassContrib(const double& mult)
 {
-	// Pointer to the first Shape Fuctions Derivative (const static)
-	auto pShape = m_pElem->getShapeFc();
-	auto pWeight = m_pElem->getWeight();
+	auto mi_pShape = mv_pElem->getShapeFc();
+	auto mi_pWeight = mv_pElem->getWeight();
 
-	auto nNodes = m_pElem->getNumNodes();
-	auto nIP = m_pElem->getNumIP();
+	auto mi_nNodes = mv_pElem->getNumNodes();
+	auto mi_nIP = mv_pElem->getNumIP();
 
-	// Contribution from each material point
-	for (int i = 0; i < nIP; ++i) {
+	for (int i = 0; i < mi_nIP; ++i) {
+		int p = i * mi_nNodes;
+		double numInt = mult * *(mi_pWeight + i) * mv_matPoint[i]->getJacobian();
 
-		// Local mass matrix
-		Eigen::MatrixXd M = Eigen::MatrixXd::Zero(nDim, nDim);
-
-		// Some pointer arithmetic is required
-		// p and numInt are related to current integration point and weighting numerical integration
-		int p = i * nNodes;
-		double numInt = mult * *(pWeight + i) * m_matPoint[i]->getJacobian();
-
-		for (int j = 0; j < nNodes; ++j) {
-			for (int k = 0; k < nNodes; ++k) {
-				// nDim is considered the number of DOF per node
+		for (int j = 0; j < mi_nNodes; ++j) {
+			for (int k = j; k < mi_nNodes; ++k) {
 				for (int m = 0; m < nDim; ++m) {
-					Hessian(j*nDim + m, k*nDim + m) += *(pShape + p + j) * *(pShape + p + k) * numInt;
+					mv_elHes.at(j * nDim + m, k * nDim + m) += *(mi_pShape + p + j) * *(mi_pShape + p + k) * numInt;
 				}
 			}
 		}

@@ -2,7 +2,7 @@
 // 
 // This file is part of O2P2, an object oriented environment for the positional FEM
 //
-// Copyright(C) 2022 Rogerio Carrazedo - All Rights Reserved.
+// Copyright(C) 2023 GEMeCO - All Rights Reserved.
 // 
 // This source code form is subject to the terms of the Apache License 2.0.
 // If a copy of Apache License 2.0 was not distributed with this file, you can obtain one at
@@ -11,17 +11,9 @@
 // ================================================================================================
 #pragma once
 
-// C++ standard libraries
-#include <vector>		// required by std::vector
-#include <memory>		// required by std::shared_pointer
-#include <iostream>		// required by operator << overloading
-#include <algorithm>	// std::max / std::max_element
-#include <math.h>		// std::sqrt
+// Custom header files
+#include "Common.h"
 
-// Eigen libraries
-#include <Eigen/Dense>
-
-// Custom Header Files
 #include "Material.h"
 #include "Section.h"
 #include "Node.h"
@@ -45,7 +37,7 @@ namespace O2P2 {
 				/** Constructor for element objects.
 				  * @param Material Pointer to Material class.
 				  */
-				explicit BaseElement(const std::shared_ptr<O2P2::Prep::Material>& Material) : m_Mat(Material) { }
+				explicit BaseElement(const std::shared_ptr<O2P2::Prep::Material>& Material) : mv_Mat(Material) {}
 
 				// Default destructor of private / protected pointers.
 				virtual ~BaseElement() = default;
@@ -67,27 +59,22 @@ namespace O2P2 {
 				  * @return a vector with the shape function.
 				  * @param Point Dimensionless coordinates of the point.
 				  */
-				virtual Eigen::VectorXd getShapeFcOnPoint(const double* Point) = 0;
+				virtual std::vector<double> getShapeFcOnPoint(const double* Point) = 0;
 
 				/** Evaluates the derivative of shape function in the point.
 				  * @return a matrix with the value of the derivative of shape functions.
 				  * @param Point Dimensionless coordinates of the point.
 				  */
-				virtual Eigen::MatrixXd getShapeDerivOnPoint(const double* Point) = 0;
+				virtual std::vector<double> getShapeDerivOnPoint(const double* Point) = 0;
 
-				/** @return a pointer to the shape functions (with size [m_NumIP][m_NumNodes]). */
+				/** @return a pointer to the shape functions (with size [mv_numIP][mv_numNodes]). */
 				virtual double const* getShapeFc() const = 0;
 
-				/** @return a pointer to the derivative of shape functions (with size [m_NumIP][m_Dim][m_NumNodes]). */
+				/** @return a pointer to the derivative of shape functions (with size [mv_numIP][mv_Dim][mv_numNodes]). */
 				virtual double const* getShapeDerivative() const = 0;
 
-				/** @return a pointer to the weight of the integation points (with size [m_NumIP]). */
+				/** @return a pointer to the weight of the integation points (with size [mv_numIP]). */
 				virtual double const* getWeight() const = 0;
-
-				/** return a vector with values on the integration points currently known in the element' nodes (such as temperature).
-				  * @param value element nodal values of the required parameter. There must be the same number of values than there are nodes in the element.
-				  */
-				virtual Eigen::VectorXd getValueOnIPs(const double* value) = 0;
 
 				/** @return the number of nodes of current element. */
 				virtual int getNumNodes() = 0;
@@ -105,11 +92,13 @@ namespace O2P2 {
 				virtual int getDIM() = 0;
 
 				/** @return a reference to the elements Material object. */
-				O2P2::Prep::Material* getMaterial() { return m_Mat.get(); }
+				O2P2::Prep::Material* getMaterial() { return mv_Mat.get(); }
+
+				virtual std::vector<double> getValueOnIPs(const double* value) = 0;
 
 			protected:
 				/** @brief Pointer to the Material. */
-				std::shared_ptr<O2P2::Prep::Material> m_Mat;
+				std::shared_ptr<O2P2::Prep::Material> mv_Mat;
 			};
 
 
@@ -133,11 +122,14 @@ namespace O2P2 {
 				  */
 				explicit Element(const std::shared_ptr<O2P2::Prep::Material>& Material)
 					: BaseElement(Material) {
-					m_Centroid = nullptr;
-				}
+					mv_Centroid = nullptr;
+				};
 
 				// Default destructor of private / protected pointers.
 				~Element() = default;
+
+				/** Evaluate centroid and circumsphere Radius. Must be called after setting the conectivity. */
+				virtual void setGeomProperties() {}
 
 			public:
 				/** Overloading operator << to stream the node indexing. */
@@ -149,8 +141,8 @@ namespace O2P2 {
 				/** @return string with incidence for printing. */
 				const std::string print() const {
 					std::string str;
-					for (auto& node : v_Conect) {
-						str.append(std::to_string(node->m_index + 1));
+					for (auto& node : mv_Conect) {
+						str.append(std::to_string(node->mv_index + 1));
 						str.append(" ");
 					}
 					return str;
@@ -160,10 +152,10 @@ namespace O2P2 {
 				const std::string printGeom() const {
 					std::string str;
 					str.append("Radius: ");
-					str.append(std::to_string(m_Radius));
+					str.append(std::to_string(mv_Radius));
 					str.append("; Centroid: ");
 					for (int i = 0; i < nDim; i++) {
-						str.append(std::to_string(m_Centroid[i]));
+						str.append(std::to_string(mv_Centroid[i]));
 						str.append(" ");
 					}
 					return str;
@@ -173,45 +165,40 @@ namespace O2P2 {
 				  * @param Conect The indexing matrix.
 				  */
 				void setConectivity(const std::vector<std::shared_ptr<O2P2::Prep::Node<nDim>>>& Conect) {
-					v_Conect = std::move(Conect);
+					mv_Conect = std::move(Conect);
 					this->setGeomProperties();
 				}
 
 				/** @return a reference to the element indexing. */
-				std::vector<std::shared_ptr<O2P2::Prep::Node<nDim>>>& getConectivity() { return v_Conect; }
+				std::vector<std::shared_ptr<O2P2::Prep::Node<nDim>>>& getConectivity() { return mv_Conect; }
 
 				/** Get a pointer to a specific node from the conectivity.
 				  * @return a pointer to a node.
 				  * @param index Element convectivity container index.
 				  */
-				O2P2::Prep::Node<nDim>* getConectivity(const int& index) { return v_Conect.at(index).get(); }
+				O2P2::Prep::Node<nDim>* getConectivity(const int& index) { return mv_Conect.at(index).get(); }
 
 				/** @return the radius of the element' minimum bounding circle. */
-				double getRadius() { return this->m_Radius; }
+				double getRadius() { return this->mv_Radius; }
 
 				/** @return a pointer to the centroid of the element (with size [nDim]). */
-				double const* getCentroid() const { return &m_Centroid[0]; }
+				double const* getCentroid() const { return &mv_Centroid[0]; }
 
 				/** Verifies dimensionless coordinates from input - if it is immersed on the element.
 				  * @return True if input falls within the element.
 				  * @param xsi Trial dimensionless coordinates.
 				  */
-				virtual bool evaluateXsi(const std::array<double, nDim> xsi) { return false; }
-
-			protected:
-				/** Evaluate centroid and circumsphere Radius. Must be called after setting the conectivity. */
-				virtual void setGeomProperties() {}
-				//virtual void setGeomProperties() = 0;
+				virtual inline bool evaluateXsi(const std::array<double, nDim> xsi) { return false; }
 
 			protected:
 				/** @brief Vector with element indexing. */
-				std::vector<std::shared_ptr<O2P2::Prep::Node<nDim>>> v_Conect;
+				std::vector<std::shared_ptr<O2P2::Prep::Node<nDim>>> mv_Conect;
 
 				/** @brief Centroid of the polygon (It is not the circumcenter). */
-				std::unique_ptr<double[]> m_Centroid;
+				std::unique_ptr<double[]> mv_Centroid;
 
 				/** @brief Radius of the minimum bounding circle. */
-				double m_Radius{ 0. };
+				double mv_Radius{ 0. };
 			};
 
 
@@ -233,26 +220,25 @@ namespace O2P2 {
 				  * @param Section Pointer to Section class.
 				  */
 				ElementLinear(std::shared_ptr<O2P2::Prep::Material>& Material, std::shared_ptr<O2P2::Prep::Section>& Section)
-					: Element<nDim>(Material), m_Section(Section) { }
+					: Element<nDim>(Material), mv_Section(Section) {}
 
 			protected:
 				/** @brief Pointer to the Section. */
-				std::shared_ptr<O2P2::Prep::Section> m_Section;
+				std::shared_ptr<O2P2::Prep::Section> mv_Section;
 
 				/** @brief Element dimensionality */
-				static inline int const m_Dim{ 1 };
+				static inline int const mv_Dim{ 1 };
 
 			public:
 				// Returns the number of DOF per node of current element.
 				int getNumNdDOF() override { return nDim; }
 
 				// Returns the dimensionality of current element.
-				int getDIM() override { return m_Dim; }
+				int getDIM() override { return mv_Dim; }
 
 				/** @return a reference to a section object. */
-				O2P2::Prep::Section* getSection() { return m_Section.get(); }
+				O2P2::Prep::Section* getSection() { return mv_Section.get(); }
 			};
-
 
 			/**
 			  * @class ElementPlane
@@ -267,30 +253,29 @@ namespace O2P2 {
 				ElementPlane() = delete;
 
 			protected:
-
 				/** Constructor for plane element objects.
 				  * @param Material Pointer to Material class.
 				  * @param Section Pointer to Section class.
 				  */
 				ElementPlane(std::shared_ptr<O2P2::Prep::Material>& Material, std::shared_ptr<O2P2::Prep::Section>& Section)
-					: Element<2>(Material), m_Section(Section) { }
+					: Element<2>(Material), mv_Section(Section) {}
 
 			protected:
 				/** @brief Pointer to Section. */
-				std::shared_ptr<O2P2::Prep::Section> m_Section;
+				std::shared_ptr<O2P2::Prep::Section> mv_Section;
 
 				/** @brief Element dimensionality */
-				static inline int const m_Dim{ 2 };
+				static inline int const mv_Dim{ 2 };
 
 			public:
 				// Returns the number of DOF per node of current element.
 				int getNumNdDOF() override { return 2; }
 
 				// Returns the dimensionality of current element.
-				int getDIM() override { return m_Dim; }
+				int getDIM() override { return mv_Dim; }
 
 				/** @return a reference to a section object. */
-				O2P2::Prep::Section* getSection() { return m_Section.get(); }
+				O2P2::Prep::Section* getSection() { return mv_Section.get(); }
 			};
 
 
@@ -307,23 +292,22 @@ namespace O2P2 {
 				ElementSolid() = delete;
 
 			protected:
-
 				/** Constructor for plane solid objects.
 				  * @param Material Pointer to Material class.
 				  */
 				ElementSolid(std::shared_ptr<O2P2::Prep::Material>& Material)
-					: Element<3>(Material) { }
-
-			public:
-				// Returns the number of DOF per node of current element.
-				int getNumNdDOF() { return 3; }
-
-				// Returns the dimensionality of current element.
-				int getDIM() { return m_Dim; }
+					: Element<3>(Material) {}
 
 			protected:
 				/** @brief Element dimensionality */
-				static inline int const m_Dim{ 3 };
+				static inline int const mv_Dim{ 3 };
+
+			public:
+				// Returns the number of DOF per node of current element.
+				int getNumNdDOF() override { return 3; }
+
+				// Returns the dimensionality of current element.
+				int getDIM() override { return mv_Dim; }
 			};
 		} // End of Elem Namespace
 	} // End of Prep Namespace

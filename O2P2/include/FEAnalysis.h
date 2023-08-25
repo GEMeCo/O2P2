@@ -2,7 +2,7 @@
 // 
 // This file is part of O2P2, an object oriented environment for the positional FEM
 //
-// Copyright(C) 2022 Rogerio Carrazedo - All Rights Reserved.
+// Copyright(C) 2023 GEMeCO - All Rights Reserved.
 // 
 // This source code form is subject to the terms of the Apache License 2.0.
 // If a copy of Apache License 2.0 was not distributed with this file, you can obtain one at
@@ -77,18 +77,11 @@ namespace O2P2 {
 		}
 
 	private:
-		// Container of Domain objects.
-		std::unique_ptr<O2P2::Prep::Domain<nDim>> m_theMesh;
-
-		// Manages the processing unity.
-		std::unique_ptr<O2P2::Proc::SolutionAlgorithm> m_theAnalyzer;
-
-		// Manages the pos-process. Also buffers solutions.
-		std::unique_ptr<O2P2::Post::PostProcess> m_thePost;
-
-	private:
 		// Copy constructor. It must be deleted to avoid instantiation. Only references can be obtained.
 		FEAnalysis(const FEAnalysis<nDim>&) = delete;
+
+		// Move constructor will also be deleted.
+		FEAnalysis(FEAnalysis&& other) = delete;
 
 		// Private constructor. It is private because it is a singleton, thus it cannot be instantiated.
 		FEAnalysis() { }
@@ -97,48 +90,80 @@ namespace O2P2 {
 		~FEAnalysis() = default;
 
 		// Internal implementation of call to ModelBuilder.
-		bool initComponentsImpl(std::istream& file) {
-			LOG("\nFEAnalysis.initComponents: Reading project files");
-
-			std::cout << "\n\n------------------------------------------------------------"
-				<< "\nReading project files"
-				<< "\n------------------------------------------------------------";
-
-			O2P2::ModelBuilder<nDim> m_theBuilder;
-
-			m_theMesh = m_theBuilder.initMesh(file);
-			m_theAnalyzer = m_theBuilder.initAnalyzer(file);
-			m_thePost = std::make_unique<O2P2::Post::PostProcess>();
-
-			bool InitMesh = m_theBuilder.populateDomain(m_theMesh.get());
-
-			// Once mesh was succefully initiated, initiate the solution algorithm elements
-			if (InitMesh) InitMesh = m_theAnalyzer->initFEModel(m_theMesh.get(), m_thePost.get());
-
-			// Read boundary conditions
-			int numSteps = m_theBuilder.readBondaryConditions(m_theMesh.get(), m_theAnalyzer.get());
-			m_thePost->setNumSteps(numSteps);
-
-			LOG("\nFEAnalysis.initComponents: Finished reading project files");
-
-			return InitMesh;
-		}
+		bool initComponentsImpl(std::istream& file);
 
 		// Internal implementation of call to the solution algorithm.
-		bool runAnalysisImpl() {
-			LOG("\nFEAnalysis.runAnalysis: Starting the analysis");
-			m_theAnalyzer->runSolutionAlgorithm(m_theMesh.get());
-			return true;
-		}
+		bool runAnalysisImpl();
 
 		// Internal implementation of call to output system.
-		bool drawResultsImpl(const std::string& ProjectName) {
-			LOG("\nFEAnalysis.drawResults: Outputting solution");
+		bool drawResultsImpl(const std::string& ProjectName);
 
-			O2P2::Post::OutputSystem<nDim> theSketcher(OutputType::OGL, ProjectName);
-			theSketcher.draw(m_theMesh.get(), m_thePost.get());
+	private:
+		// Container of Domain objects.
+		std::unique_ptr<O2P2::Prep::Domain<nDim>> mv_theDomain;
 
-			return true;
-		}
+		// Manages the processing unity.
+		std::unique_ptr<O2P2::Proc::SolutionAlgorithm> mv_theAnalyzer;
+
+		// Manages the pos-process. Also buffers solutions.
+		std::unique_ptr<O2P2::Post::PostProcess> mv_thePost;
 	};
+
+
+	// ================================================================================================
+	//
+	// Implementation of Private Template Member Function (2D and 3D): initComponentsImpl
+	//
+	// ================================================================================================
+	template<int nDim>
+	inline bool FEAnalysis<nDim>::initComponentsImpl(std::istream& file)
+	{
+		LOG("\nFEAnalysis.initComponents: Reading project files");
+
+		std::cout << "\n\n------------------------------------------------------------"
+			      << "\nReading project files"
+			      << "\n------------------------------------------------------------";
+
+		O2P2::ModelBuilder<nDim> mi_theBuilder;
+
+		mv_theDomain = mi_theBuilder.initMesh(file);
+		mv_theAnalyzer = mi_theBuilder.initAnalyzer(file);
+		mv_thePost = std::make_unique<O2P2::Post::PostProcess>();
+
+		bool mi_initMesh = mi_theBuilder.populateDomain(file, mv_theDomain.get());
+
+		// Once mesh was succefully initiated, initiate the solution algorithm elements
+		if (mi_initMesh) mi_initMesh = mv_theAnalyzer->initFEModel(mv_theDomain.get(), mv_thePost.get());
+
+		// Read boundary conditions
+		int numSteps = mi_theBuilder.readBondaryConditions(file, mv_theDomain.get(), mv_theAnalyzer.get());
+		mv_thePost->setNumSteps(numSteps);
+
+		LOG("\nFEAnalysis.initComponents: Finished reading project files");
+
+		return mi_initMesh;
+	}
+
+	// ================================================================================================
+	//
+	// Implementation of Private Template Member Function (2D and 3D): runAnalysisImpl
+	//
+	// ================================================================================================
+	template<int nDim>
+	inline bool FEAnalysis<nDim>::runAnalysisImpl() {
+		LOG("\nFEAnalysis.runAnalysis: Starting the analysis");
+		mv_theAnalyzer->runSolutionAlgorithm(mv_theDomain.get());
+		return true;
+	}
+
+	// Internal implementation of call to output system.
+	template<int nDim>
+	inline bool FEAnalysis<nDim>::drawResultsImpl(const std::string& ProjectName) {
+		LOG("\nFEAnalysis.drawResults: Outputting solution");
+
+		O2P2::Post::OutputSystem<nDim> theSketcher(OutputType::OGL, ProjectName);
+		theSketcher.draw(mv_theDomain.get(), mv_thePost.get());
+
+		return true;
+	}
 } // End of O2P2 namespace

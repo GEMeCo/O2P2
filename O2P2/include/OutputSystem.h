@@ -2,7 +2,7 @@
 // 
 // This file is part of O2P2, an object oriented environment for the positional FEM
 //
-// Copyright(C) 2022 Rogerio Carrazedo - All Rights Reserved.
+// Copyright(C) 2023 GEMeCO - All Rights Reserved.
 // 
 // This source code form is subject to the terms of the Apache License 2.0.
 // If a copy of Apache License 2.0 was not distributed with this file, you can obtain one at
@@ -38,8 +38,8 @@ namespace O2P2 {
 			  * @param projectName Name of the project, employed to give name to files.
 			  */
 			OutputSystem(OutputType fileType, const std::string& projectName) {
-				m_OutputType = fileType;
-				m_Project = projectName + OutputTypeExtension[fileType];
+				mv_OutputType = fileType;
+				mv_Project = projectName + OutputTypeExtension[fileType];
 			}
 
 			// Default destructor of private / protected pointers.
@@ -51,9 +51,9 @@ namespace O2P2 {
 			  */
 			void draw(O2P2::Prep::Domain<nDim>* theDomain, O2P2::Post::PostProcess* thePost) {
 				std::ofstream file;
-				file.open(m_Project, std::ios::trunc);
+				file.open(mv_Project, std::ios::trunc);
 
-				if (m_OutputType == OutputType::OGL) {
+				if (mv_OutputType == OutputType::OGL) {
 					draw_AcadView_Node(file, theDomain, thePost);
 				}
 			}
@@ -67,10 +67,11 @@ namespace O2P2 {
 
 		private:
 			/** @brief Type of output */
-			OutputType m_OutputType;
+			OutputType mv_OutputType;
 
 			/** @brief Name of the Project */
-			std::string m_Project;
+			std::string mv_Project;
 		};
 	} // End of Post Namespace
 } // End of O2P2 Namespace
+

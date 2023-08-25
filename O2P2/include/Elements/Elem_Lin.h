@@ -2,7 +2,7 @@
 // 
 // This file is part of O2P2, an object oriented environment for the positional FEM
 //
-// Copyright(C) 2022 Rogerio Carrazedo - All Rights Reserved.
+// Copyright(C) 2023 GEMeCO - All Rights Reserved.
 // 
 // This source code form is subject to the terms of the Apache License 2.0.
 // If a copy of Apache License 2.0 was not distributed with this file, you can obtain one at
@@ -52,9 +52,9 @@ namespace O2P2 {
 					std::stringstream msg;
 					msg << "1 " << nNodes - 1;
 					for (int i = 0; i < nNodes; ++i) {
-						msg << this->v_Conect[i]->m_index + add << "";
+						msg << this->mv_Conect[i]->mv_index + add << "";
 					}
-					msg << this->m_Mat->m_index << "\n";
+					msg << this->mv_Mat->mv_index << "\n";
 					return msg.str();
 				}
 
@@ -65,27 +65,27 @@ namespace O2P2 {
 					for (int i = 0; i < nNodes; ++i) {
 						msg << i + 1 + add << " ";
 					}
-					msg << this->m_Mat->m_index << "\n";
+					msg << this->mv_Mat->mv_index << "\n";
 					return msg.str();
 				}
 
 				// Evaluates shape function in the point.
-				Eigen::VectorXd getShapeFcOnPoint(const double* Point) override;
+				std::vector<double> getShapeFcOnPoint(const double* Point) override;
 
 				// Evaluates the derivative of shape function in the point.
-				Eigen::MatrixXd getShapeDerivOnPoint(const double* Point) override;
+				std::vector<double> getShapeDerivOnPoint(const double* Point) override;
 
 				// Return a vector with values on the integration points currently known in the element' nodes.
-				Eigen::VectorXd getValueOnIPs(const double* value) override;
+				std::vector<double> getValueOnIPs(const double* value) override;
 
 				// Returns a pointer to the first element of the shape functions (with size [nIP][nNodes]).
-				double const* getShapeFc() const override { return &m_Psi[0][0]; }
+				double const* getShapeFc() const override { return &mv_Psi[0][0]; }
 
 				// Returns a pointer to the first element of the derivative of shape functions (with size [nIP][nNodes][nDim]).
-				double const* getShapeDerivative() const override { return &m_DPsi[0][0]; }
+				double const* getShapeDerivative() const override { return &mv_DPsi[0][0]; }
 
 				// Returns a pointer to the weight of the integation points (with size [nIP]).
-				double const* getWeight() const override { return m_weight; }
+				double const* getWeight() const override { return mv_weight; }
 
 				// Returns the number of nodes of current element.
 				int getNumNodes() override { return nNodes; }
@@ -97,18 +97,18 @@ namespace O2P2 {
 				int getNumIP() override { return nIP; }
 
 			private:
-				// Evaluate Length (saving in . Must be called after setting the conectivity.
+				// Evaluate Length. Must be called after setting the conectivity.
 				void setGeomProperties() override;
 
 			private:
 				/** @brief Weights for numerical integration */
-				static const double* m_weight;
+				static const double* mv_weight;
 
 				/** @brief Shape functions */
-				static const double m_Psi[nIP][nNodes];
+				static const double mv_Psi[nIP][nNodes];
 
 				/** @brief Shape functions derivative */
-				static const double m_DPsi[nIP][nNodes];
+				static const double mv_DPsi[nIP][nNodes];
 			};
 		} // End of Elem Namespace
 	} // End of Prep Namespace
@@ -121,184 +121,184 @@ namespace O2P2 {
 // Shape functions evaluated on Point
 // 
 // ================================================================================================
-template<> inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Lin<2, 2, 2>::getShapeFcOnPoint(const double* Point) {
-	Eigen::VectorXd Psi(2);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<2, 2, 2>::getShapeFcOnPoint(const double* Point) {
+	std::vector<double> mi_Psi(2);
 
-	Psi(0) = 0.5 - 0.5 * Point[0];
-	Psi(1) = 0.5 + 0.5 * Point[0];
+	mi_Psi.at(0) = 0.5 - 0.5 * Point[0];
+	mi_Psi.at(1) = 0.5 + 0.5 * Point[0];
 
-	return Psi;
+	return mi_Psi;
 };
 
-template<> inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Lin<2, 2, 3>::getShapeFcOnPoint(const double* Point) {
-	Eigen::VectorXd Psi(2);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<2, 2, 3>::getShapeFcOnPoint(const double* Point) {
+	std::vector<double> mi_Psi(2);
 
-	Psi(0) = 0.5 - 0.5 * Point[0];
-	Psi(1) = 0.5 + 0.5 * Point[0];
+	mi_Psi.at(0) = 0.5 - 0.5 * Point[0];
+	mi_Psi.at(1) = 0.5 + 0.5 * Point[0];
 
-	return Psi;
+	return mi_Psi;
 };
 
-template<> inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Lin<2, 2, 4>::getShapeFcOnPoint(const double* Point) {
-	Eigen::VectorXd Psi(2);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<2, 2, 4>::getShapeFcOnPoint(const double* Point) {
+	std::vector<double> mi_Psi(2);
 
-	Psi(0) = 0.5 - 0.5 * Point[0];
-	Psi(1) = 0.5 + 0.5 * Point[0];
+	mi_Psi.at(0) = 0.5 - 0.5 * Point[0];
+	mi_Psi.at(1) = 0.5 + 0.5 * Point[0];
 
-	return Psi;
+	return mi_Psi;
 };
 
-template<> inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Lin<3, 2, 2>::getShapeFcOnPoint(const double* Point) {
-	Eigen::VectorXd Psi(2);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<3, 2, 2>::getShapeFcOnPoint(const double* Point) {
+	std::vector<double> mi_Psi(2);
 
-	Psi(0) = 0.5 - 0.5 * Point[0];
-	Psi(1) = 0.5 + 0.5 * Point[0];
+	mi_Psi.at(0) = 0.5 - 0.5 * Point[0];
+	mi_Psi.at(1) = 0.5 + 0.5 * Point[0];
 
-	return Psi;
+	return mi_Psi;
 };
 
-template<> inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Lin<3, 2, 3>::getShapeFcOnPoint(const double* Point) {
-	Eigen::VectorXd Psi(2);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<3, 2, 3>::getShapeFcOnPoint(const double* Point) {
+	std::vector<double> mi_Psi(2);
 
-	Psi(0) = 0.5 - 0.5 * Point[0];
-	Psi(1) = 0.5 + 0.5 * Point[0];
+	mi_Psi.at(0) = 0.5 - 0.5 * Point[0];
+	mi_Psi.at(1) = 0.5 + 0.5 * Point[0];
 
-	return Psi;
+	return mi_Psi;
 };
 
-template<> inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Lin<3, 2, 4>::getShapeFcOnPoint(const double* Point) {
-	Eigen::VectorXd Psi(2);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<3, 2, 4>::getShapeFcOnPoint(const double* Point) {
+	std::vector<double> mi_Psi(2);
 
-	Psi(0) = 0.5 - 0.5 * Point[0];
-	Psi(1) = 0.5 + 0.5 * Point[0];
+	mi_Psi.at(0) = 0.5 - 0.5 * Point[0];
+	mi_Psi.at(1) = 0.5 + 0.5 * Point[0];
 
-	return Psi;
+	return mi_Psi;
 };
 
-template<> inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Lin<2, 3, 2>::getShapeFcOnPoint(const double* Point) {
-	Eigen::VectorXd Psi(3);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<2, 3, 2>::getShapeFcOnPoint(const double* Point) {
+	std::vector<double> mi_Psi(3);
 
-	Psi(0) = 0.5 * (Point[0] - 1.) * Point[0];
-	Psi(1) = 0.5 * (Point[0] + 1.) * Point[0];
-	Psi(2) = (1. + Point[0]) * (1. - Point[0]);
+	mi_Psi.at(0) = 0.5 * (Point[0] - 1.) * Point[0];
+	mi_Psi.at(1) = 0.5 * (Point[0] + 1.) * Point[0];
+	mi_Psi.at(2) = (1. + Point[0]) * (1. - Point[0]);
 
-	return Psi;
+	return mi_Psi;
 };
 
-template<> inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Lin<2, 3, 3>::getShapeFcOnPoint(const double* Point) {
-	Eigen::VectorXd Psi(3);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<2, 3, 3>::getShapeFcOnPoint(const double* Point) {
+	std::vector<double> mi_Psi(3);
 
-	Psi(0) = 0.5 * (Point[0] - 1.) * Point[0];
-	Psi(1) = 0.5 * (Point[0] + 1.) * Point[0];
-	Psi(2) = (1. + Point[0]) * (1. - Point[0]);
+	mi_Psi.at(0) = 0.5 * (Point[0] - 1.) * Point[0];
+	mi_Psi.at(1) = 0.5 * (Point[0] + 1.) * Point[0];
+	mi_Psi.at(2) = (1. + Point[0]) * (1. - Point[0]);
 
-	return Psi;
+	return mi_Psi;
 };
 
-template<> inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Lin<2, 3, 4>::getShapeFcOnPoint(const double* Point) {
-	Eigen::VectorXd Psi(3);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<2, 3, 4>::getShapeFcOnPoint(const double* Point) {
+	std::vector<double> mi_Psi(3);
 
-	Psi(0) = 0.5 * (Point[0] - 1.) * Point[0];
-	Psi(1) = 0.5 * (Point[0] + 1.) * Point[0];
-	Psi(2) = (1. + Point[0]) * (1. - Point[0]);
+	mi_Psi.at(0) = 0.5 * (Point[0] - 1.) * Point[0];
+	mi_Psi.at(1) = 0.5 * (Point[0] + 1.) * Point[0];
+	mi_Psi.at(2) = (1. + Point[0]) * (1. - Point[0]);
 
-	return Psi;
+	return mi_Psi;
 };
 
-template<> inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Lin<3, 3, 2>::getShapeFcOnPoint(const double* Point) {
-	Eigen::VectorXd Psi(3);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<3, 3, 2>::getShapeFcOnPoint(const double* Point) {
+	std::vector<double> mi_Psi(3);
 
-	Psi(0) = 0.5 * (Point[0] - 1.) * Point[0];
-	Psi(1) = 0.5 * (Point[0] + 1.) * Point[0];
-	Psi(2) = (1. + Point[0]) * (1. - Point[0]);
+	mi_Psi.at(0) = 0.5 * (Point[0] - 1.) * Point[0];
+	mi_Psi.at(1) = 0.5 * (Point[0] + 1.) * Point[0];
+	mi_Psi.at(2) = (1. + Point[0]) * (1. - Point[0]);
 
-	return Psi;
+	return mi_Psi;
 };
 
-template<> inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Lin<3, 3, 3>::getShapeFcOnPoint(const double* Point) {
-	Eigen::VectorXd Psi(3);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<3, 3, 3>::getShapeFcOnPoint(const double* Point) {
+	std::vector<double> mi_Psi(3);
 
-	Psi(0) = 0.5 * (Point[0] - 1.) * Point[0];
-	Psi(1) = 0.5 * (Point[0] + 1.) * Point[0];
-	Psi(2) = (1. + Point[0]) * (1. - Point[0]);
+	mi_Psi.at(0) = 0.5 * (Point[0] - 1.) * Point[0];
+	mi_Psi.at(1) = 0.5 * (Point[0] + 1.) * Point[0];
+	mi_Psi.at(2) = (1. + Point[0]) * (1. - Point[0]);
 
-	return Psi;
+	return mi_Psi;
 };
 
-template<> inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Lin<3, 3, 4>::getShapeFcOnPoint(const double* Point) {
-	Eigen::VectorXd Psi(3);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<3, 3, 4>::getShapeFcOnPoint(const double* Point) {
+	std::vector<double> mi_Psi(3);
 
-	Psi(0) = 0.5 * (Point[0] - 1.) * Point[0];
-	Psi(1) = 0.5 * (Point[0] + 1.) * Point[0];
-	Psi(2) = (1. + Point[0]) * (1. - Point[0]);
+	mi_Psi.at(0) = 0.5 * (Point[0] - 1.) * Point[0];
+	mi_Psi.at(1) = 0.5 * (Point[0] + 1.) * Point[0];
+	mi_Psi.at(2) = (1. + Point[0]) * (1. - Point[0]);
 
-	return Psi;
+	return mi_Psi;
 };
 
-template<> inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Lin<2, 4, 2>::getShapeFcOnPoint(const double* Point) {
-	Eigen::VectorXd Psi(4);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<2, 4, 2>::getShapeFcOnPoint(const double* Point) {
+	std::vector<double> mi_Psi(4);
 
-	Psi(0) = -0.0625 + Point[0] / 16.0 + (9.0 * Point[0] * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0] * Point[0]) / 16.0;
-	Psi(1) = 0.5625 - (27.0 * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0]) / 16.0 + (27.0 * Point[0] * Point[0] * Point[0]) / 16.0;
-	Psi(2) = 0.5625 + (27.0 * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0]) / 16.0 - (27.0 * Point[0] * Point[0] * Point[0]) / 16.0;
-	Psi(3) = -0.0625 - Point[0] / 16.0 + (9.0 * Point[0] * Point[0]) / 16.0 + (9.0 * Point[0] * Point[0] * Point[0]) / 16.0;
+	mi_Psi.at(0) = -0.0625 + Point[0] / 16.0 + (9.0 * Point[0] * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0] * Point[0]) / 16.0;
+	mi_Psi.at(1) = 0.5625 - (27.0 * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0]) / 16.0 + (27.0 * Point[0] * Point[0] * Point[0]) / 16.0;
+	mi_Psi.at(2) = 0.5625 + (27.0 * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0]) / 16.0 - (27.0 * Point[0] * Point[0] * Point[0]) / 16.0;
+	mi_Psi.at(3) = -0.0625 - Point[0] / 16.0 + (9.0 * Point[0] * Point[0]) / 16.0 + (9.0 * Point[0] * Point[0] * Point[0]) / 16.0;
 
-	return Psi;
+	return mi_Psi;
 };
 
-template<> inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Lin<2, 4, 3>::getShapeFcOnPoint(const double* Point) {
-	Eigen::VectorXd Psi(4);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<2, 4, 3>::getShapeFcOnPoint(const double* Point) {
+	std::vector<double> mi_Psi(4);
 
-	Psi(0) = -0.0625 + Point[0] / 16.0 + (9.0 * Point[0] * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0] * Point[0]) / 16.0;
-	Psi(1) = 0.5625 - (27.0 * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0]) / 16.0 + (27.0 * Point[0] * Point[0] * Point[0]) / 16.0;
-	Psi(2) = 0.5625 + (27.0 * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0]) / 16.0 - (27.0 * Point[0] * Point[0] * Point[0]) / 16.0;
-	Psi(3) = -0.0625 - Point[0] / 16.0 + (9.0 * Point[0] * Point[0]) / 16.0 + (9.0 * Point[0] * Point[0] * Point[0]) / 16.0;
+	mi_Psi.at(0) = -0.0625 + Point[0] / 16.0 + (9.0 * Point[0] * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0] * Point[0]) / 16.0;
+	mi_Psi.at(1) = 0.5625 - (27.0 * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0]) / 16.0 + (27.0 * Point[0] * Point[0] * Point[0]) / 16.0;
+	mi_Psi.at(2) = 0.5625 + (27.0 * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0]) / 16.0 - (27.0 * Point[0] * Point[0] * Point[0]) / 16.0;
+	mi_Psi.at(3) = -0.0625 - Point[0] / 16.0 + (9.0 * Point[0] * Point[0]) / 16.0 + (9.0 * Point[0] * Point[0] * Point[0]) / 16.0;
 
-	return Psi;
+	return mi_Psi;
 };
 
-template<> inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Lin<2, 4, 4>::getShapeFcOnPoint(const double* Point) {
-	Eigen::VectorXd Psi(4);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<2, 4, 4>::getShapeFcOnPoint(const double* Point) {
+	std::vector<double> mi_Psi(4);
 
-	Psi(0) = -0.0625 + Point[0] / 16.0 + (9.0 * Point[0] * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0] * Point[0]) / 16.0;
-	Psi(1) = 0.5625 - (27.0 * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0]) / 16.0 + (27.0 * Point[0] * Point[0] * Point[0]) / 16.0;
-	Psi(2) = 0.5625 + (27.0 * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0]) / 16.0 - (27.0 * Point[0] * Point[0] * Point[0]) / 16.0;
-	Psi(3) = -0.0625 - Point[0] / 16.0 + (9.0 * Point[0] * Point[0]) / 16.0 + (9.0 * Point[0] * Point[0] * Point[0]) / 16.0;
+	mi_Psi.at(0) = -0.0625 + Point[0] / 16.0 + (9.0 * Point[0] * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0] * Point[0]) / 16.0;
+	mi_Psi.at(1) = 0.5625 - (27.0 * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0]) / 16.0 + (27.0 * Point[0] * Point[0] * Point[0]) / 16.0;
+	mi_Psi.at(2) = 0.5625 + (27.0 * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0]) / 16.0 - (27.0 * Point[0] * Point[0] * Point[0]) / 16.0;
+	mi_Psi.at(3) = -0.0625 - Point[0] / 16.0 + (9.0 * Point[0] * Point[0]) / 16.0 + (9.0 * Point[0] * Point[0] * Point[0]) / 16.0;
 
-	return Psi;
+	return mi_Psi;
 };
 
-template<> inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Lin<3, 4, 2>::getShapeFcOnPoint(const double* Point) {
-	Eigen::VectorXd Psi(4);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<3, 4, 2>::getShapeFcOnPoint(const double* Point) {
+	std::vector<double> mi_Psi(4);
 
-	Psi(0) = -0.0625 + Point[0] / 16.0 + (9.0 * Point[0] * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0] * Point[0]) / 16.0;
-	Psi(1) = 0.5625 - (27.0 * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0]) / 16.0 + (27.0 * Point[0] * Point[0] * Point[0]) / 16.0;
-	Psi(2) = 0.5625 + (27.0 * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0]) / 16.0 - (27.0 * Point[0] * Point[0] * Point[0]) / 16.0;
-	Psi(3) = -0.0625 - Point[0] / 16.0 + (9.0 * Point[0] * Point[0]) / 16.0 + (9.0 * Point[0] * Point[0] * Point[0]) / 16.0;
+	mi_Psi.at(0) = -0.0625 + Point[0] / 16.0 + (9.0 * Point[0] * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0] * Point[0]) / 16.0;
+	mi_Psi.at(1) = 0.5625 - (27.0 * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0]) / 16.0 + (27.0 * Point[0] * Point[0] * Point[0]) / 16.0;
+	mi_Psi.at(2) = 0.5625 + (27.0 * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0]) / 16.0 - (27.0 * Point[0] * Point[0] * Point[0]) / 16.0;
+	mi_Psi.at(3) = -0.0625 - Point[0] / 16.0 + (9.0 * Point[0] * Point[0]) / 16.0 + (9.0 * Point[0] * Point[0] * Point[0]) / 16.0;
 
-	return Psi;
+	return mi_Psi;
 };
 
-template<> inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Lin<3, 4, 3>::getShapeFcOnPoint(const double* Point) {
-	Eigen::VectorXd Psi(4);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<3, 4, 3>::getShapeFcOnPoint(const double* Point) {
+	std::vector<double> mi_Psi(4);
 
-	Psi(0) = -0.0625 + Point[0] / 16.0 + (9.0 * Point[0] * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0] * Point[0]) / 16.0;
-	Psi(1) = 0.5625 - (27.0 * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0]) / 16.0 + (27.0 * Point[0] * Point[0] * Point[0]) / 16.0;
-	Psi(2) = 0.5625 + (27.0 * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0]) / 16.0 - (27.0 * Point[0] * Point[0] * Point[0]) / 16.0;
-	Psi(3) = -0.0625 - Point[0] / 16.0 + (9.0 * Point[0] * Point[0]) / 16.0 + (9.0 * Point[0] * Point[0] * Point[0]) / 16.0;
+	mi_Psi.at(0) = -0.0625 + Point[0] / 16.0 + (9.0 * Point[0] * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0] * Point[0]) / 16.0;
+	mi_Psi.at(1) = 0.5625 - (27.0 * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0]) / 16.0 + (27.0 * Point[0] * Point[0] * Point[0]) / 16.0;
+	mi_Psi.at(2) = 0.5625 + (27.0 * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0]) / 16.0 - (27.0 * Point[0] * Point[0] * Point[0]) / 16.0;
+	mi_Psi.at(3) = -0.0625 - Point[0] / 16.0 + (9.0 * Point[0] * Point[0]) / 16.0 + (9.0 * Point[0] * Point[0] * Point[0]) / 16.0;
 
-	return Psi;
+	return mi_Psi;
 };
 
-template<> inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Lin<3, 4, 4>::getShapeFcOnPoint(const double* Point) {
-	Eigen::VectorXd Psi(4);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<3, 4, 4>::getShapeFcOnPoint(const double* Point) {
+	std::vector<double> mi_Psi(4);
 
-	Psi(0) = -0.0625 + Point[0] / 16.0 + (9.0 * Point[0] * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0] * Point[0]) / 16.0;
-	Psi(1) = 0.5625 - (27.0 * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0]) / 16.0 + (27.0 * Point[0] * Point[0] * Point[0]) / 16.0;
-	Psi(2) = 0.5625 + (27.0 * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0]) / 16.0 - (27.0 * Point[0] * Point[0] * Point[0]) / 16.0;
-	Psi(3) = -0.0625 - Point[0] / 16.0 + (9.0 * Point[0] * Point[0]) / 16.0 + (9.0 * Point[0] * Point[0] * Point[0]) / 16.0;
+	mi_Psi.at(0) = -0.0625 + Point[0] / 16.0 + (9.0 * Point[0] * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0] * Point[0]) / 16.0;
+	mi_Psi.at(1) = 0.5625 - (27.0 * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0]) / 16.0 + (27.0 * Point[0] * Point[0] * Point[0]) / 16.0;
+	mi_Psi.at(2) = 0.5625 + (27.0 * Point[0]) / 16.0 - (9.0 * Point[0] * Point[0]) / 16.0 - (27.0 * Point[0] * Point[0] * Point[0]) / 16.0;
+	mi_Psi.at(3) = -0.0625 - Point[0] / 16.0 + (9.0 * Point[0] * Point[0]) / 16.0 + (9.0 * Point[0] * Point[0] * Point[0]) / 16.0;
 
-	return Psi;
+	return mi_Psi;
 };
 
 // ================================================================================================
@@ -307,185 +307,185 @@ template<> inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Lin<3, 4, 4>::getShapeF
 // Shape functions derivative evaluated on Point
 // 
 // ================================================================================================
-template<> inline Eigen::MatrixXd O2P2::Prep::Elem::Elem_Lin<2, 2, 2>::getShapeDerivOnPoint(const double* Point) {
-	Eigen::MatrixXd DPsi(2, 1);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<2, 2, 2>::getShapeDerivOnPoint(const double* Point) {
+	std::vector<double> mi_DPsi(2 * 1);
 
-	DPsi(0, 0) = -0.5;
-	DPsi(1, 0) = 0.5;
+	mi_DPsi.at(0) = -0.5;
+	mi_DPsi.at(1) = 0.5;
 
-	return DPsi;
+	return mi_DPsi;
 };
 
-template<> inline Eigen::MatrixXd O2P2::Prep::Elem::Elem_Lin<2, 2, 3>::getShapeDerivOnPoint(const double* Point) {
-	Eigen::MatrixXd DPsi(2, 1);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<2, 2, 3>::getShapeDerivOnPoint(const double* Point) {
+	std::vector<double> mi_DPsi(2 * 1);
 
-	DPsi(0, 0) = -0.5;
-	DPsi(1, 0) = 0.5;
+	mi_DPsi.at(0) = -0.5;
+	mi_DPsi.at(1) = 0.5;
 
-	return DPsi;
+	return mi_DPsi;
 };
 
-template<> inline Eigen::MatrixXd O2P2::Prep::Elem::Elem_Lin<2, 2, 4>::getShapeDerivOnPoint(const double* Point) {
-	Eigen::MatrixXd DPsi(2, 1);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<2, 2, 4>::getShapeDerivOnPoint(const double* Point) {
+	std::vector<double> mi_DPsi(2 * 1);
 
-	DPsi(0, 0) = -0.5;
-	DPsi(1, 0) = 0.5;
+	mi_DPsi.at(0) = -0.5;
+	mi_DPsi.at(1) = 0.5;
 
-	return DPsi;
+	return mi_DPsi;
 };
 
-template<> inline Eigen::MatrixXd O2P2::Prep::Elem::Elem_Lin<3, 2, 2>::getShapeDerivOnPoint(const double* Point) {
-	Eigen::MatrixXd DPsi(2, 1);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<3, 2, 2>::getShapeDerivOnPoint(const double* Point) {
+	std::vector<double> mi_DPsi(2 * 1);
 
-	DPsi(0, 0) = -0.5;
-	DPsi(1, 0) = 0.5;
+	mi_DPsi.at(0) = -0.5;
+	mi_DPsi.at(1) = 0.5;
 
-	return DPsi;
+	return mi_DPsi;
 };
 
-template<> inline Eigen::MatrixXd O2P2::Prep::Elem::Elem_Lin<3, 2, 3>::getShapeDerivOnPoint(const double* Point) {
-	Eigen::MatrixXd DPsi(2, 1);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<3, 2, 3>::getShapeDerivOnPoint(const double* Point) {
+	std::vector<double> mi_DPsi(2 * 1);
 
-	DPsi(0, 0) = -0.5;
-	DPsi(1, 0) = 0.5;
+	mi_DPsi.at(0) = -0.5;
+	mi_DPsi.at(1) = 0.5;
 
-	return DPsi;
+	return mi_DPsi;
 };
 
-template<> inline Eigen::MatrixXd O2P2::Prep::Elem::Elem_Lin<3, 2, 4>::getShapeDerivOnPoint(const double* Point) {
-	Eigen::MatrixXd DPsi(2, 1);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<3, 2, 4>::getShapeDerivOnPoint(const double* Point) {
+	std::vector<double> mi_DPsi(2 * 1);
 
-	DPsi(0, 0) = -0.5;
-	DPsi(1, 0) = 0.5;
+	mi_DPsi.at(0) = -0.5;
+	mi_DPsi.at(1) = 0.5;
 
-	return DPsi;
+	return mi_DPsi;
 };
 
-template<> inline Eigen::MatrixXd O2P2::Prep::Elem::Elem_Lin<2, 3, 2>::getShapeDerivOnPoint(const double* Point) {
-	Eigen::MatrixXd DPsi(3, 1);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<2, 3, 2>::getShapeDerivOnPoint(const double* Point) {
+	std::vector<double> mi_DPsi(3 * 1);
 
-	DPsi(0, 0) = Point[0] - 0.5;
-	DPsi(1, 0) = Point[0] + 0.5;
-	DPsi(2, 0) = -2. * Point[0];
+	mi_DPsi.at(0) = Point[0] - 0.5;
+	mi_DPsi.at(1) = Point[0] + 0.5;
+	mi_DPsi.at(2) = -2. * Point[0];
 
-	return DPsi;
+	return mi_DPsi;
 };
 
-template<> inline Eigen::MatrixXd O2P2::Prep::Elem::Elem_Lin<2, 3, 3>::getShapeDerivOnPoint(const double* Point) {
-	Eigen::MatrixXd DPsi(3, 1);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<2, 3, 3>::getShapeDerivOnPoint(const double* Point) {
+	std::vector<double> mi_DPsi(3 * 1);
 
-	DPsi(0, 0) = Point[0] - 0.5;
-	DPsi(1, 0) = Point[0] + 0.5;
-	DPsi(2, 0) = -2. * Point[0];
+	mi_DPsi.at(0) = Point[0] - 0.5;
+	mi_DPsi.at(1) = Point[0] + 0.5;
+	mi_DPsi.at(2) = -2. * Point[0];
 
-	return DPsi;
+	return mi_DPsi;
 };
 
-template<> inline Eigen::MatrixXd O2P2::Prep::Elem::Elem_Lin<2, 3, 4>::getShapeDerivOnPoint(const double* Point) {
-	Eigen::MatrixXd DPsi(3, 1);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<2, 3, 4>::getShapeDerivOnPoint(const double* Point) {
+	std::vector<double> mi_DPsi(3 * 1);
 
-	DPsi(0, 0) = Point[0] - 0.5;
-	DPsi(1, 0) = Point[0] + 0.5;
-	DPsi(2, 0) = -2. * Point[0];
+	mi_DPsi.at(0) = Point[0] - 0.5;
+	mi_DPsi.at(1) = Point[0] + 0.5;
+	mi_DPsi.at(2) = -2. * Point[0];
 
-	return DPsi;
+	return mi_DPsi;
 };
 
-template<> inline Eigen::MatrixXd O2P2::Prep::Elem::Elem_Lin<3, 3, 2>::getShapeDerivOnPoint(const double* Point) {
-	Eigen::MatrixXd DPsi(3, 1);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<3, 3, 2>::getShapeDerivOnPoint(const double* Point) {
+	std::vector<double> mi_DPsi(3 * 1);
 
-	DPsi(0, 0) = Point[0] - 0.5;
-	DPsi(1, 0) = Point[0] + 0.5;
-	DPsi(2, 0) = -2. * Point[0];
+	mi_DPsi.at(0) = Point[0] - 0.5;
+	mi_DPsi.at(1) = Point[0] + 0.5;
+	mi_DPsi.at(2) = -2. * Point[0];
 
-	return DPsi;
+	return mi_DPsi;
 };
 
-template<> inline Eigen::MatrixXd O2P2::Prep::Elem::Elem_Lin<3, 3, 3>::getShapeDerivOnPoint(const double* Point) {
-	Eigen::MatrixXd DPsi(3, 1);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<3, 3, 3>::getShapeDerivOnPoint(const double* Point) {
+	std::vector<double> mi_DPsi(3 * 1);
 
-	DPsi(0, 0) = Point[0] - 0.5;
-	DPsi(1, 0) = Point[0] + 0.5;
-	DPsi(2, 0) = -2. * Point[0];
+	mi_DPsi.at(0) = Point[0] - 0.5;
+	mi_DPsi.at(1) = Point[0] + 0.5;
+	mi_DPsi.at(2) = -2. * Point[0];
 
-	return DPsi;
+	return mi_DPsi;
 };
 
-template<> inline Eigen::MatrixXd O2P2::Prep::Elem::Elem_Lin<3, 3, 4>::getShapeDerivOnPoint(const double* Point) {
-	Eigen::MatrixXd DPsi(3, 1);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<3, 3, 4>::getShapeDerivOnPoint(const double* Point) {
+	std::vector<double> mi_DPsi(3 * 1);
 
-	DPsi(0, 0) = Point[0] - 0.5;
-	DPsi(1, 0) = Point[0] + 0.5;
-	DPsi(2, 0) = -2. * Point[0];
+	mi_DPsi.at(0) = Point[0] - 0.5;
+	mi_DPsi.at(1) = Point[0] + 0.5;
+	mi_DPsi.at(2) = -2. * Point[0];
 
-	return DPsi;
+	return mi_DPsi;
 };
 
 
-template<> inline Eigen::MatrixXd O2P2::Prep::Elem::Elem_Lin<2, 4, 2>::getShapeDerivOnPoint(const double* Point) {
-	Eigen::MatrixXd DPsi(4, 1);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<2, 4, 2>::getShapeDerivOnPoint(const double* Point) {
+	std::vector<double> mi_DPsi(4 * 1);
 
-	DPsi(0, 0) = 0.0625 + (9.0 * Point[0]) / 8.0 - (27.0 * Point[0] * Point[0]) / 16.0;
-	DPsi(1, 0) = -1.6875 - (9.0 * Point[0]) / 8.0 + (81.0 * Point[0] * Point[0]) / 16.0;
-	DPsi(2, 0) = 1.6875 - (9.0 * Point[0]) / 8.0 - (81.0 * Point[0] * Point[0]) / 16.0;
-	DPsi(3, 0) = -0.0625 + (9.0 * Point[0]) / 8.0 + (27.0 * Point[0] * Point[0]) / 16.0;
+	mi_DPsi.at(0) = 0.0625 + (9.0 * Point[0]) / 8.0 - (27.0 * Point[0] * Point[0]) / 16.0;
+	mi_DPsi.at(1) = -1.6875 - (9.0 * Point[0]) / 8.0 + (81.0 * Point[0] * Point[0]) / 16.0;
+	mi_DPsi.at(2) = 1.6875 - (9.0 * Point[0]) / 8.0 - (81.0 * Point[0] * Point[0]) / 16.0;
+	mi_DPsi.at(3) = -0.0625 + (9.0 * Point[0]) / 8.0 + (27.0 * Point[0] * Point[0]) / 16.0;
 
-	return DPsi;
+	return mi_DPsi;
 };
 
-template<> inline Eigen::MatrixXd O2P2::Prep::Elem::Elem_Lin<2, 4, 3>::getShapeDerivOnPoint(const double* Point) {
-	Eigen::MatrixXd DPsi(4, 1);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<2, 4, 3>::getShapeDerivOnPoint(const double* Point) {
+	std::vector<double> mi_DPsi(4 * 1);
 
-	DPsi(0, 0) = 0.0625 + (9.0 * Point[0]) / 8.0 - (27.0 * Point[0] * Point[0]) / 16.0;
-	DPsi(1, 0) = -1.6875 - (9.0 * Point[0]) / 8.0 + (81.0 * Point[0] * Point[0]) / 16.0;
-	DPsi(2, 0) = 1.6875 - (9.0 * Point[0]) / 8.0 - (81.0 * Point[0] * Point[0]) / 16.0;
-	DPsi(3, 0) = -0.0625 + (9.0 * Point[0]) / 8.0 + (27.0 * Point[0] * Point[0]) / 16.0;
+	mi_DPsi.at(0) = 0.0625 + (9.0 * Point[0]) / 8.0 - (27.0 * Point[0] * Point[0]) / 16.0;
+	mi_DPsi.at(1) = -1.6875 - (9.0 * Point[0]) / 8.0 + (81.0 * Point[0] * Point[0]) / 16.0;
+	mi_DPsi.at(2) = 1.6875 - (9.0 * Point[0]) / 8.0 - (81.0 * Point[0] * Point[0]) / 16.0;
+	mi_DPsi.at(3) = -0.0625 + (9.0 * Point[0]) / 8.0 + (27.0 * Point[0] * Point[0]) / 16.0;
 
-	return DPsi;
+	return mi_DPsi;
 };
 
-template<> inline Eigen::MatrixXd O2P2::Prep::Elem::Elem_Lin<2, 4, 4>::getShapeDerivOnPoint(const double* Point) {
-	Eigen::MatrixXd DPsi(4, 1);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<2, 4, 4>::getShapeDerivOnPoint(const double* Point) {
+	std::vector<double> mi_DPsi(4 * 1);
 
-	DPsi(0, 0) = 0.0625 + (9.0 * Point[0]) / 8.0 - (27.0 * Point[0] * Point[0]) / 16.0;
-	DPsi(1, 0) = -1.6875 - (9.0 * Point[0]) / 8.0 + (81.0 * Point[0] * Point[0]) / 16.0;
-	DPsi(2, 0) = 1.6875 - (9.0 * Point[0]) / 8.0 - (81.0 * Point[0] * Point[0]) / 16.0;
-	DPsi(3, 0) = -0.0625 + (9.0 * Point[0]) / 8.0 + (27.0 * Point[0] * Point[0]) / 16.0;
+	mi_DPsi.at(0) = 0.0625 + (9.0 * Point[0]) / 8.0 - (27.0 * Point[0] * Point[0]) / 16.0;
+	mi_DPsi.at(1) = -1.6875 - (9.0 * Point[0]) / 8.0 + (81.0 * Point[0] * Point[0]) / 16.0;
+	mi_DPsi.at(2) = 1.6875 - (9.0 * Point[0]) / 8.0 - (81.0 * Point[0] * Point[0]) / 16.0;
+	mi_DPsi.at(3) = -0.0625 + (9.0 * Point[0]) / 8.0 + (27.0 * Point[0] * Point[0]) / 16.0;
 
-	return DPsi;
+	return mi_DPsi;
 };
 
-template<> inline Eigen::MatrixXd O2P2::Prep::Elem::Elem_Lin<3, 4, 2>::getShapeDerivOnPoint(const double* Point) {
-	Eigen::MatrixXd DPsi(4, 1);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<3, 4, 2>::getShapeDerivOnPoint(const double* Point) {
+	std::vector<double> mi_DPsi(4 * 1);
 
-	DPsi(0, 0) = 0.0625 + (9.0 * Point[0]) / 8.0 - (27.0 * Point[0] * Point[0]) / 16.0;
-	DPsi(1, 0) = -1.6875 - (9.0 * Point[0]) / 8.0 + (81.0 * Point[0] * Point[0]) / 16.0;
-	DPsi(2, 0) = 1.6875 - (9.0 * Point[0]) / 8.0 - (81.0 * Point[0] * Point[0]) / 16.0;
-	DPsi(3, 0) = -0.0625 + (9.0 * Point[0]) / 8.0 + (27.0 * Point[0] * Point[0]) / 16.0;
+	mi_DPsi.at(0) = 0.0625 + (9.0 * Point[0]) / 8.0 - (27.0 * Point[0] * Point[0]) / 16.0;
+	mi_DPsi.at(1) = -1.6875 - (9.0 * Point[0]) / 8.0 + (81.0 * Point[0] * Point[0]) / 16.0;
+	mi_DPsi.at(2) = 1.6875 - (9.0 * Point[0]) / 8.0 - (81.0 * Point[0] * Point[0]) / 16.0;
+	mi_DPsi.at(3) = -0.0625 + (9.0 * Point[0]) / 8.0 + (27.0 * Point[0] * Point[0]) / 16.0;
 
-	return DPsi;
+	return mi_DPsi;
 };
 
-template<> inline Eigen::MatrixXd O2P2::Prep::Elem::Elem_Lin<3, 4, 3>::getShapeDerivOnPoint(const double* Point) {
-	Eigen::MatrixXd DPsi(4, 1);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<3, 4, 3>::getShapeDerivOnPoint(const double* Point) {
+	std::vector<double> mi_DPsi(4 * 1);
 
-	DPsi(0, 0) = 0.0625 + (9.0 * Point[0]) / 8.0 - (27.0 * Point[0] * Point[0]) / 16.0;
-	DPsi(1, 0) = -1.6875 - (9.0 * Point[0]) / 8.0 + (81.0 * Point[0] * Point[0]) / 16.0;
-	DPsi(2, 0) = 1.6875 - (9.0 * Point[0]) / 8.0 - (81.0 * Point[0] * Point[0]) / 16.0;
-	DPsi(3, 0) = -0.0625 + (9.0 * Point[0]) / 8.0 + (27.0 * Point[0] * Point[0]) / 16.0;
+	mi_DPsi.at(0) = 0.0625 + (9.0 * Point[0]) / 8.0 - (27.0 * Point[0] * Point[0]) / 16.0;
+	mi_DPsi.at(1) = -1.6875 - (9.0 * Point[0]) / 8.0 + (81.0 * Point[0] * Point[0]) / 16.0;
+	mi_DPsi.at(2) = 1.6875 - (9.0 * Point[0]) / 8.0 - (81.0 * Point[0] * Point[0]) / 16.0;
+	mi_DPsi.at(3) = -0.0625 + (9.0 * Point[0]) / 8.0 + (27.0 * Point[0] * Point[0]) / 16.0;
 
-	return DPsi;
+	return mi_DPsi;
 };
 
-template<> inline Eigen::MatrixXd O2P2::Prep::Elem::Elem_Lin<3, 4, 4>::getShapeDerivOnPoint(const double* Point) {
-	Eigen::MatrixXd DPsi(4, 1);
+template<> inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<3, 4, 4>::getShapeDerivOnPoint(const double* Point) {
+	std::vector<double> mi_DPsi(4 * 1);
 
-	DPsi(0, 0) = 0.0625 + (9.0 * Point[0]) / 8.0 - (27.0 * Point[0] * Point[0]) / 16.0;
-	DPsi(1, 0) = -1.6875 - (9.0 * Point[0]) / 8.0 + (81.0 * Point[0] * Point[0]) / 16.0;
-	DPsi(2, 0) = 1.6875 - (9.0 * Point[0]) / 8.0 - (81.0 * Point[0] * Point[0]) / 16.0;
-	DPsi(3, 0) = -0.0625 + (9.0 * Point[0]) / 8.0 + (27.0 * Point[0] * Point[0]) / 16.0;
+	mi_DPsi.at(0) = 0.0625 + (9.0 * Point[0]) / 8.0 - (27.0 * Point[0] * Point[0]) / 16.0;
+	mi_DPsi.at(1) = -1.6875 - (9.0 * Point[0]) / 8.0 + (81.0 * Point[0] * Point[0]) / 16.0;
+	mi_DPsi.at(2) = 1.6875 - (9.0 * Point[0]) / 8.0 - (81.0 * Point[0] * Point[0]) / 16.0;
+	mi_DPsi.at(3) = -0.0625 + (9.0 * Point[0]) / 8.0 + (27.0 * Point[0] * Point[0]) / 16.0;
 
-	return DPsi;
+	return mi_DPsi;
 };
 
 
@@ -498,11 +498,11 @@ template<> inline Eigen::MatrixXd O2P2::Prep::Elem::Elem_Lin<3, 4, 4>::getShapeD
 template<int nDim, int nNodes, int nIP>
 inline void O2P2::Prep::Elem::Elem_Lin<nDim, nNodes, nIP>::setGeomProperties() {
 
-	// Allocate an array with size m_Dim to which m_Centroid points to.
-	this->m_Centroid = std::make_unique<double[]>(nDim);
+	// Allocate an array with size mv_Dim to which mv_Centroid points to.
+	this->mv_Centroid = std::make_unique<double[]>(nDim);
 
 	// Memory requested by make_unique is not empty
-	for (int i = 0; i < nDim; ++i) this->m_Centroid[i] = 0.;
+	for (int i = 0; i < nDim; ++i) this->mv_Centroid[i] = 0.;
 };
 
 
@@ -513,18 +513,18 @@ inline void O2P2::Prep::Elem::Elem_Lin<nDim, nNodes, nIP>::setGeomProperties() {
 // 
 // ================================================================================================
 template<int nDim, int nNodes, int nIP>
-inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Lin<nDim, nNodes, nIP>::getValueOnIPs(const double* value) {
+inline std::vector<double> O2P2::Prep::Elem::Elem_Lin<nDim, nNodes, nIP>::getValueOnIPs(const double* value) {
 
 	// return value
-	Eigen::VectorXd valueOnIp = Eigen::VectorXd::Zero(nNodes);
+	std::vector<double> mi_valueOnIp(nIP, 0.);
 
 	for (int i = 0; i < nIP; i++) {
 		for (int j = 0; j < nNodes; j++) {
-			valueOnIp(i) += value[i] * m_Psi[i][j];
+			mi_valueOnIp.at(i) += value[i] * mv_Psi[i][j];
 		}
 	}
 
-	return valueOnIp;
+	return mi_valueOnIp;
 };
 
 
@@ -533,96 +533,96 @@ inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Lin<nDim, nNodes, nIP>::getValueOn
 // Weights for numerical integration
 //
 // ================================================================================================
-template<> const double* O2P2::Prep::Elem::Elem_Lin<2, 2, 2>::m_weight = &Gauss1D::Wg_2P[0];
-template<> const double* O2P2::Prep::Elem::Elem_Lin<2, 3, 2>::m_weight = &Gauss1D::Wg_2P[0];
-template<> const double* O2P2::Prep::Elem::Elem_Lin<2, 4, 2>::m_weight = &Gauss1D::Wg_2P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Lin<2, 2, 2>::mv_weight = &Gauss1D::Wg_2P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Lin<2, 3, 2>::mv_weight = &Gauss1D::Wg_2P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Lin<2, 4, 2>::mv_weight = &Gauss1D::Wg_2P[0];
 
-template<> const double* O2P2::Prep::Elem::Elem_Lin<2, 2, 3>::m_weight = &Gauss1D::Wg_3P[0];
-template<> const double* O2P2::Prep::Elem::Elem_Lin<2, 3, 3>::m_weight = &Gauss1D::Wg_3P[0];
-template<> const double* O2P2::Prep::Elem::Elem_Lin<2, 4, 3>::m_weight = &Gauss1D::Wg_3P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Lin<2, 2, 3>::mv_weight = &Gauss1D::Wg_3P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Lin<2, 3, 3>::mv_weight = &Gauss1D::Wg_3P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Lin<2, 4, 3>::mv_weight = &Gauss1D::Wg_3P[0];
 
-template<> const double* O2P2::Prep::Elem::Elem_Lin<2, 2, 4>::m_weight = &Gauss1D::Wg_4P[0];
-template<> const double* O2P2::Prep::Elem::Elem_Lin<2, 3, 4>::m_weight = &Gauss1D::Wg_4P[0];
-template<> const double* O2P2::Prep::Elem::Elem_Lin<2, 4, 4>::m_weight = &Gauss1D::Wg_4P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Lin<2, 2, 4>::mv_weight = &Gauss1D::Wg_4P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Lin<2, 3, 4>::mv_weight = &Gauss1D::Wg_4P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Lin<2, 4, 4>::mv_weight = &Gauss1D::Wg_4P[0];
 
-template<> const double* O2P2::Prep::Elem::Elem_Lin<3, 2, 2>::m_weight = &Gauss1D::Wg_2P[0];
-template<> const double* O2P2::Prep::Elem::Elem_Lin<3, 3, 2>::m_weight = &Gauss1D::Wg_2P[0];
-template<> const double* O2P2::Prep::Elem::Elem_Lin<3, 4, 2>::m_weight = &Gauss1D::Wg_2P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Lin<3, 2, 2>::mv_weight = &Gauss1D::Wg_2P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Lin<3, 3, 2>::mv_weight = &Gauss1D::Wg_2P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Lin<3, 4, 2>::mv_weight = &Gauss1D::Wg_2P[0];
 
-template<> const double* O2P2::Prep::Elem::Elem_Lin<3, 2, 3>::m_weight = &Gauss1D::Wg_3P[0];
-template<> const double* O2P2::Prep::Elem::Elem_Lin<3, 3, 3>::m_weight = &Gauss1D::Wg_3P[0];
-template<> const double* O2P2::Prep::Elem::Elem_Lin<3, 4, 3>::m_weight = &Gauss1D::Wg_3P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Lin<3, 2, 3>::mv_weight = &Gauss1D::Wg_3P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Lin<3, 3, 3>::mv_weight = &Gauss1D::Wg_3P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Lin<3, 4, 3>::mv_weight = &Gauss1D::Wg_3P[0];
 
-template<> const double* O2P2::Prep::Elem::Elem_Lin<3, 2, 4>::m_weight = &Gauss1D::Wg_4P[0];
-template<> const double* O2P2::Prep::Elem::Elem_Lin<3, 3, 4>::m_weight = &Gauss1D::Wg_4P[0];
-template<> const double* O2P2::Prep::Elem::Elem_Lin<3, 4, 4>::m_weight = &Gauss1D::Wg_4P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Lin<3, 2, 4>::mv_weight = &Gauss1D::Wg_4P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Lin<3, 3, 4>::mv_weight = &Gauss1D::Wg_4P[0];
+template<> const double* O2P2::Prep::Elem::Elem_Lin<3, 4, 4>::mv_weight = &Gauss1D::Wg_4P[0];
 
 // ================================================================================================
 //
 // Shape functions
 //
 // ================================================================================================
-template<> const double O2P2::Prep::Elem::Elem_Lin<2, 2, 2>::m_Psi[2][2] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<2, 2, 2>::mv_Psi[2][2] = {
 	{ 0.5 - 0.5 * Gauss1D::Qsi_2P[0], 0.5 + 0.5 * Gauss1D::Qsi_2P[0] } ,
 	{ 0.5 - 0.5 * Gauss1D::Qsi_2P[1], 0.5 + 0.5 * Gauss1D::Qsi_2P[1] } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<2, 2, 3>::m_Psi[3][2] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<2, 2, 3>::mv_Psi[3][2] = {
 	{ 0.5 - 0.5 * Gauss1D::Qsi_3P[0], 0.5 + 0.5 * Gauss1D::Qsi_3P[0] } ,
 	{ 0.5 - 0.5 * Gauss1D::Qsi_3P[1], 0.5 + 0.5 * Gauss1D::Qsi_3P[1] } ,
 	{ 0.5 - 0.5 * Gauss1D::Qsi_3P[2], 0.5 + 0.5 * Gauss1D::Qsi_3P[2] } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<2, 2, 4>::m_Psi[4][2] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<2, 2, 4>::mv_Psi[4][2] = {
 	{ 0.5 - 0.5 * Gauss1D::Qsi_4P[0], 0.5 + 0.5 * Gauss1D::Qsi_4P[0] } ,
 	{ 0.5 - 0.5 * Gauss1D::Qsi_4P[1], 0.5 + 0.5 * Gauss1D::Qsi_4P[1] } ,
 	{ 0.5 - 0.5 * Gauss1D::Qsi_4P[2], 0.5 + 0.5 * Gauss1D::Qsi_4P[2] } ,
 	{ 0.5 - 0.5 * Gauss1D::Qsi_4P[3], 0.5 + 0.5 * Gauss1D::Qsi_4P[3] } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<3, 2, 2>::m_Psi[2][2] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<3, 2, 2>::mv_Psi[2][2] = {
 	{ 0.5 - 0.5 * Gauss1D::Qsi_2P[0], 0.5 + 0.5 * Gauss1D::Qsi_2P[0] } ,
 	{ 0.5 - 0.5 * Gauss1D::Qsi_2P[1], 0.5 + 0.5 * Gauss1D::Qsi_2P[1] } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<3, 2, 3>::m_Psi[3][2] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<3, 2, 3>::mv_Psi[3][2] = {
 	{ 0.5 - 0.5 * Gauss1D::Qsi_3P[0], 0.5 + 0.5 * Gauss1D::Qsi_3P[0] } ,
 	{ 0.5 - 0.5 * Gauss1D::Qsi_3P[1], 0.5 + 0.5 * Gauss1D::Qsi_3P[1] } ,
 	{ 0.5 - 0.5 * Gauss1D::Qsi_3P[2], 0.5 + 0.5 * Gauss1D::Qsi_3P[2] } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<3, 2, 4>::m_Psi[4][2] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<3, 2, 4>::mv_Psi[4][2] = {
 	{ 0.5 - 0.5 * Gauss1D::Qsi_4P[0], 0.5 + 0.5 * Gauss1D::Qsi_4P[0] } ,
 	{ 0.5 - 0.5 * Gauss1D::Qsi_4P[1], 0.5 + 0.5 * Gauss1D::Qsi_4P[1] } ,
 	{ 0.5 - 0.5 * Gauss1D::Qsi_4P[2], 0.5 + 0.5 * Gauss1D::Qsi_4P[2] } ,
 	{ 0.5 - 0.5 * Gauss1D::Qsi_4P[3], 0.5 + 0.5 * Gauss1D::Qsi_4P[3] } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<2, 3, 2>::m_Psi[2][3] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<2, 3, 2>::mv_Psi[2][3] = {
 	{ 0.5 * (Gauss1D::Qsi_2P[0] - 1.) * Gauss1D::Qsi_2P[0], 0.5 * (Gauss1D::Qsi_2P[0] + 1.) * Gauss1D::Qsi_2P[0],  (1. + Gauss1D::Qsi_2P[0]) * (1. - Gauss1D::Qsi_2P[0]) },
 	{ 0.5 * (Gauss1D::Qsi_2P[1] - 1.) * Gauss1D::Qsi_2P[1], 0.5 * (Gauss1D::Qsi_2P[1] + 1.) * Gauss1D::Qsi_2P[1],  (1. + Gauss1D::Qsi_2P[1]) * (1. - Gauss1D::Qsi_2P[1]) } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<2, 3, 3>::m_Psi[3][3] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<2, 3, 3>::mv_Psi[3][3] = {
 	{ 0.5 * (Gauss1D::Qsi_3P[0] - 1.) * Gauss1D::Qsi_3P[0], 0.5 * (Gauss1D::Qsi_3P[0] + 1.) * Gauss1D::Qsi_3P[0],  (1. + Gauss1D::Qsi_3P[0]) * (1. - Gauss1D::Qsi_3P[0]) },
 	{ 0.5 * (Gauss1D::Qsi_3P[1] - 1.) * Gauss1D::Qsi_3P[1], 0.5 * (Gauss1D::Qsi_3P[1] + 1.) * Gauss1D::Qsi_3P[1],  (1. + Gauss1D::Qsi_3P[1]) * (1. - Gauss1D::Qsi_3P[1]) },
 	{ 0.5 * (Gauss1D::Qsi_3P[2] - 1.) * Gauss1D::Qsi_3P[2], 0.5 * (Gauss1D::Qsi_3P[2] + 1.) * Gauss1D::Qsi_3P[2],  (1. + Gauss1D::Qsi_3P[2]) * (1. - Gauss1D::Qsi_3P[2]) } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<2, 3, 4>::m_Psi[4][3] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<2, 3, 4>::mv_Psi[4][3] = {
 	{ 0.5 * (Gauss1D::Qsi_4P[0] - 1.) * Gauss1D::Qsi_4P[0], 0.5 * (Gauss1D::Qsi_4P[0] + 1.) * Gauss1D::Qsi_4P[0],  (1. + Gauss1D::Qsi_4P[0]) * (1. - Gauss1D::Qsi_4P[0]) },
 	{ 0.5 * (Gauss1D::Qsi_4P[1] - 1.) * Gauss1D::Qsi_4P[1], 0.5 * (Gauss1D::Qsi_4P[1] + 1.) * Gauss1D::Qsi_4P[1],  (1. + Gauss1D::Qsi_4P[1]) * (1. - Gauss1D::Qsi_4P[1]) },
 	{ 0.5 * (Gauss1D::Qsi_4P[2] - 1.) * Gauss1D::Qsi_4P[2], 0.5 * (Gauss1D::Qsi_4P[2] + 1.) * Gauss1D::Qsi_4P[2],  (1. + Gauss1D::Qsi_4P[2]) * (1. - Gauss1D::Qsi_4P[2]) },
 	{ 0.5 * (Gauss1D::Qsi_4P[3] - 1.) * Gauss1D::Qsi_4P[3], 0.5 * (Gauss1D::Qsi_4P[3] + 1.) * Gauss1D::Qsi_4P[3],  (1. + Gauss1D::Qsi_4P[3]) * (1. - Gauss1D::Qsi_4P[3]) } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<3, 3, 2>::m_Psi[2][3] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<3, 3, 2>::mv_Psi[2][3] = {
 	{ 0.5 * (Gauss1D::Qsi_2P[0] - 1.) * Gauss1D::Qsi_2P[0], 0.5 * (Gauss1D::Qsi_2P[0] + 1.) * Gauss1D::Qsi_2P[0],  (1. + Gauss1D::Qsi_2P[0]) * (1. - Gauss1D::Qsi_2P[0]) },
 	{ 0.5 * (Gauss1D::Qsi_2P[1] - 1.) * Gauss1D::Qsi_2P[1], 0.5 * (Gauss1D::Qsi_2P[1] + 1.) * Gauss1D::Qsi_2P[1],  (1. + Gauss1D::Qsi_2P[1]) * (1. - Gauss1D::Qsi_2P[1]) } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<3, 3, 3>::m_Psi[3][3] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<3, 3, 3>::mv_Psi[3][3] = {
 	{ 0.5 * (Gauss1D::Qsi_3P[0] - 1.) * Gauss1D::Qsi_3P[0], 0.5 * (Gauss1D::Qsi_3P[0] + 1.) * Gauss1D::Qsi_3P[0],  (1. + Gauss1D::Qsi_3P[0]) * (1. - Gauss1D::Qsi_3P[0]) },
 	{ 0.5 * (Gauss1D::Qsi_3P[1] - 1.) * Gauss1D::Qsi_3P[1], 0.5 * (Gauss1D::Qsi_3P[1] + 1.) * Gauss1D::Qsi_3P[1],  (1. + Gauss1D::Qsi_3P[1]) * (1. - Gauss1D::Qsi_3P[1]) },
 	{ 0.5 * (Gauss1D::Qsi_3P[2] - 1.) * Gauss1D::Qsi_3P[2], 0.5 * (Gauss1D::Qsi_3P[2] + 1.) * Gauss1D::Qsi_3P[2],  (1. + Gauss1D::Qsi_3P[2]) * (1. - Gauss1D::Qsi_3P[2]) } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<3, 3, 4>::m_Psi[4][3] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<3, 3, 4>::mv_Psi[4][3] = {
 	{ 0.5 * (Gauss1D::Qsi_4P[0] - 1.) * Gauss1D::Qsi_4P[0], 0.5 * (Gauss1D::Qsi_4P[0] + 1.) * Gauss1D::Qsi_4P[0],  (1. + Gauss1D::Qsi_4P[0]) * (1. - Gauss1D::Qsi_4P[0]) },
 	{ 0.5 * (Gauss1D::Qsi_4P[1] - 1.) * Gauss1D::Qsi_4P[1], 0.5 * (Gauss1D::Qsi_4P[1] + 1.) * Gauss1D::Qsi_4P[1],  (1. + Gauss1D::Qsi_4P[1]) * (1. - Gauss1D::Qsi_4P[1]) },
 	{ 0.5 * (Gauss1D::Qsi_4P[2] - 1.) * Gauss1D::Qsi_4P[2], 0.5 * (Gauss1D::Qsi_4P[2] + 1.) * Gauss1D::Qsi_4P[2],  (1. + Gauss1D::Qsi_4P[2]) * (1. - Gauss1D::Qsi_4P[2]) },
 	{ 0.5 * (Gauss1D::Qsi_4P[3] - 1.) * Gauss1D::Qsi_4P[3], 0.5 * (Gauss1D::Qsi_4P[3] + 1.) * Gauss1D::Qsi_4P[3],  (1. + Gauss1D::Qsi_4P[3]) * (1. - Gauss1D::Qsi_4P[3]) } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<2, 4, 2>::m_Psi[2][4] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<2, 4, 2>::mv_Psi[2][4] = {
 	{ -0.0625 + Gauss1D::Qsi_2P[0] / 16.0 + (9.0 * Gauss1D::Qsi_2P[0] * Gauss1D::Qsi_2P[0]) / 16.0 - (9.0 * Gauss1D::Qsi_2P[0] * Gauss1D::Qsi_2P[0] * Gauss1D::Qsi_2P[0]) / 16.0,
 	   0.5625 - (27.0 * Gauss1D::Qsi_2P[0]) / 16.0 - (9.0 * Gauss1D::Qsi_2P[0] * Gauss1D::Qsi_2P[0]) / 16.0 + (27.0 * Gauss1D::Qsi_2P[0] * Gauss1D::Qsi_2P[0] * Gauss1D::Qsi_2P[0]) / 16.0,
 	   0.5625 + (27.0 * Gauss1D::Qsi_2P[0]) / 16.0 - (9.0 * Gauss1D::Qsi_2P[0] * Gauss1D::Qsi_2P[0]) / 16.0 - (27.0 * Gauss1D::Qsi_2P[0] * Gauss1D::Qsi_2P[0] * Gauss1D::Qsi_2P[0]) / 16.0,
@@ -633,7 +633,7 @@ template<> const double O2P2::Prep::Elem::Elem_Lin<2, 4, 2>::m_Psi[2][4] = {
 	   0.5625 + (27.0 * Gauss1D::Qsi_2P[1]) / 16.0 - (9.0 * Gauss1D::Qsi_2P[1] * Gauss1D::Qsi_2P[1]) / 16.0 - (27.0 * Gauss1D::Qsi_2P[1] * Gauss1D::Qsi_2P[1] * Gauss1D::Qsi_2P[1]) / 16.0,
 	  -0.0625 - Gauss1D::Qsi_2P[1] / 16.0 + (9.0 * Gauss1D::Qsi_2P[1] * Gauss1D::Qsi_2P[1]) / 16.0 + (9.0 * Gauss1D::Qsi_2P[1] * Gauss1D::Qsi_2P[1] * Gauss1D::Qsi_2P[1]) / 16.0 } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<2, 4, 3>::m_Psi[3][4] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<2, 4, 3>::mv_Psi[3][4] = {
 	{ -0.0625 + Gauss1D::Qsi_3P[0] / 16.0 + (9.0 * Gauss1D::Qsi_3P[0] * Gauss1D::Qsi_3P[0]) / 16.0 - (9.0 * Gauss1D::Qsi_3P[0] * Gauss1D::Qsi_3P[0] * Gauss1D::Qsi_3P[0]) / 16.0,
 	   0.5625 - (27.0 * Gauss1D::Qsi_3P[0]) / 16.0 - (9.0 * Gauss1D::Qsi_3P[0] * Gauss1D::Qsi_3P[0]) / 16.0 + (27.0 * Gauss1D::Qsi_3P[0] * Gauss1D::Qsi_3P[0] * Gauss1D::Qsi_3P[0]) / 16.0,
 	   0.5625 + (27.0 * Gauss1D::Qsi_3P[0]) / 16.0 - (9.0 * Gauss1D::Qsi_3P[0] * Gauss1D::Qsi_3P[0]) / 16.0 - (27.0 * Gauss1D::Qsi_3P[0] * Gauss1D::Qsi_3P[0] * Gauss1D::Qsi_3P[0]) / 16.0,
@@ -649,7 +649,7 @@ template<> const double O2P2::Prep::Elem::Elem_Lin<2, 4, 3>::m_Psi[3][4] = {
 	   0.5625 + (27.0 * Gauss1D::Qsi_3P[2]) / 16.0 - (9.0 * Gauss1D::Qsi_3P[2] * Gauss1D::Qsi_3P[2]) / 16.0 - (27.0 * Gauss1D::Qsi_3P[2] * Gauss1D::Qsi_3P[2] * Gauss1D::Qsi_3P[2]) / 16.0,
 	  -0.0625 - Gauss1D::Qsi_3P[2] / 16.0 + (9.0 * Gauss1D::Qsi_3P[2] * Gauss1D::Qsi_3P[2]) / 16.0 + (9.0 * Gauss1D::Qsi_3P[2] * Gauss1D::Qsi_3P[2] * Gauss1D::Qsi_3P[2]) / 16.0 } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<2, 4, 4>::m_Psi[4][4] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<2, 4, 4>::mv_Psi[4][4] = {
 	{ -0.0625 + Gauss1D::Qsi_4P[0] / 16.0 + (9.0 * Gauss1D::Qsi_4P[0] * Gauss1D::Qsi_4P[0]) / 16.0 - (9.0 * Gauss1D::Qsi_4P[0] * Gauss1D::Qsi_4P[0] * Gauss1D::Qsi_4P[0]) / 16.0,
 	   0.5625 - (27.0 * Gauss1D::Qsi_4P[0]) / 16.0 - (9.0 * Gauss1D::Qsi_4P[0] * Gauss1D::Qsi_4P[0]) / 16.0 + (27.0 * Gauss1D::Qsi_4P[0] * Gauss1D::Qsi_4P[0] * Gauss1D::Qsi_4P[0]) / 16.0,
 	   0.5625 + (27.0 * Gauss1D::Qsi_4P[0]) / 16.0 - (9.0 * Gauss1D::Qsi_4P[0] * Gauss1D::Qsi_4P[0]) / 16.0 - (27.0 * Gauss1D::Qsi_4P[0] * Gauss1D::Qsi_4P[0] * Gauss1D::Qsi_4P[0]) / 16.0,
@@ -670,7 +670,7 @@ template<> const double O2P2::Prep::Elem::Elem_Lin<2, 4, 4>::m_Psi[4][4] = {
 	   0.5625 + (27.0 * Gauss1D::Qsi_4P[3]) / 16.0 - (9.0 * Gauss1D::Qsi_4P[3] * Gauss1D::Qsi_4P[3]) / 16.0 - (27.0 * Gauss1D::Qsi_4P[3] * Gauss1D::Qsi_4P[3] * Gauss1D::Qsi_4P[3]) / 16.0,
 	  -0.0625 - Gauss1D::Qsi_4P[3] / 16.0 + (9.0 * Gauss1D::Qsi_4P[3] * Gauss1D::Qsi_4P[3]) / 16.0 + (9.0 * Gauss1D::Qsi_4P[3] * Gauss1D::Qsi_4P[3] * Gauss1D::Qsi_4P[3]) / 16.0 } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<3, 4, 2>::m_Psi[2][4] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<3, 4, 2>::mv_Psi[2][4] = {
 	{ -0.0625 + Gauss1D::Qsi_2P[0] / 16.0 + (9.0 * Gauss1D::Qsi_2P[0] * Gauss1D::Qsi_2P[0]) / 16.0 - (9.0 * Gauss1D::Qsi_2P[0] * Gauss1D::Qsi_2P[0] * Gauss1D::Qsi_2P[0]) / 16.0,
 	   0.5625 - (27.0 * Gauss1D::Qsi_2P[0]) / 16.0 - (9.0 * Gauss1D::Qsi_2P[0] * Gauss1D::Qsi_2P[0]) / 16.0 + (27.0 * Gauss1D::Qsi_2P[0] * Gauss1D::Qsi_2P[0] * Gauss1D::Qsi_2P[0]) / 16.0,
 	   0.5625 + (27.0 * Gauss1D::Qsi_2P[0]) / 16.0 - (9.0 * Gauss1D::Qsi_2P[0] * Gauss1D::Qsi_2P[0]) / 16.0 - (27.0 * Gauss1D::Qsi_2P[0] * Gauss1D::Qsi_2P[0] * Gauss1D::Qsi_2P[0]) / 16.0,
@@ -681,7 +681,7 @@ template<> const double O2P2::Prep::Elem::Elem_Lin<3, 4, 2>::m_Psi[2][4] = {
 	   0.5625 + (27.0 * Gauss1D::Qsi_2P[1]) / 16.0 - (9.0 * Gauss1D::Qsi_2P[1] * Gauss1D::Qsi_2P[1]) / 16.0 - (27.0 * Gauss1D::Qsi_2P[1] * Gauss1D::Qsi_2P[1] * Gauss1D::Qsi_2P[1]) / 16.0,
 	  -0.0625 - Gauss1D::Qsi_2P[1] / 16.0 + (9.0 * Gauss1D::Qsi_2P[1] * Gauss1D::Qsi_2P[1]) / 16.0 + (9.0 * Gauss1D::Qsi_2P[1] * Gauss1D::Qsi_2P[1] * Gauss1D::Qsi_2P[1]) / 16.0 } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<3, 4, 3>::m_Psi[3][4] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<3, 4, 3>::mv_Psi[3][4] = {
 	{ -0.0625 + Gauss1D::Qsi_3P[0] / 16.0 + (9.0 * Gauss1D::Qsi_3P[0] * Gauss1D::Qsi_3P[0]) / 16.0 - (9.0 * Gauss1D::Qsi_3P[0] * Gauss1D::Qsi_3P[0] * Gauss1D::Qsi_3P[0]) / 16.0,
 	   0.5625 - (27.0 * Gauss1D::Qsi_3P[0]) / 16.0 - (9.0 * Gauss1D::Qsi_3P[0] * Gauss1D::Qsi_3P[0]) / 16.0 + (27.0 * Gauss1D::Qsi_3P[0] * Gauss1D::Qsi_3P[0] * Gauss1D::Qsi_3P[0]) / 16.0,
 	   0.5625 + (27.0 * Gauss1D::Qsi_3P[0]) / 16.0 - (9.0 * Gauss1D::Qsi_3P[0] * Gauss1D::Qsi_3P[0]) / 16.0 - (27.0 * Gauss1D::Qsi_3P[0] * Gauss1D::Qsi_3P[0] * Gauss1D::Qsi_3P[0]) / 16.0,
@@ -697,7 +697,7 @@ template<> const double O2P2::Prep::Elem::Elem_Lin<3, 4, 3>::m_Psi[3][4] = {
 	   0.5625 + (27.0 * Gauss1D::Qsi_3P[2]) / 16.0 - (9.0 * Gauss1D::Qsi_3P[2] * Gauss1D::Qsi_3P[2]) / 16.0 - (27.0 * Gauss1D::Qsi_3P[2] * Gauss1D::Qsi_3P[2] * Gauss1D::Qsi_3P[2]) / 16.0,
 	  -0.0625 - Gauss1D::Qsi_3P[2] / 16.0 + (9.0 * Gauss1D::Qsi_3P[2] * Gauss1D::Qsi_3P[2]) / 16.0 + (9.0 * Gauss1D::Qsi_3P[2] * Gauss1D::Qsi_3P[2] * Gauss1D::Qsi_3P[2]) / 16.0 } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<3, 4, 4>::m_Psi[4][4] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<3, 4, 4>::mv_Psi[4][4] = {
 	{ -0.0625 + Gauss1D::Qsi_4P[0] / 16.0 + (9.0 * Gauss1D::Qsi_4P[0] * Gauss1D::Qsi_4P[0]) / 16.0 - (9.0 * Gauss1D::Qsi_4P[0] * Gauss1D::Qsi_4P[0] * Gauss1D::Qsi_4P[0]) / 16.0,
 	   0.5625 - (27.0 * Gauss1D::Qsi_4P[0]) / 16.0 - (9.0 * Gauss1D::Qsi_4P[0] * Gauss1D::Qsi_4P[0]) / 16.0 + (27.0 * Gauss1D::Qsi_4P[0] * Gauss1D::Qsi_4P[0] * Gauss1D::Qsi_4P[0]) / 16.0,
 	   0.5625 + (27.0 * Gauss1D::Qsi_4P[0]) / 16.0 - (9.0 * Gauss1D::Qsi_4P[0] * Gauss1D::Qsi_4P[0]) / 16.0 - (27.0 * Gauss1D::Qsi_4P[0] * Gauss1D::Qsi_4P[0] * Gauss1D::Qsi_4P[0]) / 16.0,
@@ -724,55 +724,55 @@ template<> const double O2P2::Prep::Elem::Elem_Lin<3, 4, 4>::m_Psi[4][4] = {
 // Shape functions derivative
 //
 // ================================================================================================
-template<> const double O2P2::Prep::Elem::Elem_Lin<2, 2, 2>::m_DPsi[2][2] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<2, 2, 2>::mv_DPsi[2][2] = {
 	{ -0.5, 0.5 }, { -0.5, 0.5 } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<2, 2, 3>::m_DPsi[3][2] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<2, 2, 3>::mv_DPsi[3][2] = {
 	{ -0.5, 0.5 }, { -0.5, 0.5 }, { -0.5, 0.5 } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<2, 2, 4>::m_DPsi[4][2] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<2, 2, 4>::mv_DPsi[4][2] = {
 	{ -0.5, 0.5 }, { -0.5, 0.5 }, { -0.5, 0.5 }, { -0.5, 0.5 } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<3, 2, 2>::m_DPsi[2][2] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<3, 2, 2>::mv_DPsi[2][2] = {
 	{ -0.5, 0.5 }, { -0.5, 0.5 } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<3, 2, 3>::m_DPsi[3][2] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<3, 2, 3>::mv_DPsi[3][2] = {
 	{ -0.5, 0.5 }, { -0.5, 0.5 }, { -0.5, 0.5 } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<3, 2, 4>::m_DPsi[4][2] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<3, 2, 4>::mv_DPsi[4][2] = {
 	{ -0.5, 0.5 }, { -0.5, 0.5 }, { -0.5, 0.5 }, { -0.5, 0.5 } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<2, 3, 2>::m_DPsi[2][3] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<2, 3, 2>::mv_DPsi[2][3] = {
 	{ Gauss1D::Qsi_2P[0] - 0.5, Gauss1D::Qsi_2P[0] + 0.5, -2. * Gauss1D::Qsi_2P[0] },
 	{ Gauss1D::Qsi_2P[1] - 0.5, Gauss1D::Qsi_2P[1] + 0.5, -2. * Gauss1D::Qsi_2P[1] } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<2, 3, 3>::m_DPsi[3][3] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<2, 3, 3>::mv_DPsi[3][3] = {
 	{ Gauss1D::Qsi_3P[0] - 0.5, Gauss1D::Qsi_3P[0] + 0.5, -2. * Gauss1D::Qsi_3P[0] },
 	{ Gauss1D::Qsi_3P[1] - 0.5, Gauss1D::Qsi_3P[1] + 0.5, -2. * Gauss1D::Qsi_3P[1] },
 	{ Gauss1D::Qsi_3P[2] - 0.5, Gauss1D::Qsi_3P[2] + 0.5, -2. * Gauss1D::Qsi_3P[2] } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<2, 3, 4>::m_DPsi[4][3] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<2, 3, 4>::mv_DPsi[4][3] = {
 	{ Gauss1D::Qsi_4P[0] - 0.5, Gauss1D::Qsi_4P[0] + 0.5, -2. * Gauss1D::Qsi_4P[0] },
 	{ Gauss1D::Qsi_4P[1] - 0.5, Gauss1D::Qsi_4P[1] + 0.5, -2. * Gauss1D::Qsi_4P[1] },
 	{ Gauss1D::Qsi_4P[2] - 0.5, Gauss1D::Qsi_4P[2] + 0.5, -2. * Gauss1D::Qsi_4P[2] },
 	{ Gauss1D::Qsi_4P[3] - 0.5, Gauss1D::Qsi_4P[3] + 0.5, -2. * Gauss1D::Qsi_4P[3] } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<3, 3, 2>::m_DPsi[2][3] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<3, 3, 2>::mv_DPsi[2][3] = {
 	{ Gauss1D::Qsi_2P[0] - 0.5, Gauss1D::Qsi_2P[0] + 0.5, -2. * Gauss1D::Qsi_2P[0] },
 	{ Gauss1D::Qsi_2P[1] - 0.5, Gauss1D::Qsi_2P[1] + 0.5, -2. * Gauss1D::Qsi_2P[1] } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<3, 3, 3>::m_DPsi[3][3] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<3, 3, 3>::mv_DPsi[3][3] = {
 	{ Gauss1D::Qsi_3P[0] - 0.5, Gauss1D::Qsi_3P[0] + 0.5, -2. * Gauss1D::Qsi_3P[0] },
 	{ Gauss1D::Qsi_3P[1] - 0.5, Gauss1D::Qsi_3P[1] + 0.5, -2. * Gauss1D::Qsi_3P[1] },
 	{ Gauss1D::Qsi_3P[2] - 0.5, Gauss1D::Qsi_3P[2] + 0.5, -2. * Gauss1D::Qsi_3P[2] } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<3, 3, 4>::m_DPsi[4][3] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<3, 3, 4>::mv_DPsi[4][3] = {
 	{ Gauss1D::Qsi_4P[0] - 0.5, Gauss1D::Qsi_4P[0] + 0.5, -2. * Gauss1D::Qsi_4P[0] },
 	{ Gauss1D::Qsi_4P[1] - 0.5, Gauss1D::Qsi_4P[1] + 0.5, -2. * Gauss1D::Qsi_4P[1] },
 	{ Gauss1D::Qsi_4P[2] - 0.5, Gauss1D::Qsi_4P[2] + 0.5, -2. * Gauss1D::Qsi_4P[2] },
 	{ Gauss1D::Qsi_4P[3] - 0.5, Gauss1D::Qsi_4P[3] + 0.5, -2. * Gauss1D::Qsi_4P[3] } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<2, 4, 2>::m_DPsi[2][4] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<2, 4, 2>::mv_DPsi[2][4] = {
 	{ 0.0625 + (9.0 * Gauss1D::Qsi_2P[0]) / 8.0 - (27.0 * Gauss1D::Qsi_2P[0] * Gauss1D::Qsi_2P[0]) / 16.0,
 	 -1.6875 - (9.0 * Gauss1D::Qsi_2P[0]) / 8.0 + (81.0 * Gauss1D::Qsi_2P[0] * Gauss1D::Qsi_2P[0]) / 16.0,
 	  1.6875 - (9.0 * Gauss1D::Qsi_2P[0]) / 8.0 - (81.0 * Gauss1D::Qsi_2P[0] * Gauss1D::Qsi_2P[0]) / 16.0,
@@ -783,7 +783,7 @@ template<> const double O2P2::Prep::Elem::Elem_Lin<2, 4, 2>::m_DPsi[2][4] = {
 	  1.6875 - (9.0 * Gauss1D::Qsi_2P[1]) / 8.0 - (81.0 * Gauss1D::Qsi_2P[1] * Gauss1D::Qsi_2P[1]) / 16.0,
 	 -0.0625 + (9.0 * Gauss1D::Qsi_2P[1]) / 8.0 + (27.0 * Gauss1D::Qsi_2P[1] * Gauss1D::Qsi_2P[1]) / 16.0 } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<2, 4, 3>::m_DPsi[3][4] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<2, 4, 3>::mv_DPsi[3][4] = {
 	{ 0.0625 + (9.0 * Gauss1D::Qsi_3P[0]) / 8.0 - (27.0 * Gauss1D::Qsi_3P[0] * Gauss1D::Qsi_3P[0]) / 16.0,
 	 -1.6875 - (9.0 * Gauss1D::Qsi_3P[0]) / 8.0 + (81.0 * Gauss1D::Qsi_3P[0] * Gauss1D::Qsi_3P[0]) / 16.0,
 	  1.6875 - (9.0 * Gauss1D::Qsi_3P[0]) / 8.0 - (81.0 * Gauss1D::Qsi_3P[0] * Gauss1D::Qsi_3P[0]) / 16.0,
@@ -799,7 +799,7 @@ template<> const double O2P2::Prep::Elem::Elem_Lin<2, 4, 3>::m_DPsi[3][4] = {
 	  1.6875 - (9.0 * Gauss1D::Qsi_3P[2]) / 8.0 - (81.0 * Gauss1D::Qsi_3P[2] * Gauss1D::Qsi_3P[2]) / 16.0,
 	 -0.0625 + (9.0 * Gauss1D::Qsi_3P[2]) / 8.0 + (27.0 * Gauss1D::Qsi_3P[2] * Gauss1D::Qsi_3P[2]) / 16.0 } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<2, 4, 4>::m_DPsi[4][4] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<2, 4, 4>::mv_DPsi[4][4] = {
 	{ 0.0625 + (9.0 * Gauss1D::Qsi_4P[0]) / 8.0 - (27.0 * Gauss1D::Qsi_4P[0] * Gauss1D::Qsi_4P[0]) / 16.0,
 	 -1.6875 - (9.0 * Gauss1D::Qsi_4P[0]) / 8.0 + (81.0 * Gauss1D::Qsi_4P[0] * Gauss1D::Qsi_4P[0]) / 16.0,
 	  1.6875 - (9.0 * Gauss1D::Qsi_4P[0]) / 8.0 - (81.0 * Gauss1D::Qsi_4P[0] * Gauss1D::Qsi_4P[0]) / 16.0,
@@ -820,7 +820,7 @@ template<> const double O2P2::Prep::Elem::Elem_Lin<2, 4, 4>::m_DPsi[4][4] = {
 	  1.6875 - (9.0 * Gauss1D::Qsi_4P[3]) / 8.0 - (81.0 * Gauss1D::Qsi_4P[3] * Gauss1D::Qsi_4P[3]) / 16.0,
 	 -0.0625 + (9.0 * Gauss1D::Qsi_4P[3]) / 8.0 + (27.0 * Gauss1D::Qsi_4P[3] * Gauss1D::Qsi_4P[3]) / 16.0 } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<3, 4, 2>::m_DPsi[2][4] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<3, 4, 2>::mv_DPsi[2][4] = {
 	{ 0.0625 + (9.0 * Gauss1D::Qsi_2P[0]) / 8.0 - (27.0 * Gauss1D::Qsi_2P[0] * Gauss1D::Qsi_2P[0]) / 16.0,
 	 -1.6875 - (9.0 * Gauss1D::Qsi_2P[0]) / 8.0 + (81.0 * Gauss1D::Qsi_2P[0] * Gauss1D::Qsi_2P[0]) / 16.0,
 	  1.6875 - (9.0 * Gauss1D::Qsi_2P[0]) / 8.0 - (81.0 * Gauss1D::Qsi_2P[0] * Gauss1D::Qsi_2P[0]) / 16.0,
@@ -831,7 +831,7 @@ template<> const double O2P2::Prep::Elem::Elem_Lin<3, 4, 2>::m_DPsi[2][4] = {
 	  1.6875 - (9.0 * Gauss1D::Qsi_2P[1]) / 8.0 - (81.0 * Gauss1D::Qsi_2P[1] * Gauss1D::Qsi_2P[1]) / 16.0,
 	 -0.0625 + (9.0 * Gauss1D::Qsi_2P[1]) / 8.0 + (27.0 * Gauss1D::Qsi_2P[1] * Gauss1D::Qsi_2P[1]) / 16.0 } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<3, 4, 3>::m_DPsi[3][4] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<3, 4, 3>::mv_DPsi[3][4] = {
 	{ 0.0625 + (9.0 * Gauss1D::Qsi_3P[0]) / 8.0 - (27.0 * Gauss1D::Qsi_3P[0] * Gauss1D::Qsi_3P[0]) / 16.0,
 	 -1.6875 - (9.0 * Gauss1D::Qsi_3P[0]) / 8.0 + (81.0 * Gauss1D::Qsi_3P[0] * Gauss1D::Qsi_3P[0]) / 16.0,
 	  1.6875 - (9.0 * Gauss1D::Qsi_3P[0]) / 8.0 - (81.0 * Gauss1D::Qsi_3P[0] * Gauss1D::Qsi_3P[0]) / 16.0,
@@ -847,7 +847,7 @@ template<> const double O2P2::Prep::Elem::Elem_Lin<3, 4, 3>::m_DPsi[3][4] = {
 	  1.6875 - (9.0 * Gauss1D::Qsi_3P[2]) / 8.0 - (81.0 * Gauss1D::Qsi_3P[2] * Gauss1D::Qsi_3P[2]) / 16.0,
 	 -0.0625 + (9.0 * Gauss1D::Qsi_3P[2]) / 8.0 + (27.0 * Gauss1D::Qsi_3P[2] * Gauss1D::Qsi_3P[2]) / 16.0 } };
 
-template<> const double O2P2::Prep::Elem::Elem_Lin<3, 4, 4>::m_DPsi[4][4] = {
+template<> const double O2P2::Prep::Elem::Elem_Lin<3, 4, 4>::mv_DPsi[4][4] = {
 	{ 0.0625 + (9.0 * Gauss1D::Qsi_4P[0]) / 8.0 - (27.0 * Gauss1D::Qsi_4P[0] * Gauss1D::Qsi_4P[0]) / 16.0,
 	 -1.6875 - (9.0 * Gauss1D::Qsi_4P[0]) / 8.0 + (81.0 * Gauss1D::Qsi_4P[0] * Gauss1D::Qsi_4P[0]) / 16.0,
 	  1.6875 - (9.0 * Gauss1D::Qsi_4P[0]) / 8.0 - (81.0 * Gauss1D::Qsi_4P[0] * Gauss1D::Qsi_4P[0]) / 16.0,

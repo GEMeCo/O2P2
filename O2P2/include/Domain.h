@@ -2,7 +2,7 @@
 // 
 // This file is part of O2P2, an object oriented environment for the positional FEM
 //
-// Copyright(C) 2022 Rogerio Carrazedo - All Rights Reserved.
+// Copyright(C) 2023 GEMeCO - All Rights Reserved.
 // 
 // This source code form is subject to the terms of the Apache License 2.0.
 // If a copy of Apache License 2.0 was not distributed with this file, you can obtain one at
@@ -15,9 +15,9 @@
 #include "Common.h"
 
 #include "Node.h"
-#include "Element.h"
 #include "Material.h"
 #include "Section.h"
+#include "Element.h"
 
 namespace O2P2 {
 	namespace Prep {
@@ -29,7 +29,7 @@ namespace O2P2 {
 		  * Node, Element, Material and Section.
 		  *
 		  * @tparam nDim The dimensionality of the problem. It is either 2 or 3 (bidimensional or tridimensional).
-		  * 
+		  *
 		  * @sa Node
 		  * @sa Element
 		  * @sa Material
@@ -42,13 +42,16 @@ namespace O2P2 {
 			// Default constructor
 			Domain() = delete;
 
-			// Domain is unique, therefore it should not be copied. Thus, copy constructor will be deleted.
+			// Domain is unique. Copy constructor will be deleted.
 			Domain(const Domain& other) = delete;
 
-			// Move constructor will also be deleted.
+			// Domain is unique. Move constructor will be deleted.
 			Domain(Domain&& other) = delete;
 
 		public:
+			// Default destructor
+			~Domain() = default;
+
 			/** The only constructor that there is. It resizes mesh containers (Node, Element, Section, Material)
 			  * @param nNodes Number of matrix nodes.
 			  * @param nElem Number of matrix elements.
@@ -56,17 +59,13 @@ namespace O2P2 {
 			  * @param nSec Number of cross sections.
 			  */
 			explicit Domain(const size_t& nNodes, const size_t& nElem, const size_t& nMat, const size_t& nSec) :
-				m_nNodes(nNodes), m_nElem(nElem), m_nMat(nMat), m_nSec(nSec) {
-
-				// Resize containers
-				v_Node.reserve(nNodes);
-				v_Mat.reserve(nMat);
-				v_Sect.reserve(nSec);
-				v_Elem.reserve(nElem);
+				mv_nNodes(nNodes), mv_nElem(nElem), mv_nMat(nMat), mv_nSec(nSec)
+			{
+				mv_Node.reserve(nNodes);
+				mv_Mat.reserve(nMat);
+				mv_Sect.reserve(nSec);
+				mv_Elem.reserve(nElem);
 			}
-
-			// Default destructor.
-			~Domain() = default;
 
 			/** Add a new node to the matrix node vector.
 			  * @param index Node indexing number.
@@ -84,18 +83,6 @@ namespace O2P2 {
 			  * @sa Material
 			  */
 			void addMaterial(const size_t& index, const MaterialType& matType, const std::vector<double> matParam);
-
-			/** Sets the material properties to the material with the input index. It throws an out_of_range exception if index is out of bounds.
-			  * @note There is no validation if container index and material index are the same.
-			  *
-			  * @param index Material container index number - Notice that this is NOT the material index.
-			  * @param Parameters Material parameters.
-			  *
-			  * @sa Material
-			  */
-			void addMaterialParam(const size_t& index, const std::vector<double>& Parameters) {
-				v_Mat.at(index)->setParameters(Parameters);
-			}
 
 			/** Add a new section to the container of cross sections.
 			  * @param data Section parameters.
@@ -121,64 +108,66 @@ namespace O2P2 {
 			  * @param index Element container index number - Notice that this is NOT the element index.
 			  * @param Conectivity Node incidence.
 			  */
-			void addElementConect(const size_t& index, const std::vector<size_t>& Conectivity);
+			void addElementConect(const size_t& index, const std::vector<size_t>& conectivity);
 
 			/** Get a single node from the Node container index.
 			  * @return a pointer to a single node.
 			  * @param index Node container index.
 			  */
 			const O2P2::Prep::Node<nDim>* getNode(const size_t& index) {
-				return v_Node.at(index).get();
+				return mv_Node.at(index).get();
 			}
 
 			/** Get access to the container of nodes.
 			  * @return a pointer to the node's container.
 			  * @note Direct access to node's container should be avoided. This was allowed for fasten up process.
 			  */
-			std::vector<std::shared_ptr<O2P2::Prep::Node<nDim>>>& getNode() { return v_Node; }
+			std::vector<std::shared_ptr<O2P2::Prep::Node<nDim>>>& getNode() { return mv_Node; }
 
 			/** Get a single element from the Element container index.
 			  * @return a pointer to a single element.
 			  * @param index Element container index.
 			  */
-			O2P2::Prep::Elem::Element<nDim>* getElem(const size_t& index) { return v_Elem.at(index).get(); }
+			const O2P2::Prep::Elem::Element<nDim>* getElem(const size_t& index) {
+				return mv_Elem.at(index).get();
+			}
 
 			/** Get access to the container of elements.
 			  * @return a pointer to the container of elements.
 			  * @note Direct access to element's container should be avoided. This was allowed for fasten up process.
 			  */
-			std::vector<std::shared_ptr<O2P2::Prep::Elem::Element<nDim>>>& getElem() { return v_Elem; }
+			std::vector<std::shared_ptr<O2P2::Prep::Elem::Element<nDim>>>& getElem() { return mv_Elem; }
 
 			/** @return Number of element' nodes.
 			  * @param index Element container index.
 			  */
-			int getNumNodes(const size_t& index) { return v_Elem.at(index)->getNumNodes(); }
+			int getNumNodes(const size_t& index) { return mv_Elem.at(index)->getNumNodes(); }
 
 		public:
 			/** @brief Number of geometry nodes. */
-			size_t m_nNodes;
+			size_t mv_nNodes;
 
 			/** @brief Number of geometry elements. */
-			size_t m_nElem;
+			size_t mv_nElem;
 
 			/** @brief Number of materials. */
-			size_t m_nMat;
+			size_t mv_nMat;
 
 			/** @brief Number of cross sections. */
-			size_t m_nSec;
+			size_t mv_nSec;
 
 		private:
 			// Container of Node objects.
-			std::vector<std::shared_ptr<O2P2::Prep::Node<nDim>>> v_Node;
+			std::vector<std::shared_ptr<O2P2::Prep::Node<nDim>>> mv_Node;
 
 			// Container of Material objects.
-			std::vector<std::shared_ptr<O2P2::Prep::Material>> v_Mat;
+			std::vector<std::shared_ptr<O2P2::Prep::Material>> mv_Mat;
 
 			// Container of Section objects.
-			std::vector<std::shared_ptr<O2P2::Prep::Section>> v_Sect;
+			std::vector<std::shared_ptr<O2P2::Prep::Section>> mv_Sect;
 
 			// Container of Element objects.
-			std::vector<std::shared_ptr<O2P2::Prep::Elem::Element<nDim>>> v_Elem;
+			std::vector<std::shared_ptr<O2P2::Prep::Elem::Element<nDim>>> mv_Elem;
 		};
 	} // End of Prep Namespace
 } // End of O2P2 Namespace

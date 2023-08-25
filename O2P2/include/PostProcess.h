@@ -2,7 +2,7 @@
 // 
 // This file is part of O2P2, an object oriented environment for the positional FEM
 //
-// Copyright(C) 2022 Rogerio Carrazedo - All Rights Reserved.
+// Copyright(C) 2023 GEMeCO - All Rights Reserved.
 // 
 // This source code form is subject to the terms of the Apache License 2.0.
 // If a copy of Apache License 2.0 was not distributed with this file, you can obtain one at
@@ -36,19 +36,19 @@ namespace O2P2 {
 			  * @param sol Vector with the solution obtained.
 			  */
 			void addSolution(double curTimeStep, std::vector<double>& sol) {
-				m_SolOnNode.emplace_back(std::make_pair(curTimeStep, sol));
+				mv_SolOnNode.emplace_back(std::make_pair(curTimeStep, sol));
 			}
 
 			/** Set the number of entries for post-processing.
 			  * @param entries Number of entries for post-processing.
 			  */
 			void setNumSteps(int entries) {
-				m_SolOnNode.reserve(entries);
+				mv_SolOnNode.reserve(entries);
 			}
 
 		public:
 			/** @brief Solution on each node dof, for each time step. */
-			std::vector<std::pair<double, std::vector<double>>> m_SolOnNode;
+			std::vector<std::pair<double, std::vector<double>>> mv_SolOnNode;
 
 			/** @brief Solution on each material point dof, for each time step. */
 			//std::vector<double> m_SolOnMatPoint;

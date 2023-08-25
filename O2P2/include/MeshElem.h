@@ -2,7 +2,7 @@
 // 
 // This file is part of O2P2, an object oriented environment for the positional FEM
 //
-// Copyright(C) 2022 Rogerio Carrazedo - All Rights Reserved.
+// Copyright(C) 2023 GEMeCO - All Rights Reserved.
 // 
 // This source code form is subject to the terms of the Apache License 2.0.
 // If a copy of Apache License 2.0 was not distributed with this file, you can obtain one at
@@ -14,18 +14,13 @@
 // C++ standard libraries
 #include <vector>		// required by std::vector
 #include <memory>		// required by std::shared_pointer
-#include <utility>		// required by std::make_pair
-#include <assert.h>		// required by assert
+#include <cassert>		// required by assert
 
 // Custom libraries
 #include "Element.h"
 #include "MeshNode.h"
 #include "MaterialPoint.h"
-
-// Eigen libraries
-#include <Eigen/Dense>
-#include <Eigen/Sparse>		// required by Triplets
-#include <Eigen/Geometry>	// required by .cross (Cross product)
+#include "M2S2/M2S2.h"
 
 namespace O2P2 {
 	namespace Proc {
@@ -46,56 +41,60 @@ namespace O2P2 {
 				virtual ~MeshElem() = default;
 
 				/** @return a reference to the elements Material object. */
-				O2P2::Prep::Material* getMaterial() { return m_pElem->getMaterial(); }
+				O2P2::Prep::Material* getMaterial() { return mv_pElem->getMaterial(); };
 
 				/** Prepare element contribution.
-				  * @param Hessian Element contribution to the hessian matrix.
 				  */
-				virtual void getContribution(Eigen::MatrixXd& Hessian) = 0;
+				virtual void getContribution() = 0;
 
 				/** Prepare element inertia contribution to hessian matrix.
 				  * @param mult Multiplier of the mass matrix (such as Damping and Density, which are not included).
-				  * @param Hessian Elemental hessian matrix.
 				  */
-				virtual void addMassContrib(const double& mult, Eigen::MatrixXd& Hessian) = 0;
+				virtual void addMassContrib(const double& mult) = 0;
 
 			protected:
 				/** Constructor for mechanical analysis elements, for SVK material model.
 				  * @param pElem Pointer to geometry element.
 				  * @param conect Mesh nodes indexing.
 				  */
-				MeshElem(std::shared_ptr<O2P2::Prep::Elem::BaseElement> pElem, std::vector<std::shared_ptr<O2P2::Proc::Comp::MeshNode>>& conect) {
+				MeshElem(std::shared_ptr<O2P2::Prep::Elem::BaseElement> pElem,
+					std::vector<std::shared_ptr<O2P2::Proc::Comp::MeshNode>>& conect)
+				{
 					// Store pointer to geometry element
-					m_pElem = pElem;
+					mv_pElem = pElem;
 					// Sets the number of DOF for current element
-					m_nDof = conect.size() * pElem->getNumNdDOF();
+					mv_nDof = conect.size() * pElem->getNumNdDOF();
 
-					// Set the size for the internal force vector and conectivity
-					m_elFor.resize(m_nDof);
-					v_Conect = std::move(conect);
+					// Set the size for the internal force vector, Hessian and conectivity
+					mv_elHes.resize(mv_nDof);
+					mv_elFor.resize(mv_nDof);
+					mv_elIndex.reserve(mv_nDof);
+					mv_conect = std::move(conect);
 				}
-
-			protected:
-				/** @brief Pointer to material point that holds information in the integration point. */
-				std::vector<std::unique_ptr<O2P2::Proc::Comp::MaterialPoint>> m_matPoint;
-
-				/** @brief Pointer to domain element. */
-				std::shared_ptr<O2P2::Prep::Elem::BaseElement> m_pElem;
 
 			public:
 				/** @brief Number of DOF for current element. */
-				int m_nDof;
-
-				/** @brief Vector with element indexing. */
-				std::vector<std::shared_ptr<O2P2::Proc::Comp::MeshNode>> v_Conect;
+				int mv_nDof;
 
 				/** @brief Vector with element contribution to Hessian matrix (used for parallelism). */
-				std::vector<Eigen::Triplet<double>> m_elHes;
+				M2S2::MatrixS mv_elHes;
 
 				/** @brief Vector with element contribution to internal force (used for parallelism). */
-				Eigen::VectorXd m_elFor;
-			};
+				std::vector<double> mv_elFor;
 
+				/** @brief Vector with dof indexing. */
+				std::vector<int> mv_elIndex;
+
+				/** @brief Vector with element indexing. */
+				std::vector<std::shared_ptr<O2P2::Proc::Comp::MeshNode>> mv_conect;
+
+			protected:
+				/** @brief Pointer to domain element. */
+				std::shared_ptr<O2P2::Prep::Elem::BaseElement> mv_pElem;
+
+				/** @brief Pointer to material point that holds information in the integration point. */
+				std::vector<std::unique_ptr<O2P2::Proc::Comp::MaterialPoint>> mv_matPoint;
+			};
 
 			/**
 			  * @class MeshElem_SVK
@@ -117,41 +116,42 @@ namespace O2P2 {
 				  * @param pElem Pointer to geometry element.
 				  * @param conect Mesh nodes indexing.
 				  */
-				explicit MeshElem_SVK(std::shared_ptr<O2P2::Prep::Elem::BaseElement> pElem, std::vector<std::shared_ptr<O2P2::Proc::Comp::MeshNode>>& conect)
-					: MeshElem(pElem, conect) {
-					this->m_matPoint.reserve(pElem->getNumIP());
+				explicit MeshElem_SVK(std::shared_ptr<O2P2::Prep::Elem::BaseElement> pElem,
+					std::vector<std::shared_ptr<O2P2::Proc::Comp::MeshNode>>& conect) :
+					MeshElem(pElem, conect) {
+					this->mv_matPoint.reserve(pElem->getNumIP());
 					this->setMaterialPoint();
+					this->setIndexing();
 				}
 
 				// Default destructor of private / protected pointers.
-				virtual ~MeshElem_SVK() = default;
+				~MeshElem_SVK() = default;
 
 				// Prepare element contribution.
-				void getContribution(Eigen::MatrixXd& Hessian) override;
+				void getContribution() override;
 
 				// Add element mass contribution to the Hessian.
-				void addMassContrib(const double& mult, Eigen::MatrixXd& Hessian) override;
+				void addMassContrib(const double& mult) override;
 
 			protected:
 				/** @brief Populates the material point vector. */
 				void setMaterialPoint();
 
-				/** @return the constitutive matrix (in Voigt notation).
-				  */
-				Eigen::MatrixXd getConstitutiveMatrix();
+				/** @brief Populates the indexing (DOF) vector. */
+				void setIndexing();
 
 				/** @return Young modulus for linear elements.
 				  */
 				double getYoungModulus();
 
-				/** Prepare element contribution of SVK_ISO material.
-				  * @param Hessian Element contribution to the hessian matrix.
-				  *
+				/** Prepare element contribution of SVK material.
 				  * @tparam nElDim The dimensionality of the element. It can be 1, 2 or 3 (linear, plane or solid).
 				  */
 				template<int nElDim>
-				void getContribution_SVK_ISO(Eigen::MatrixXd& Hessian);
+				void getContribution_SVK();
 			};
 		} // End of Comp Namespace
 	} // End of Proc Namespace
 } // End of O2P2 Namespace
+
+

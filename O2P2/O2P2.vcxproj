@@ -65,7 +65,7 @@
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(SolutionDir)O2P2\include;$(SolutionDir)O2P2\Libs\Eigen;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)O2P2\include;$(SolutionDir)O2P2\libraries;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMP>GenerateParallelCode</OpenMP>
     </ClCompile>
     <Link>
@@ -83,7 +83,7 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(SolutionDir)O2P2\include;$(SolutionDir)O2P2\Libs\Eigen;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)O2P2\include;$(SolutionDir)O2P2\libraries;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OpenMP>GenerateParallelCode</OpenMP>
     </ClCompile>
     <Link>
@@ -94,8 +94,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="O2P2.cpp" />
-    <ClCompile Include="O2P2_DOC.cpp" />
+    <ClCompile Include="source\O2P2.cpp" />
+    <ClCompile Include="source\O2P2_DOC.cpp" />
     <ClCompile Include="source\Mesh.cpp" />
     <ClCompile Include="source\Common.cpp" />
     <ClCompile Include="source\Domain.cpp" />
@@ -149,6 +149,7 @@
     <ClInclude Include="include\Profiler.h" />
     <ClInclude Include="include\Section.h" />
     <ClInclude Include="include\SolutionAlgorithm.h" />
+    <ClInclude Include="include\Solver.h" />
     <ClInclude Include="include\TimeStepping.h" />
     <ClInclude Include="include\MeshNode.h" />
   </ItemGroup>

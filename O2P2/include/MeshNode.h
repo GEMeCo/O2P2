@@ -2,7 +2,7 @@
 // 
 // This file is part of O2P2, an object oriented environment for the positional FEM
 //
-// Copyright(C) 2022 Rogerio Carrazedo - All Rights Reserved.
+// Copyright(C) 2023 GEMeCO - All Rights Reserved.
 // 
 // This source code form is subject to the terms of the Apache License 2.0.
 // If a copy of Apache License 2.0 was not distributed with this file, you can obtain one at
@@ -11,11 +11,7 @@
 // ================================================================================================
 #pragma once
 
-// C++ standard libraries
-#include <array>				// Standard array manipulation (fixed size)
-#include <vector>				// Standard vector manipulation
-#include <iomanip>				// Required by ios (stream)
-
+// Custom Header Files
 #include "Common.h"
 
 namespace O2P2 {
@@ -37,7 +33,7 @@ namespace O2P2 {
 				  * @param index Node DOF index (the first one).
 				  * @param Tp Temperature.
 				  */
-				MeshNode(const size_t& index, const double Tp = 0.) : m_DofIndex(index), m_Tp(Tp) {	}
+				explicit MeshNode(const size_t& index, const double Tp = 0.) : mv_DofIndex(index), mv_Tp(Tp) {}
 
 			public:
 				// Default destructor of private / protected pointers.
@@ -65,23 +61,23 @@ namespace O2P2 {
 				/** Retrieve current nodal temperature.
 				  * @return double with nodal temperature.
 				  */
-				const double& getCurTemp() { return m_Tp; }
+				const double& getCurTemp() { return mv_Tp; }
 
 				/** Retrieve current trial nodal temperature.
 				  * @return double with nodal trial temperature.
 				  */
-				const double& getTrialTemp() { return m_Tp; }
+				const double& getTrialTemp() { return mv_Tp; }
 
 				/** Update trial position / velocity / acceleration.
 				  * @param dPos Increase in the trial position and new values for velociy and acceleration (in a single vector, and only if applied).
-				  * @warning The size of dPos is not validated anywhere. Undoubtedly will lead to access error, if you don't know what you are doing. 
+				  * @warning The size of dPos is not validated anywhere. Undoubtedly will lead to access error, if you don't know what you are doing.
 				  */
 				virtual void updateTrial(const double dPos[]) = 0;
 
 				/** Update trial temperature.
 				  * @param dTp New value for trial temperature.
 				  */
-				void updateTrial(const double dTp) { m_Tp = dTp; }
+				void updateTrial(const double dTp) { mv_Tp = dTp; }
 
 				/** Commit trial to current. */
 				virtual void setCurrent() = 0;
@@ -91,11 +87,11 @@ namespace O2P2 {
 				virtual const int getNumDOF() = 0;
 
 				/** @brief Node DOF index. */
-				size_t m_DofIndex = 0;
+				size_t mv_DofIndex;
 
 			protected:
 				/** @brief Room / Commit temperature. */
-				double m_Tp;
+				double mv_Tp;
 			};
 
 
@@ -119,8 +115,8 @@ namespace O2P2 {
 				  * @param InitPos Initial position of the corresponding geometry node. Used to initialize trial position.
 				  * @param Tp Initial temperature.
 				  */
-				explicit MeshNode_MQS(const size_t& index, const std::array<double, nDim>& InitPos, const double Tp = 0.)
-					: MeshNode(index, Tp), v_Ytrial(InitPos), v_Ycommit(InitPos) { }
+				explicit MeshNode_MQS(const size_t& index, const std::array<double, nDim>& initPos, const double Tp = 0.)
+					: MeshNode(index, Tp), mv_Ytrial(initPos), mv_Ycommit(initPos) { }
 
 				// Default destructor of private / protected pointers.
 				~MeshNode_MQS() = default;
@@ -128,7 +124,7 @@ namespace O2P2 {
 				// Return a string with current position for printing.
 				const std::string print() const override {
 					std::string str;
-					for (auto& pos : v_Ycommit) {
+					for (auto& pos : mv_Ycommit) {
 						str.append(std::to_string(pos));
 						str.append(" ");
 					}
@@ -136,20 +132,20 @@ namespace O2P2 {
 				}
 
 				// Function to retrieve current nodal coordinates.
-				const double* getCurPos() override { return this->v_Ycommit.data(); }
+				const double* getCurPos() override { return this->mv_Ycommit.data(); }
 
 				// Function to retrieve current trial nodal coordinates.
-				const double* getTrialPos() override { return this->v_Ytrial.data(); }
+				const double* getTrialPos() override { return this->mv_Ytrial.data(); }
 
 				// Function to increase trial position.
 				void updateTrial(const double dPos[]) override {
 					for (int i = 0; i < nDim; ++i) {
-						this->v_Ytrial[i] += dPos[i];
+						this->mv_Ytrial.at(i) += dPos[i];
 					}
 				}
 
 				// Function to commit trial position to current.
-				void setCurrent() override { this->v_Ycommit = this->v_Ytrial; }
+				void setCurrent() override { this->mv_Ycommit = this->mv_Ytrial; }
 
 				/** @return the number of DOF per node.
 				  */
@@ -157,10 +153,10 @@ namespace O2P2 {
 
 			protected:
 				/** @brief Trial current position. */
-				std::array<double, nDim> v_Ytrial;
+				std::array<double, nDim> mv_Ytrial;
 
 				/** @brief Commit current position. */
-				std::array<double, nDim> v_Ycommit;
+				std::array<double, nDim> mv_Ycommit;
 			};
 
 
@@ -184,50 +180,50 @@ namespace O2P2 {
 				  * @param InitPos Initial position of the corresponding geometry node. Used to initialize trial position.
 				  * @param Tp Initial temperature.
 				  */
-				explicit MeshNode_MD(const size_t& index, const std::array<double, nDim>& InitPos, const double Tp = 0.)
-					: MeshNode_MQS<nDim>(index, InitPos, Tp) {
-					v_Vp.fill(0);
-					v_Vc.fill(0);
-					v_Ap.fill(0);
-					v_Ac.fill(0);
+				explicit MeshNode_MD(const size_t& index, const std::array<double, nDim>& initPos, const double Tp = 0.)
+					: MeshNode_MQS<nDim>(index, initPos, Tp) {
+					this->mv_Vp.fill(0.);
+					this->mv_Vc.fill(0.);
+					this->mv_Ap.fill(0.);
+					this->mv_Ac.fill(0.);
 				}
 
 				// Default destructor of private / protected pointers.
 				~MeshNode_MD() = default;
 
 				// Function to retrieve current nodal coordinates.
-				const double* getCurPos() override { return this->v_Ycommit.data(); }
+				const double* getCurPos() override { return this->mv_Ycommit.data(); }
 
 				// Function to retrieve current trial nodal coordinates.
-				const double* getTrialPos() override { return this->v_Ytrial.data(); }
+				const double* getTrialPos() override { return this->mv_Ytrial.data(); }
 
 				/** Retrieve previous velocity.
 				  * @return pointer to nodal previous velocity (with size nDim).
 				  */
-				const double* getPrevVel() { return v_Vp.data(); }
+				const double* getPrevVel() { return this->mv_Vp.data(); }
 
 				/** Retrieve current velocity.
 				  * @return pointer to nodal current velocity (with size nDim).
 				  */
-				const double* getCurVel() { return v_Vc.data(); }
+				const double* getCurVel() { return this->mv_Vc.data(); }
 
 				/** Retrieve previous acceleration.
 				  * @return pointer to nodal previous acceleration (with size nDim).
 				  */
-				const double* getPrevAcc() { return v_Ap.data(); }
+				const double* getPrevAcc() { return this->mv_Ap.data(); }
 
 				/** Retrieve current acceleration.
 				  * @return pointer to nodal current acceleration (with size nDim).
 				  */
-				const double* getCurAcc() { return v_Ac.data(); }
+				const double* getCurAcc() { return this->mv_Ac.data(); }
 
 				/** Initiates velocity.
 				  * @param Dir Direction of the imposed velocity.
 				  * @param value Imposed velocity.
 				  */
-				void setVel(int Dir, double value) { 
-					this->v_Vp[Dir] = value;
-					this->v_Vc[Dir] = value;
+				void setVel(int Dir, double value) {
+					this->mv_Vp.at(Dir) = value;
+					this->mv_Vc.at(Dir) = value;
 				}
 
 				/** Initiates acceleration.
@@ -235,45 +231,39 @@ namespace O2P2 {
 				  * @param value Imposed acceleration.
 				  */
 				void setAcc(int Dir, double value) {
-					this->v_Ap[Dir] = value;
-					this->v_Ac[Dir] = value;
+					this->mv_Ap.at(Dir) = value;
+					this->mv_Ac.at(Dir) = value;
 				}
-
 
 				// Update trial position, velocity and acceleration.
 				void updateTrial(const double dPos[]) override {
 					for (int i = 0; i < nDim; ++i) {
-						this->v_Ytrial[i] = dPos[i];
-						this->v_Vc[i] = dPos[nDim + i];
-						this->v_Ac[i] = dPos[2 * nDim + i];
+						this->mv_Ytrial.at(i) += dPos[i];
+						this->mv_Vc.at(i) = dPos[nDim + i];
+						this->mv_Ac.at(i) = dPos[2 * nDim + i];
 					}
 				}
 
 				// Function to commit trial position, velocity and acceleration to current.
 				void setCurrent() override { 
-					this->v_Ycommit = this->v_Ytrial;
-					this->v_Vp = this->v_Vc;
-					this->v_Ap = this->v_Ac;
+					this->mv_Ycommit = this->mv_Ytrial;
+					this->mv_Vp = this->mv_Vc;
+					this->mv_Ap = this->mv_Ac;
 				}
-
-				/** @return the number of DOF per node.
-				  */
-				const int getNumDOF() override { return nDim; }
 
 			protected:
 				/** @brief Previous velocity. */
-				std::array<double, nDim> v_Vp;
+				std::array<double, nDim> mv_Vp;
 
 				/** @brief Current velocity. */
-				std::array<double, nDim> v_Vc;
+				std::array<double, nDim> mv_Vc;
 
 				/** @brief Previous acceleration. */
-				std::array<double, nDim> v_Ap;
+				std::array<double, nDim> mv_Ap;
 
 				/** @brief Current acceleration. */
-				std::array<double, nDim> v_Ac;
+				std::array<double, nDim> mv_Ac;
 			};
-
 		} // End of Comp Namespace
 	} // End of Proc Namespace
 } // End of O2P2 Namespace

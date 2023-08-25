@@ -2,7 +2,7 @@
 // 
 // This file is part of O2P2, an object oriented environment for the positional FEM
 //
-// Copyright(C) 2022 Rogerio Carrazedo - All Rights Reserved.
+// Copyright(C) 2023 GEMeCO - All Rights Reserved.
 // 
 // This source code form is subject to the terms of the Apache License 2.0.
 // If a copy of Apache License 2.0 was not distributed with this file, you can obtain one at
@@ -12,16 +12,21 @@
 #pragma once
 
 // C++ standard libraries
+#include <string>			// standard string
+#include <iostream>			// standard input and output stream | also required by operator << overloading
+#include <sstream>			// required by istringstream
+#include <fstream>			// standard input and output stream in files
+#include <iomanip>			// required by std::setprecision / std::setw
+#include <stdexcept>		// standard exceptions (try, throw, catch)
 #include <memory>			// required by std::shared_ptr
 #include <vector>			// required by std::vector
-#include <string>			// standard string
-#include <stdexcept>		// standard exceptions (try, throw, catch)
-#include <fstream>			// standard input and output stream in files
-#include <iostream>			// standard input and output stream
-#include <sstream>			// required by istringstream
-#include <iomanip>			// Required by ios (stream)
-#include <map>				// standard map
+#include <array>			// required by std::array
+#include <map>				// required by std::map
+#include <algorithm>		// std::max / std::max_element
 #include <chrono>			// standard timing functions
+
+#include <algorithm>		// for_each
+#include <execution>		// parallel for_each
 
 // Profiler
 #include "Profiler.h"
@@ -40,8 +45,8 @@ std::ostream& formatFixed(std::ostream& os);
 std::ostream& formatScien(std::ostream& os);
 
 /**
- * @enum AnalysisType Type of analysis
-*/
+  * @enum AnalysisType Type of analysis
+  */
 enum struct AnalysisType {
 	STATIC,							/** @brief Quasi-estatic analysis */
 	TRANSIENT_1stORDER,				/** @brief First order transient analysis, such as heat transfer */
@@ -51,8 +56,8 @@ enum struct AnalysisType {
 };
 
 /**
- * @enum ProblemType Type of problem
-*/
+  * @enum ProblemType Type of problem
+  */
 enum struct ProblemType {
 	MECHANICAL,					/** @brief Only mechanical analysis */
 	THERMAL,					/** @brief Only Heat transfer analysis */
@@ -60,8 +65,8 @@ enum struct ProblemType {
 };
 
 /**
- * @enum NLSolverType Type of Nonlinear solver
-*/
+  * @enum NLSolverType Type of Nonlinear solver
+  */
 enum struct NLSolverType {
 	NEWTONRAPHSON,				/** @brief Newton-Raphson Method */
 	BFGS,						/** @brief Broyden–Fletcher–Goldfarb–Shanno Method */
@@ -70,8 +75,8 @@ enum struct NLSolverType {
 };
 
 /**
- * @enum MaterialType Material Type
-*/
+  * @enum MaterialType Material Type
+  */
 enum struct MaterialType {
 	SVK_ISO,					/** @brief Elastic isotropic, based on Saint-Venant-Kirchhof constitutive model */
 	SVK_ORT,					/** @brief Elastic orthotropic, based on Saint-Venant-Kirchhof constitutive model */
@@ -86,8 +91,8 @@ enum struct MaterialType {
 };
 
 /**
- * @enum PlaneStateType Plane State
-*/
+  * @enum PlaneStateType Plane State
+  */
 enum struct PlaneStateType {
 	PLANE_STRESS,				/** @brief Stress Plane State */
 	PLANE_STRAIN				/** @brief Strain Plane State */
@@ -105,6 +110,7 @@ extern std::map<MaterialType, std::string> MaterialTypeNames;
 extern std::map<PlaneStateType, std::string> PlaneStateTypeNames;
 extern std::map<OutputType, std::string> OutputTypeExtension;
 
+
 /**
  * @brief Timer class for basic profiling - it outputs log file
 */
@@ -115,7 +121,7 @@ struct Timer
 
 	/** @brief Register the timer end. */
 	std::chrono::time_point<std::chrono::steady_clock> end;
-	
+
 	/** @brief Function caller, just for output. */
 	std::string caller;
 

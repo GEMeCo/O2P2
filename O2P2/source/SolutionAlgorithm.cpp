@@ -2,7 +2,7 @@
 // 
 // This file is part of O2P2, an object oriented environment for the positional FEM
 //
-// Copyright(C) 2022 Rogerio Carrazedo - All Rights Reserved.
+// Copyright(C) 2023 GEMeCO - All Rights Reserved.
 // 
 // This source code form is subject to the terms of the Apache License 2.0.
 // If a copy of Apache License 2.0 was not distributed with this file, you can obtain one at
@@ -10,6 +10,7 @@
 // 
 // ================================================================================================
 #include "SolutionAlgorithm.h"
+
 
 // ================================================================================================
 //
@@ -22,39 +23,39 @@ template bool O2P2::Proc::SolutionAlgorithm::initFEM<3>(O2P2::Prep::Domain<3>* t
 template void O2P2::Proc::SolutionAlgorithm::runSolution<2>(O2P2::Prep::Domain<2>* theDomain);
 template void O2P2::Proc::SolutionAlgorithm::runSolution<3>(O2P2::Prep::Domain<3>* theDomain);
 
+
 // ================================================================================================
 //
-// Implementation of Template Member Function (2D and 3D): initFEModel
+// Implementation of Template Member Function (2D and 3D): initFEM
 //
 // ================================================================================================
-template<int nDim>
-bool O2P2::Proc::SolutionAlgorithm::initFEM(O2P2::Prep::Domain<nDim>* theDomain, O2P2::Post::PostProcess* thePost)
+template<int nDim> inline bool O2P2::Proc::SolutionAlgorithm::initFEM(O2P2::Prep::Domain<nDim>* theDomain, O2P2::Post::PostProcess* thePost)
 {
 	LOG("\nSolutionAlgorithm.initFEModel: Basic Definitions");
 	LOG("SolutionAlgorithm.initFEModel: Initiating DOF Mapping system");
 
-	switch (m_AnalysisType)
+	switch (mv_AnalysisType)
 	{
 	case AnalysisType::STATIC:
 	{
-		m_theFEModel = std::make_unique<O2P2::Proc::Mesh_MQS<nDim>>(theDomain, thePost);
-		O2P2::Proc::Mesh_MQS<nDim>* theModel = static_cast<O2P2::Proc::Mesh_MQS<nDim>*>(m_theFEModel.get());
+		mv_theFEModel = std::make_unique<O2P2::Proc::Mesh_MQS<nDim>>(theDomain, thePost);
+		O2P2::Proc::Mesh_MQS<nDim>* theModel = static_cast<O2P2::Proc::Mesh_MQS<nDim>*>(mv_theFEModel.get());
 		theModel->initMesh(theDomain);
 		break;
 	}
 	case AnalysisType::TRANSIENT_2ndORDER_NEWMARK:
 	{
-		m_theFEModel = std::make_unique<O2P2::Proc::Mesh_MD<nDim>>(theDomain, thePost);
-		O2P2::Proc::Mesh_MD<nDim>* theModel = static_cast<O2P2::Proc::Mesh_MD<nDim>*>(m_theFEModel.get());
+		mv_theFEModel = std::make_unique<O2P2::Proc::Mesh_MD<nDim>>(theDomain, thePost);
+		O2P2::Proc::Mesh_MD<nDim>* theModel = static_cast<O2P2::Proc::Mesh_MD<nDim>*>(mv_theFEModel.get());
 		theModel->initMesh(theDomain);
 		break;
 	}
-	default:
-		// if none, thows an error message
-		throw std::invalid_argument("\n\n\nUndefined time integration scheme\nCheck input file\n\n\n");
+	case AnalysisType::TRANSIENT_1stORDER:
+	case AnalysisType::TRANSIENT_2ndORDER_HHT_Alpha:
+	case AnalysisType::EIGENVALUE:
+	default: { throw std::invalid_argument("\n\nUndefined type of analysis\nCheck input file\n\n\n"); break; }
 	}
-
-	LOG("SolutionAlgorithm.initFEModel: Total number of DOF: " << std::to_string(m_theFEModel->getNumDof()));
+	LOG("SolutionAlgorithm.initFEModel: Total number of DOF: " << std::to_string(mv_theFEModel->getNumDof()));
 
 	return true;
 }
@@ -65,24 +66,22 @@ bool O2P2::Proc::SolutionAlgorithm::initFEM(O2P2::Prep::Domain<nDim>* theDomain,
 // Implementation of Template Member Function (2D and 3D): runSolutionAlgorithm
 //
 // ================================================================================================
-template<int nDim>
-void O2P2::Proc::SolutionAlgorithm::runSolution(O2P2::Prep::Domain<nDim>* theDomain)
+template<int nDim> inline void O2P2::Proc::SolutionAlgorithm::runSolution(O2P2::Prep::Domain<nDim>* theDomain)
 {
 	std::cout << "\n\n------------------------------------------------------------"
 		<< "\nIniting Solution Algorithm"
 		<< "\n------------------------------------------------------------";
 
-	// First loop -> Load Steps
-	for (int loadStep = 0; loadStep < m_numLoadSteps; ++loadStep)
+	for (int loadStep = 0; loadStep < mv_numLoadSteps; ++loadStep)
 	{
 		LOG("\nSolutionAlgorithm.runSolutionAlgorithm: Current LoadStep: " << std::to_string(loadStep + 1));
 		std::cout << "\nLoad Step = " << loadStep + 1
 			<< "\n------------------------------------------------------------";
 
 		// Setup Dirichlet boundary conditions
-		m_theFEModel->initDirichletBC(loadStep);
+		mv_theFEModel->initDirichletBC(loadStep);
 
 		// Second loop -> Time Stepping
-		m_theTimeStep->runTimeLoop(m_theFEModel.get(), m_theNLSolver.get());
+		mv_theTimeStep->runTimeLoop(mv_theFEModel.get(), mv_theNLSolver.get());
 	}
 }

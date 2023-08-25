@@ -2,7 +2,7 @@
 // 
 // This file is part of O2P2, an object oriented environment for the positional FEM
 //
-// Copyright(C) 2022 Rogerio Carrazedo - All Rights Reserved.
+// Copyright(C) 2023 GEMeCO - All Rights Reserved.
 // 
 // This source code form is subject to the terms of the Apache License 2.0.
 // If a copy of Apache License 2.0 was not distributed with this file, you can obtain one at
@@ -44,30 +44,30 @@ namespace O2P2 {
 				const std::string printByIndex_AV(const size_t add) const override {
 					std::stringstream msg;
 
-					msg << "2 3 " << this->v_Conect[0]->m_index + add << " " << this->v_Conect[1]->m_index + add << " " << this->v_Conect[2]->m_index + add << " " << this->v_Conect[3]->m_index + add << " "
-						<< this->v_Conect[4]->m_index + add << " " << this->v_Conect[5]->m_index + add << " " << this->v_Conect[6]->m_index + add << " " << this->v_Conect[7]->m_index + add << " "
-						<< this->v_Conect[8]->m_index + add << " " << this->v_Conect[9]->m_index + add << " " << this->m_Mat->m_index << "\n";
-					//msg << "2 3 " << this->v_Conect[10]->m_index + add << " " << this->v_Conect[11]->m_index + add << " " << this->v_Conect[12]->m_index + add << " " << this->v_Conect[13]->m_index + add << " "
-					//	<< this->v_Conect[14]->m_index + add << " " << this->v_Conect[15]->m_index + add << " " << this->v_Conect[16]->m_index + add << " " << this->v_Conect[17]->m_index + add << " "
-					//	<< this->v_Conect[18]->m_index + add << " " << this->v_Conect[19]->m_index + add << " " << this->m_Mat->m_index << "\n";
-					//msg << "2 3 " << this->v_Conect[20]->m_index + add << " " << this->v_Conect[21]->m_index + add << " " << this->v_Conect[22]->m_index + add << " " << this->v_Conect[23]->m_index + add << " "
-					//	<< this->v_Conect[24]->m_index + add << " " << this->v_Conect[25]->m_index + add << " " << this->v_Conect[26]->m_index + add << " " << this->v_Conect[27]->m_index + add << " "
-					//	<< this->v_Conect[28]->m_index + add << " " << this->v_Conect[29]->m_index + add << " " << this->m_Mat->m_index << "\n";
-					msg << "2 3 " << this->v_Conect[30]->m_index + add << " " << this->v_Conect[31]->m_index + add << " " << this->v_Conect[32]->m_index + add << " " << this->v_Conect[33]->m_index + add << " "
-						<< this->v_Conect[34]->m_index + add << " " << this->v_Conect[35]->m_index + add << " " << this->v_Conect[36]->m_index + add << " " << this->v_Conect[37]->m_index + add << " "
-						<< this->v_Conect[38]->m_index + add << " " << this->v_Conect[39]->m_index + add << " " << this->m_Mat->m_index << "\n";
-					msg << "3 3 " << this->v_Conect[0]->m_index + add << " " << this->v_Conect[1]->m_index + add << " " << this->v_Conect[2]->m_index + add << " " << this->v_Conect[3]->m_index + add << " "
-						<< this->v_Conect[10]->m_index + add << " " << this->v_Conect[11]->m_index + add << " " << this->v_Conect[12]->m_index + add << " " << this->v_Conect[13]->m_index + add << " "
-						<< this->v_Conect[20]->m_index + add << " " << this->v_Conect[21]->m_index + add << " " << this->v_Conect[22]->m_index + add << " " << this->v_Conect[23]->m_index + add << " "
-						<< this->v_Conect[30]->m_index + add << " " << this->v_Conect[31]->m_index + add << " " << this->v_Conect[32]->m_index + add << " " << this->v_Conect[33]->m_index + add << " " << this->m_Mat->m_index << "\n";
-					msg << "3 3 " << this->v_Conect[3]->m_index + add << " " << this->v_Conect[6]->m_index + add << " " << this->v_Conect[8]->m_index + add << " " << this->v_Conect[9]->m_index + add << " "
-						<< this->v_Conect[13]->m_index + add << " " << this->v_Conect[16]->m_index + add << " " << this->v_Conect[18]->m_index + add << " " << this->v_Conect[19]->m_index + add << " "
-						<< this->v_Conect[23]->m_index + add << " " << this->v_Conect[26]->m_index + add << " " << this->v_Conect[28]->m_index + add << " " << this->v_Conect[29]->m_index + add << " "
-						<< this->v_Conect[33]->m_index + add << " " << this->v_Conect[36]->m_index + add << " " << this->v_Conect[38]->m_index + add << " " << this->v_Conect[39]->m_index + add << " " << this->m_Mat->m_index << "\n";
-					msg << "3 3 " << this->v_Conect[0]->m_index + add << " " << this->v_Conect[4]->m_index + add << " " << this->v_Conect[7]->m_index + add << " " << this->v_Conect[9]->m_index + add << " "
-						<< this->v_Conect[10]->m_index + add << " " << this->v_Conect[14]->m_index + add << " " << this->v_Conect[17]->m_index + add << " " << this->v_Conect[19]->m_index + add << " "
-						<< this->v_Conect[20]->m_index + add << " " << this->v_Conect[24]->m_index + add << " " << this->v_Conect[27]->m_index + add << " " << this->v_Conect[29]->m_index + add << " "
-						<< this->v_Conect[30]->m_index + add << " " << this->v_Conect[34]->m_index + add << " " << this->v_Conect[37]->m_index + add << " " << this->v_Conect[39]->m_index + add << " " << this->m_Mat->m_index << "\n";
+					msg << "2 3 " << this->mv_Conect[0]->mv_index + add << " " << this->mv_Conect[1]->mv_index + add << " " << this->mv_Conect[2]->mv_index + add << " " << this->mv_Conect[3]->mv_index + add << " "
+						<< this->mv_Conect[4]->mv_index + add << " " << this->mv_Conect[5]->mv_index + add << " " << this->mv_Conect[6]->mv_index + add << " " << this->mv_Conect[7]->mv_index + add << " "
+						<< this->mv_Conect[8]->mv_index + add << " " << this->mv_Conect[9]->mv_index + add << " " << this->mv_Mat->mv_index << "\n";
+					//msg << "2 3 " << this->mv_Conect[10]->mv_index + add << " " << this->mv_Conect[11]->mv_index + add << " " << this->mv_Conect[12]->mv_index + add << " " << this->mv_Conect[13]->mv_index + add << " "
+					//	<< this->mv_Conect[14]->mv_index + add << " " << this->mv_Conect[15]->mv_index + add << " " << this->mv_Conect[16]->mv_index + add << " " << this->mv_Conect[17]->mv_index + add << " "
+					//	<< this->mv_Conect[18]->mv_index + add << " " << this->mv_Conect[19]->mv_index + add << " " << this->mv_Mat->mv_index << "\n";
+					//msg << "2 3 " << this->mv_Conect[20]->mv_index + add << " " << this->mv_Conect[21]->mv_index + add << " " << this->mv_Conect[22]->mv_index + add << " " << this->mv_Conect[23]->mv_index + add << " "
+					//	<< this->mv_Conect[24]->mv_index + add << " " << this->mv_Conect[25]->mv_index + add << " " << this->mv_Conect[26]->mv_index + add << " " << this->mv_Conect[27]->mv_index + add << " "
+					//	<< this->mv_Conect[28]->mv_index + add << " " << this->mv_Conect[29]->mv_index + add << " " << this->mv_Mat->mv_index << "\n";
+					msg << "2 3 " << this->mv_Conect[30]->mv_index + add << " " << this->mv_Conect[31]->mv_index + add << " " << this->mv_Conect[32]->mv_index + add << " " << this->mv_Conect[33]->mv_index + add << " "
+						<< this->mv_Conect[34]->mv_index + add << " " << this->mv_Conect[35]->mv_index + add << " " << this->mv_Conect[36]->mv_index + add << " " << this->mv_Conect[37]->mv_index + add << " "
+						<< this->mv_Conect[38]->mv_index + add << " " << this->mv_Conect[39]->mv_index + add << " " << this->mv_Mat->mv_index << "\n";
+					msg << "3 3 " << this->mv_Conect[0]->mv_index + add << " " << this->mv_Conect[1]->mv_index + add << " " << this->mv_Conect[2]->mv_index + add << " " << this->mv_Conect[3]->mv_index + add << " "
+						<< this->mv_Conect[10]->mv_index + add << " " << this->mv_Conect[11]->mv_index + add << " " << this->mv_Conect[12]->mv_index + add << " " << this->mv_Conect[13]->mv_index + add << " "
+						<< this->mv_Conect[20]->mv_index + add << " " << this->mv_Conect[21]->mv_index + add << " " << this->mv_Conect[22]->mv_index + add << " " << this->mv_Conect[23]->mv_index + add << " "
+						<< this->mv_Conect[30]->mv_index + add << " " << this->mv_Conect[31]->mv_index + add << " " << this->mv_Conect[32]->mv_index + add << " " << this->mv_Conect[33]->mv_index + add << " " << this->mv_Mat->mv_index << "\n";
+					msg << "3 3 " << this->mv_Conect[3]->mv_index + add << " " << this->mv_Conect[6]->mv_index + add << " " << this->mv_Conect[8]->mv_index + add << " " << this->mv_Conect[9]->mv_index + add << " "
+						<< this->mv_Conect[13]->mv_index + add << " " << this->mv_Conect[16]->mv_index + add << " " << this->mv_Conect[18]->mv_index + add << " " << this->mv_Conect[19]->mv_index + add << " "
+						<< this->mv_Conect[23]->mv_index + add << " " << this->mv_Conect[26]->mv_index + add << " " << this->mv_Conect[28]->mv_index + add << " " << this->mv_Conect[29]->mv_index + add << " "
+						<< this->mv_Conect[33]->mv_index + add << " " << this->mv_Conect[36]->mv_index + add << " " << this->mv_Conect[38]->mv_index + add << " " << this->mv_Conect[39]->mv_index + add << " " << this->mv_Mat->mv_index << "\n";
+					msg << "3 3 " << this->mv_Conect[0]->mv_index + add << " " << this->mv_Conect[4]->mv_index + add << " " << this->mv_Conect[7]->mv_index + add << " " << this->mv_Conect[9]->mv_index + add << " "
+						<< this->mv_Conect[10]->mv_index + add << " " << this->mv_Conect[14]->mv_index + add << " " << this->mv_Conect[17]->mv_index + add << " " << this->mv_Conect[19]->mv_index + add << " "
+						<< this->mv_Conect[20]->mv_index + add << " " << this->mv_Conect[24]->mv_index + add << " " << this->mv_Conect[27]->mv_index + add << " " << this->mv_Conect[29]->mv_index + add << " "
+						<< this->mv_Conect[30]->mv_index + add << " " << this->mv_Conect[34]->mv_index + add << " " << this->mv_Conect[37]->mv_index + add << " " << this->mv_Conect[39]->mv_index + add << " " << this->mv_Mat->mv_index << "\n";
 
 					return msg.str();
 				}
@@ -77,66 +77,66 @@ namespace O2P2 {
 					std::stringstream msg;
 
 					msg << "2 3 " << (1 + add) << " " << (2 + add) << " " << (3 + add) << " " << (4 + add) << " " << (5 + add) << " " << (6 + add) << " " << (7 + add) << " "
-						<< (8 + add) << " " << (9 + add) << " " << (10 + add) << " " << this->m_Mat->m_index << "\n";
+						<< (8 + add) << " " << (9 + add) << " " << (10 + add) << " " << this->mv_Mat->mv_index << "\n";
 					//msg << "2 3 " << (11 + add) << " " << (12 + add) << " " << (13 + add) << " " << (14 + add) << " " << (15 + add) << " " << (16 + add) << " " << (17 + add) << " "
-					//	<< (18 + add) << " " << (19 + add) << " " << (20 + add) << " " <<  this->m_Mat->m_index << "\n";
+					//	<< (18 + add) << " " << (19 + add) << " " << (20 + add) << " " <<  this->mv_Mat->mv_index << "\n";
 					//msg << "2 3 " << (21 + add) << " " << (22 + add) << " " << (23 + add) << " " << (24 + add) << " " << (25 + add) << " " << (26 + add) << " " << (27 + add) << " "
-					//	<< (28 + add) << " " << (29 + add) << " " << (30 + add) << " " <<  this->m_Mat->m_index << "\n";
+					//	<< (28 + add) << " " << (29 + add) << " " << (30 + add) << " " <<  this->mv_Mat->mv_index << "\n";
 					msg << "2 3 " << (31 + add) << " " << (32 + add) << " " << (33 + add) << " " << (34 + add) << " " << (35 + add) << " " << (36 + add) << " " << (37 + add) << " "
-						<< (38 + add) << " " << (39 + add) << " " << (40 + add) << " " << this->m_Mat->m_index << "\n";
+						<< (38 + add) << " " << (39 + add) << " " << (40 + add) << " " << this->mv_Mat->mv_index << "\n";
 					msg << "3 3 " << (1 + add) << " " << (2 + add) << " " << (3 + add) << " " << (4 + add) << " " << (11 + add) << " " << (12 + add) << " " << (13 + add) << " " << (14 + add) << " "
-						<< (21 + add) << " " << (22 + add) << " " << (23 + add) << " " << (24 + add) << " " << (31 + add) << " " << (32 + add) << " " << (33 + add) << " " << (34 + add) << " " << this->m_Mat->m_index << "\n";
+						<< (21 + add) << " " << (22 + add) << " " << (23 + add) << " " << (24 + add) << " " << (31 + add) << " " << (32 + add) << " " << (33 + add) << " " << (34 + add) << " " << this->mv_Mat->mv_index << "\n";
 					msg << "3 3 " << (4 + add) << " " << (7 + add) << " " << (9 + add) << " " << (10 + add) << " " << (14 + add) << " " << (17 + add) << " " << (19 + add) << " " << (20 + add) << " "
-						<< (24 + add) << " " << (27 + add) << " " << (29 + add) << " " << (30 + add) << " " << (34 + add) << " " << (37 + add) << " " << (39 + add) << " " << (40 + add) << " " << this->m_Mat->m_index << "\n";
+						<< (24 + add) << " " << (27 + add) << " " << (29 + add) << " " << (30 + add) << " " << (34 + add) << " " << (37 + add) << " " << (39 + add) << " " << (40 + add) << " " << this->mv_Mat->mv_index << "\n";
 					msg << "3 3 " << (1 + add) << " " << (5 + add) << " " << (8 + add) << " " << (10 + add) << " " << (11 + add) << " " << (15 + add) << " " << (18 + add) << " " << (20 + add) << " "
-						<< (21 + add) << " " << (25 + add) << " " << (28 + add) << " " << (30 + add) << " " << (31 + add) << " " << (35 + add) << " " << (38 + add) << " " << (40 + add) << " " << this->m_Mat->m_index << "\n";
+						<< (21 + add) << " " << (25 + add) << " " << (28 + add) << " " << (30 + add) << " " << (31 + add) << " " << (35 + add) << " " << (38 + add) << " " << (40 + add) << " " << this->mv_Mat->mv_index << "\n";
 
 					return msg.str();
 				}
 
 				// Evaluates shape function in the point.
-				Eigen::VectorXd getShapeFcOnPoint(const double* Point) override;
+				std::vector<double> getShapeFcOnPoint(const double* Point) override;
 
 				// Evaluates the derivative of shape function in the point.
-				Eigen::MatrixXd getShapeDerivOnPoint(const double* Point) override;
+				std::vector<double> getShapeDerivOnPoint(const double* Point) override;
 
 				// Return a vector with values on the integration points currently known in the element' nodes.
-				Eigen::VectorXd getValueOnIPs(const double* value) override;
+				std::vector<double> getValueOnIPs(const double* value) override;
 
-				// Returns a pointer to the first element of the shape functions (with size [nIP][m_NumNodes]).
-				double const* getShapeFc() const override { return &m_Psi[0][0]; }
+				// Returns a pointer to the first element of the shape functions (with size [nIP][mv_numNodes]).
+				double const* getShapeFc() const override { return &mv_Psi[0][0]; }
 
-				// Returns a pointer to the first element of the derivative of shape functions (with size [nIP][m_NumNodes][m_Dim]).
-				double const* getShapeDerivative() const override { return &m_DPsi[0][0][0]; }
+				// Returns a pointer to the first element of the derivative of shape functions (with size [nIP][mv_numNodes][mv_Dim]).
+				double const* getShapeDerivative() const override { return &mv_DPsi[0][0][0]; }
 
 				// Returns a pointer to the weight of the integation points (with size [nIP]).
-				double const* getWeight() const override { return &m_weight[0]; }
+				double const* getWeight() const override { return &mv_weight[0]; }
 
 				// Returns the number of nodes of current element.
-				int getNumNodes() override { return m_NumNodes; }
+				int getNumNodes() override { return mv_numNodes; }
 
 				// Returns the number of faces of current element.
-				int getNumFaces() override { return m_NumFaces; }
+				int getNumFaces() override { return mv_numFaces; }
 
 				// Returns the number of integration points of current element.
-				int getNumIP() override { return m_NumIP; }
+				int getNumIP() override { return mv_numIP; }
 
 				/** Verifies dimensionless coordinates from input - if it is immersed on the element.
 				  * @return True if input falls within the element.
 				  * @param xsi Trial dimensionless coordinates.
 				  */
-				bool evaluateXsi(const std::array<double, m_Dim> xsi) override {
+				inline bool evaluateXsi(const std::array<double, mv_Dim> xsi) override {
 
-					std::array<double, m_Dim + 1> new_xsi = {};
+					std::array<double, mv_Dim + 1> new_xsi = {};
 
-					for (int i = 0; i < m_Dim - 1; ++i) {
+					for (int i = 0; i < mv_Dim - 1; ++i) {
 						new_xsi.at(i) = xsi.at(i);
-						new_xsi.at(m_Dim - 1) -= xsi.at(i);
+						new_xsi.at(mv_Dim - 1) -= xsi.at(i);
 					}
-					new_xsi.at(m_Dim - 1) += 1.;
-					new_xsi.at(m_Dim) = xsi.at(m_Dim - 1);
+					new_xsi.at(mv_Dim - 1) += 1.;
+					new_xsi.at(mv_Dim) = xsi.at(mv_Dim - 1);
 
-					if (*std::max_element(new_xsi.begin(), new_xsi.end()) < 1.000001 && *std::min_element(new_xsi.begin(), new_xsi.end() - 1) > -0.000001 && new_xsi.at(m_Dim) > -1.000001) return true;
+					if (*std::max_element(new_xsi.begin(), new_xsi.end()) < 1.000001 && *std::min_element(new_xsi.begin(), new_xsi.end() - 1) > -0.000001 && new_xsi.at(mv_Dim) > -1.000001) return true;
 					return false;
 				}
 
@@ -146,25 +146,25 @@ namespace O2P2 {
 
 			private:
 				/** @brief Number of Nodes */
-				static const int m_NumNodes{ 40 };
+				static const int mv_numNodes{ 40 };
 
 				/** @brief Number of Integration Points */
-				static const int m_NumIP{ 28 };
+				static const int mv_numIP{ 28 };
 
 				/** @brief Number of Faces */
-				static const int m_NumFaces{ 5 };
+				static const int mv_numFaces{ 5 };
 
 				/** @brief Weights for numerical integration */
-				static const double m_weight[m_NumIP];
+				static const double mv_weight[mv_numIP];
 
 				/** @brief Shape functions */
-				static const double m_Psi[m_NumIP][m_NumNodes];
+				static const double mv_Psi[mv_numIP][mv_numNodes];
 
 				/** @brief Shape functions derivative */
-				static const double m_DPsi[m_NumIP][m_NumNodes][m_Dim];
+				static const double mv_DPsi[mv_numIP][mv_numNodes][mv_Dim];
 
 				/** @brief Integration points */
-				static const double m_xsi[m_NumIP][m_Dim];
+				static const double m_xsi[mv_numIP][mv_Dim];
 			};
 		} // End of Elem Namespace
 	} // End of Prep Namespace
@@ -177,51 +177,51 @@ namespace O2P2 {
 // Shape functions evaluated on Point
 // 
 // ================================================================================================
-inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Pri40::getShapeFcOnPoint(const double* Point) {
-	Eigen::VectorXd Psi(40);
+inline std::vector<double> O2P2::Prep::Elem::Elem_Pri40::getShapeFcOnPoint(const double* Point) {
+	std::vector<double> mi_Psi(40);
 
-	Psi(0) = (-4.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] - 13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] * Point[1] + 9. * Point[0] * Point[0] + 18. * Point[0] * Point[1] + 9. * Point[1] * Point[1] - 5.5 * Point[0] - 5.5 * Point[1] + 1.) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
-	Psi(1) = (13.5 * Point[0] * Point[0] * Point[0] + 27. * Point[0] * Point[0] * Point[1] + 13.5 * Point[0] * Point[1] * Point[1] - 22.5 * Point[0] * Point[0] - 22.5 * Point[0] * Point[1] + 9. * Point[0]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
-	Psi(2) = (-13.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] + 18. * Point[0] * Point[0] + 4.5 * Point[0] * Point[1] - 4.5 * Point[0]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
-	Psi(3) = (4.5 * Point[0] * Point[0] * Point[0] - 4.5 * Point[0] * Point[0] + Point[0]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
-	Psi(4) = (13.5 * Point[0] * Point[0] * Point[1] + 27. * Point[0] * Point[1] * Point[1] + 13.5 * Point[1] * Point[1] * Point[1] - 22.5 * Point[0] * Point[1] - 22.5 * Point[1] * Point[1] + 9. * Point[1]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
-	Psi(5) = (-27. * Point[0] * Point[0] * Point[1] - 27. * Point[0] * Point[1] * Point[1] + 27. * Point[0] * Point[1]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
-	Psi(6) = (13.5 * Point[0] * Point[0] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
-	Psi(7) = (-13.5 * Point[0] * Point[1] * Point[1] - 13.5 * Point[1] * Point[1] * Point[1] + 4.5 * Point[0] * Point[1] + 18. * Point[1] * Point[1] - 4.5 * Point[1]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
-	Psi(8) = (13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
-	Psi(9) = (4.5 * Point[1] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] + Point[1]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
-	Psi(10) = (-4.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] - 13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] * Point[1] + 9. * Point[0] * Point[0] + 18. * Point[0] * Point[1] + 9. * Point[1] * Point[1] - 5.5 * Point[0] - 5.5 * Point[1] + 1.) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
-	Psi(11) = (13.5 * Point[0] * Point[0] * Point[0] + 27. * Point[0] * Point[0] * Point[1] + 13.5 * Point[0] * Point[1] * Point[1] - 22.5 * Point[0] * Point[0] - 22.5 * Point[0] * Point[1] + 9. * Point[0]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
-	Psi(12) = (-13.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] + 18. * Point[0] * Point[0] + 4.5 * Point[0] * Point[1] - 4.5 * Point[0]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
-	Psi(13) = (4.5 * Point[0] * Point[0] * Point[0] - 4.5 * Point[0] * Point[0] + Point[0]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
-	Psi(14) = (13.5 * Point[0] * Point[0] * Point[1] + 27. * Point[0] * Point[1] * Point[1] + 13.5 * Point[1] * Point[1] * Point[1] - 22.5 * Point[0] * Point[1] - 22.5 * Point[1] * Point[1] + 9. * Point[1]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
-	Psi(15) = (-27. * Point[0] * Point[0] * Point[1] - 27. * Point[0] * Point[1] * Point[1] + 27. * Point[0] * Point[1]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
-	Psi(16) = (13.5 * Point[0] * Point[0] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
-	Psi(17) = (-13.5 * Point[0] * Point[1] * Point[1] - 13.5 * Point[1] * Point[1] * Point[1] + 4.5 * Point[0] * Point[1] + 18. * Point[1] * Point[1] - 4.5 * Point[1]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
-	Psi(18) = (13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
-	Psi(19) = (4.5 * Point[1] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] + Point[1]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
-	Psi(20) = (-4.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] - 13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] * Point[1] + 9. * Point[0] * Point[0] + 18. * Point[0] * Point[1] + 9. * Point[1] * Point[1] - 5.5 * Point[0] - 5.5 * Point[1] + 1.) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
-	Psi(21) = (13.5 * Point[0] * Point[0] * Point[0] + 27. * Point[0] * Point[0] * Point[1] + 13.5 * Point[0] * Point[1] * Point[1] - 22.5 * Point[0] * Point[0] - 22.5 * Point[0] * Point[1] + 9. * Point[0]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
-	Psi(22) = (-13.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] + 18. * Point[0] * Point[0] + 4.5 * Point[0] * Point[1] - 4.5 * Point[0]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
-	Psi(23) = (4.5 * Point[0] * Point[0] * Point[0] - 4.5 * Point[0] * Point[0] + Point[0]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
-	Psi(24) = (13.5 * Point[0] * Point[0] * Point[1] + 27. * Point[0] * Point[1] * Point[1] + 13.5 * Point[1] * Point[1] * Point[1] - 22.5 * Point[0] * Point[1] - 22.5 * Point[1] * Point[1] + 9. * Point[1]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
-	Psi(25) = (-27. * Point[0] * Point[0] * Point[1] - 27. * Point[0] * Point[1] * Point[1] + 27. * Point[0] * Point[1]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
-	Psi(26) = (13.5 * Point[0] * Point[0] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
-	Psi(27) = (-13.5 * Point[0] * Point[1] * Point[1] - 13.5 * Point[1] * Point[1] * Point[1] + 4.5 * Point[0] * Point[1] + 18. * Point[1] * Point[1] - 4.5 * Point[1]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
-	Psi(28) = (13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
-	Psi(29) = (4.5 * Point[1] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] + Point[1]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
-	Psi(30) = (-4.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] - 13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] * Point[1] + 9. * Point[0] * Point[0] + 18. * Point[0] * Point[1] + 9. * Point[1] * Point[1] - 5.5 * Point[0] - 5.5 * Point[1] + 1.) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
-	Psi(31) = (13.5 * Point[0] * Point[0] * Point[0] + 27. * Point[0] * Point[0] * Point[1] + 13.5 * Point[0] * Point[1] * Point[1] - 22.5 * Point[0] * Point[0] - 22.5 * Point[0] * Point[1] + 9. * Point[0]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
-	Psi(32) = (-13.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] + 18. * Point[0] * Point[0] + 4.5 * Point[0] * Point[1] - 4.5 * Point[0]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
-	Psi(33) = (4.5 * Point[0] * Point[0] * Point[0] - 4.5 * Point[0] * Point[0] + Point[0]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
-	Psi(34) = (13.5 * Point[0] * Point[0] * Point[1] + 27. * Point[0] * Point[1] * Point[1] + 13.5 * Point[1] * Point[1] * Point[1] - 22.5 * Point[0] * Point[1] - 22.5 * Point[1] * Point[1] + 9. * Point[1]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
-	Psi(35) = (-27. * Point[0] * Point[0] * Point[1] - 27. * Point[0] * Point[1] * Point[1] + 27. * Point[0] * Point[1]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
-	Psi(36) = (13.5 * Point[0] * Point[0] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
-	Psi(37) = (-13.5 * Point[0] * Point[1] * Point[1] - 13.5 * Point[1] * Point[1] * Point[1] + 4.5 * Point[0] * Point[1] + 18. * Point[1] * Point[1] - 4.5 * Point[1]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
-	Psi(38) = (13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
-	Psi(39) = (4.5 * Point[1] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] + Point[1]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
+	mi_Psi.at(0) = (-4.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] - 13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] * Point[1] + 9. * Point[0] * Point[0] + 18. * Point[0] * Point[1] + 9. * Point[1] * Point[1] - 5.5 * Point[0] - 5.5 * Point[1] + 1.) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
+	mi_Psi.at(1) = (13.5 * Point[0] * Point[0] * Point[0] + 27. * Point[0] * Point[0] * Point[1] + 13.5 * Point[0] * Point[1] * Point[1] - 22.5 * Point[0] * Point[0] - 22.5 * Point[0] * Point[1] + 9. * Point[0]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
+	mi_Psi.at(2) = (-13.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] + 18. * Point[0] * Point[0] + 4.5 * Point[0] * Point[1] - 4.5 * Point[0]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
+	mi_Psi.at(3) = (4.5 * Point[0] * Point[0] * Point[0] - 4.5 * Point[0] * Point[0] + Point[0]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
+	mi_Psi.at(4) = (13.5 * Point[0] * Point[0] * Point[1] + 27. * Point[0] * Point[1] * Point[1] + 13.5 * Point[1] * Point[1] * Point[1] - 22.5 * Point[0] * Point[1] - 22.5 * Point[1] * Point[1] + 9. * Point[1]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
+	mi_Psi.at(5) = (-27. * Point[0] * Point[0] * Point[1] - 27. * Point[0] * Point[1] * Point[1] + 27. * Point[0] * Point[1]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
+	mi_Psi.at(6) = (13.5 * Point[0] * Point[0] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
+	mi_Psi.at(7) = (-13.5 * Point[0] * Point[1] * Point[1] - 13.5 * Point[1] * Point[1] * Point[1] + 4.5 * Point[0] * Point[1] + 18. * Point[1] * Point[1] - 4.5 * Point[1]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
+	mi_Psi.at(8) = (13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
+	mi_Psi.at(9) = (4.5 * Point[1] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] + Point[1]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
+	mi_Psi.at(10) = (-4.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] - 13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] * Point[1] + 9. * Point[0] * Point[0] + 18. * Point[0] * Point[1] + 9. * Point[1] * Point[1] - 5.5 * Point[0] - 5.5 * Point[1] + 1.) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
+	mi_Psi.at(11) = (13.5 * Point[0] * Point[0] * Point[0] + 27. * Point[0] * Point[0] * Point[1] + 13.5 * Point[0] * Point[1] * Point[1] - 22.5 * Point[0] * Point[0] - 22.5 * Point[0] * Point[1] + 9. * Point[0]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
+	mi_Psi.at(12) = (-13.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] + 18. * Point[0] * Point[0] + 4.5 * Point[0] * Point[1] - 4.5 * Point[0]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
+	mi_Psi.at(13) = (4.5 * Point[0] * Point[0] * Point[0] - 4.5 * Point[0] * Point[0] + Point[0]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
+	mi_Psi.at(14) = (13.5 * Point[0] * Point[0] * Point[1] + 27. * Point[0] * Point[1] * Point[1] + 13.5 * Point[1] * Point[1] * Point[1] - 22.5 * Point[0] * Point[1] - 22.5 * Point[1] * Point[1] + 9. * Point[1]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
+	mi_Psi.at(15) = (-27. * Point[0] * Point[0] * Point[1] - 27. * Point[0] * Point[1] * Point[1] + 27. * Point[0] * Point[1]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
+	mi_Psi.at(16) = (13.5 * Point[0] * Point[0] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
+	mi_Psi.at(17) = (-13.5 * Point[0] * Point[1] * Point[1] - 13.5 * Point[1] * Point[1] * Point[1] + 4.5 * Point[0] * Point[1] + 18. * Point[1] * Point[1] - 4.5 * Point[1]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
+	mi_Psi.at(18) = (13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
+	mi_Psi.at(19) = (4.5 * Point[1] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] + Point[1]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
+	mi_Psi.at(20) = (-4.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] - 13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] * Point[1] + 9. * Point[0] * Point[0] + 18. * Point[0] * Point[1] + 9. * Point[1] * Point[1] - 5.5 * Point[0] - 5.5 * Point[1] + 1.) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
+	mi_Psi.at(21) = (13.5 * Point[0] * Point[0] * Point[0] + 27. * Point[0] * Point[0] * Point[1] + 13.5 * Point[0] * Point[1] * Point[1] - 22.5 * Point[0] * Point[0] - 22.5 * Point[0] * Point[1] + 9. * Point[0]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
+	mi_Psi.at(22) = (-13.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] + 18. * Point[0] * Point[0] + 4.5 * Point[0] * Point[1] - 4.5 * Point[0]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
+	mi_Psi.at(23) = (4.5 * Point[0] * Point[0] * Point[0] - 4.5 * Point[0] * Point[0] + Point[0]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
+	mi_Psi.at(24) = (13.5 * Point[0] * Point[0] * Point[1] + 27. * Point[0] * Point[1] * Point[1] + 13.5 * Point[1] * Point[1] * Point[1] - 22.5 * Point[0] * Point[1] - 22.5 * Point[1] * Point[1] + 9. * Point[1]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
+	mi_Psi.at(25) = (-27. * Point[0] * Point[0] * Point[1] - 27. * Point[0] * Point[1] * Point[1] + 27. * Point[0] * Point[1]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
+	mi_Psi.at(26) = (13.5 * Point[0] * Point[0] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
+	mi_Psi.at(27) = (-13.5 * Point[0] * Point[1] * Point[1] - 13.5 * Point[1] * Point[1] * Point[1] + 4.5 * Point[0] * Point[1] + 18. * Point[1] * Point[1] - 4.5 * Point[1]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
+	mi_Psi.at(28) = (13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
+	mi_Psi.at(29) = (4.5 * Point[1] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] + Point[1]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
+	mi_Psi.at(30) = (-4.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] - 13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] * Point[1] + 9. * Point[0] * Point[0] + 18. * Point[0] * Point[1] + 9. * Point[1] * Point[1] - 5.5 * Point[0] - 5.5 * Point[1] + 1.) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
+	mi_Psi.at(31) = (13.5 * Point[0] * Point[0] * Point[0] + 27. * Point[0] * Point[0] * Point[1] + 13.5 * Point[0] * Point[1] * Point[1] - 22.5 * Point[0] * Point[0] - 22.5 * Point[0] * Point[1] + 9. * Point[0]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
+	mi_Psi.at(32) = (-13.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] + 18. * Point[0] * Point[0] + 4.5 * Point[0] * Point[1] - 4.5 * Point[0]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
+	mi_Psi.at(33) = (4.5 * Point[0] * Point[0] * Point[0] - 4.5 * Point[0] * Point[0] + Point[0]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
+	mi_Psi.at(34) = (13.5 * Point[0] * Point[0] * Point[1] + 27. * Point[0] * Point[1] * Point[1] + 13.5 * Point[1] * Point[1] * Point[1] - 22.5 * Point[0] * Point[1] - 22.5 * Point[1] * Point[1] + 9. * Point[1]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
+	mi_Psi.at(35) = (-27. * Point[0] * Point[0] * Point[1] - 27. * Point[0] * Point[1] * Point[1] + 27. * Point[0] * Point[1]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
+	mi_Psi.at(36) = (13.5 * Point[0] * Point[0] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
+	mi_Psi.at(37) = (-13.5 * Point[0] * Point[1] * Point[1] - 13.5 * Point[1] * Point[1] * Point[1] + 4.5 * Point[0] * Point[1] + 18. * Point[1] * Point[1] - 4.5 * Point[1]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
+	mi_Psi.at(38) = (13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
+	mi_Psi.at(39) = (4.5 * Point[1] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] + Point[1]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
 
-	return Psi;
+	return mi_Psi;
 };
 
 // ================================================================================================
@@ -230,133 +230,133 @@ inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Pri40::getShapeFcOnPoint(const dou
 // Shape functions derivative evaluated on Point
 // 
 // ================================================================================================
-inline Eigen::MatrixXd O2P2::Prep::Elem::Elem_Pri40::getShapeDerivOnPoint(const double* Point) {
-	Eigen::MatrixXd DPsi(40, 3);
+inline std::vector<double> O2P2::Prep::Elem::Elem_Pri40::getShapeDerivOnPoint(const double* Point) {
+	std::vector<double> mi_DPsi(40 * 3);
 
-	DPsi(0, 0) = (-13.5 * Point[0] * Point[0] - 27. * Point[0] * Point[1] - 13.5 * Point[1] * Point[1] + 18. * Point[0] + 18. * Point[1] - 5.5) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
-	DPsi(1, 0) = (40.5 * Point[0] * Point[0] + 54. * Point[0] * Point[1] + 13.5 * Point[1] * Point[1] - 45. * Point[0] - 22.5 * Point[1] + 9.) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
-	DPsi(2, 0) = (-40.5 * Point[0] * Point[0] - 27. * Point[0] * Point[1] + 36. * Point[0] + 4.5 * Point[1] - 4.5) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
-	DPsi(3, 0) = (13.5 * Point[0] * Point[0] - 9. * Point[0] + 1.) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
-	DPsi(4, 0) = (27. * Point[0] * Point[1] + 27. * Point[1] * Point[1] - 22.5 * Point[1]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
-	DPsi(5, 0) = (-54. * Point[0] * Point[1] - 27. * Point[1] * Point[1] + 27. * Point[1]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
-	DPsi(6, 0) = (27. * Point[0] * Point[1] - 4.5 * Point[1]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
-	DPsi(7, 0) = (-13.5 * Point[1] * Point[1] + 4.5 * Point[1]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
-	DPsi(8, 0) = (13.5 * Point[1] * Point[1] - 4.5 * Point[1]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
-	DPsi(9, 0) = 0.;
-	DPsi(10, 0) = (-13.5 * Point[0] * Point[0] - 27. * Point[0] * Point[1] - 13.5 * Point[1] * Point[1] + 18. * Point[0] + 18. * Point[1] - 5.5) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
-	DPsi(11, 0) = (40.5 * Point[0] * Point[0] + 54. * Point[0] * Point[1] + 13.5 * Point[1] * Point[1] - 45. * Point[0] - 22.5 * Point[1] + 9.) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
-	DPsi(12, 0) = (-40.5 * Point[0] * Point[0] - 27. * Point[0] * Point[1] + 36. * Point[0] + 4.5 * Point[1] - 4.5) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
-	DPsi(13, 0) = (13.5 * Point[0] * Point[0] - 9. * Point[0] + 1.) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
-	DPsi(14, 0) = (27. * Point[0] * Point[1] + 27. * Point[1] * Point[1] - 22.5 * Point[1]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
-	DPsi(15, 0) = (-54. * Point[0] * Point[1] - 27. * Point[1] * Point[1] + 27. * Point[1]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
-	DPsi(16, 0) = (27. * Point[0] * Point[1] - 4.5 * Point[1]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
-	DPsi(17, 0) = (-13.5 * Point[1] * Point[1] + 4.5 * Point[1]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
-	DPsi(18, 0) = (13.5 * Point[1] * Point[1] - 4.5 * Point[1]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
-	DPsi(19, 0) = 0.;
-	DPsi(20, 0) = (-13.5 * Point[0] * Point[0] - 27. * Point[0] * Point[1] - 13.5 * Point[1] * Point[1] + 18. * Point[0] + 18. * Point[1] - 5.5) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
-	DPsi(21, 0) = (40.5 * Point[0] * Point[0] + 54. * Point[0] * Point[1] + 13.5 * Point[1] * Point[1] - 45. * Point[0] - 22.5 * Point[1] + 9.) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
-	DPsi(22, 0) = (-40.5 * Point[0] * Point[0] - 27. * Point[0] * Point[1] + 36. * Point[0] + 4.5 * Point[1] - 4.5) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
-	DPsi(23, 0) = (13.5 * Point[0] * Point[0] - 9. * Point[0] + 1.) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
-	DPsi(24, 0) = (27. * Point[0] * Point[1] + 27. * Point[1] * Point[1] - 22.5 * Point[1]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
-	DPsi(25, 0) = (-54. * Point[0] * Point[1] - 27. * Point[1] * Point[1] + 27. * Point[1]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
-	DPsi(26, 0) = (27. * Point[0] * Point[1] - 4.5 * Point[1]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
-	DPsi(27, 0) = (-13.5 * Point[1] * Point[1] + 4.5 * Point[1]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
-	DPsi(28, 0) = (13.5 * Point[1] * Point[1] - 4.5 * Point[1]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
-	DPsi(29, 0) = 0.;
-	DPsi(30, 0) = (-13.5 * Point[0] * Point[0] - 27. * Point[0] * Point[1] - 13.5 * Point[1] * Point[1] + 18. * Point[0] + 18. * Point[1] - 5.5) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
-	DPsi(31, 0) = (40.5 * Point[0] * Point[0] + 54. * Point[0] * Point[1] + 13.5 * Point[1] * Point[1] - 45. * Point[0] - 22.5 * Point[1] + 9.) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
-	DPsi(32, 0) = (-40.5 * Point[0] * Point[0] - 27. * Point[0] * Point[1] + 36. * Point[0] + 4.5 * Point[1] - 4.5) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
-	DPsi(33, 0) = (13.5 * Point[0] * Point[0] - 9. * Point[0] + 1.) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
-	DPsi(34, 0) = (27. * Point[0] * Point[1] + 27. * Point[1] * Point[1] - 22.5 * Point[1]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
-	DPsi(35, 0) = (-54. * Point[0] * Point[1] - 27. * Point[1] * Point[1] + 27. * Point[1]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
-	DPsi(36, 0) = (27. * Point[0] * Point[1] - 4.5 * Point[1]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
-	DPsi(37, 0) = (-13.5 * Point[1] * Point[1] + 4.5 * Point[1]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
-	DPsi(38, 0) = (13.5 * Point[1] * Point[1] - 4.5 * Point[1]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
-	DPsi(39, 0) = 0.;
+	mi_DPsi.at( 0) = (-13.5 * Point[0] * Point[0] - 27. * Point[0] * Point[1] - 13.5 * Point[1] * Point[1] + 18. * Point[0] + 18. * Point[1] - 5.5) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
+	mi_DPsi.at( 1) = (40.5 * Point[0] * Point[0] + 54. * Point[0] * Point[1] + 13.5 * Point[1] * Point[1] - 45. * Point[0] - 22.5 * Point[1] + 9.) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
+	mi_DPsi.at( 2) = (-40.5 * Point[0] * Point[0] - 27. * Point[0] * Point[1] + 36. * Point[0] + 4.5 * Point[1] - 4.5) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
+	mi_DPsi.at( 3) = (13.5 * Point[0] * Point[0] - 9. * Point[0] + 1.) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
+	mi_DPsi.at( 4) = (27. * Point[0] * Point[1] + 27. * Point[1] * Point[1] - 22.5 * Point[1]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
+	mi_DPsi.at( 5) = (-54. * Point[0] * Point[1] - 27. * Point[1] * Point[1] + 27. * Point[1]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
+	mi_DPsi.at( 6) = (27. * Point[0] * Point[1] - 4.5 * Point[1]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
+	mi_DPsi.at( 7) = (-13.5 * Point[1] * Point[1] + 4.5 * Point[1]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
+	mi_DPsi.at( 8) = (13.5 * Point[1] * Point[1] - 4.5 * Point[1]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
+	mi_DPsi.at( 9) = 0.;
+	mi_DPsi.at(10) = (-13.5 * Point[0] * Point[0] - 27. * Point[0] * Point[1] - 13.5 * Point[1] * Point[1] + 18. * Point[0] + 18. * Point[1] - 5.5) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
+	mi_DPsi.at(11) = (40.5 * Point[0] * Point[0] + 54. * Point[0] * Point[1] + 13.5 * Point[1] * Point[1] - 45. * Point[0] - 22.5 * Point[1] + 9.) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
+	mi_DPsi.at(12) = (-40.5 * Point[0] * Point[0] - 27. * Point[0] * Point[1] + 36. * Point[0] + 4.5 * Point[1] - 4.5) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
+	mi_DPsi.at(13) = (13.5 * Point[0] * Point[0] - 9. * Point[0] + 1.) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
+	mi_DPsi.at(14) = (27. * Point[0] * Point[1] + 27. * Point[1] * Point[1] - 22.5 * Point[1]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
+	mi_DPsi.at(15) = (-54. * Point[0] * Point[1] - 27. * Point[1] * Point[1] + 27. * Point[1]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
+	mi_DPsi.at(16) = (27. * Point[0] * Point[1] - 4.5 * Point[1]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
+	mi_DPsi.at(17) = (-13.5 * Point[1] * Point[1] + 4.5 * Point[1]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
+	mi_DPsi.at(18) = (13.5 * Point[1] * Point[1] - 4.5 * Point[1]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
+	mi_DPsi.at(19) = 0.;
+	mi_DPsi.at(20) = (-13.5 * Point[0] * Point[0] - 27. * Point[0] * Point[1] - 13.5 * Point[1] * Point[1] + 18. * Point[0] + 18. * Point[1] - 5.5) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
+	mi_DPsi.at(21) = (40.5 * Point[0] * Point[0] + 54. * Point[0] * Point[1] + 13.5 * Point[1] * Point[1] - 45. * Point[0] - 22.5 * Point[1] + 9.) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
+	mi_DPsi.at(22) = (-40.5 * Point[0] * Point[0] - 27. * Point[0] * Point[1] + 36. * Point[0] + 4.5 * Point[1] - 4.5) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
+	mi_DPsi.at(23) = (13.5 * Point[0] * Point[0] - 9. * Point[0] + 1.) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
+	mi_DPsi.at(24) = (27. * Point[0] * Point[1] + 27. * Point[1] * Point[1] - 22.5 * Point[1]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
+	mi_DPsi.at(25) = (-54. * Point[0] * Point[1] - 27. * Point[1] * Point[1] + 27. * Point[1]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
+	mi_DPsi.at(26) = (27. * Point[0] * Point[1] - 4.5 * Point[1]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
+	mi_DPsi.at(27) = (-13.5 * Point[1] * Point[1] + 4.5 * Point[1]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
+	mi_DPsi.at(28) = (13.5 * Point[1] * Point[1] - 4.5 * Point[1]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
+	mi_DPsi.at(29) = 0.;
+	mi_DPsi.at(30) = (-13.5 * Point[0] * Point[0] - 27. * Point[0] * Point[1] - 13.5 * Point[1] * Point[1] + 18. * Point[0] + 18. * Point[1] - 5.5) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
+	mi_DPsi.at(31) = (40.5 * Point[0] * Point[0] + 54. * Point[0] * Point[1] + 13.5 * Point[1] * Point[1] - 45. * Point[0] - 22.5 * Point[1] + 9.) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
+	mi_DPsi.at(32) = (-40.5 * Point[0] * Point[0] - 27. * Point[0] * Point[1] + 36. * Point[0] + 4.5 * Point[1] - 4.5) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
+	mi_DPsi.at(33) = (13.5 * Point[0] * Point[0] - 9. * Point[0] + 1.) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
+	mi_DPsi.at(34) = (27. * Point[0] * Point[1] + 27. * Point[1] * Point[1] - 22.5 * Point[1]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
+	mi_DPsi.at(35) = (-54. * Point[0] * Point[1] - 27. * Point[1] * Point[1] + 27. * Point[1]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
+	mi_DPsi.at(36) = (27. * Point[0] * Point[1] - 4.5 * Point[1]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
+	mi_DPsi.at(37) = (-13.5 * Point[1] * Point[1] + 4.5 * Point[1]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
+	mi_DPsi.at(38) = (13.5 * Point[1] * Point[1] - 4.5 * Point[1]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
+	mi_DPsi.at(39) = 0.;
 
-	DPsi(0, 1) = (-13.5 * Point[0] * Point[0] - 27. * Point[0] * Point[1] - 13.5 * Point[1] * Point[1] + 18. * Point[0] + 18. * Point[1] - 5.5) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
-	DPsi(1, 1) = (27. * Point[0] * Point[0] + 27. * Point[0] * Point[1] - 22.5 * Point[0]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
-	DPsi(2, 1) = (-13.5 * Point[0] * Point[0] + 4.5 * Point[0]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
-	DPsi(3, 1) = 0.;
-	DPsi(4, 1) = (13.5 * Point[0] * Point[0] + 54. * Point[0] * Point[1] + 40.5 * Point[1] * Point[1] - 22.5 * Point[0] - 45. * Point[1] + 9.) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
-	DPsi(5, 1) = (-27. * Point[0] * Point[0] - 54. * Point[0] * Point[1] + 27. * Point[0]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
-	DPsi(6, 1) = (13.5 * Point[0] * Point[0] - 4.5 * Point[0]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
-	DPsi(7, 1) = (-27. * Point[0] * Point[1] - 40.5 * Point[1] * Point[1] + 4.5 * Point[0] + 36. * Point[1] - 4.5) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
-	DPsi(8, 1) = (27. * Point[0] * Point[1] - 4.5 * Point[0]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
-	DPsi(9, 1) = (13.5 * Point[1] * Point[1] - 9. * Point[1] + 1.) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
-	DPsi(10, 1) = (-13.5 * Point[0] * Point[0] - 27. * Point[0] * Point[1] - 13.5 * Point[1] * Point[1] + 18. * Point[0] + 18. * Point[1] - 5.5) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
-	DPsi(11, 1) = (27. * Point[0] * Point[0] + 27. * Point[0] * Point[1] - 22.5 * Point[0]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
-	DPsi(12, 1) = (-13.5 * Point[0] * Point[0] + 4.5 * Point[0]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
-	DPsi(13, 1) = 0.;
-	DPsi(14, 1) = (13.5 * Point[0] * Point[0] + 54. * Point[0] * Point[1] + 40.5 * Point[1] * Point[1] - 22.5 * Point[0] - 45. * Point[1] + 9.) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
-	DPsi(15, 1) = (-27. * Point[0] * Point[0] - 54. * Point[0] * Point[1] + 27. * Point[0]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
-	DPsi(16, 1) = (13.5 * Point[0] * Point[0] - 4.5 * Point[0]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
-	DPsi(17, 1) = (-27. * Point[0] * Point[1] - 40.5 * Point[1] * Point[1] + 4.5 * Point[0] + 36. * Point[1] - 4.5) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
-	DPsi(18, 1) = (27. * Point[0] * Point[1] - 4.5 * Point[0]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
-	DPsi(19, 1) = (13.5 * Point[1] * Point[1] - 9. * Point[1] + 1.) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
-	DPsi(20, 1) = (-13.5 * Point[0] * Point[0] - 27. * Point[0] * Point[1] - 13.5 * Point[1] * Point[1] + 18. * Point[0] + 18. * Point[1] - 5.5) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
-	DPsi(21, 1) = (27. * Point[0] * Point[0] + 27. * Point[0] * Point[1] - 22.5 * Point[0]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
-	DPsi(22, 1) = (-13.5 * Point[0] * Point[0] + 4.5 * Point[0]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
-	DPsi(23, 1) = 0.;
-	DPsi(24, 1) = (13.5 * Point[0] * Point[0] + 54. * Point[0] * Point[1] + 40.5 * Point[1] * Point[1] - 22.5 * Point[0] - 45. * Point[1] + 9.) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
-	DPsi(25, 1) = (-27. * Point[0] * Point[0] - 54. * Point[0] * Point[1] + 27. * Point[0]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
-	DPsi(26, 1) = (13.5 * Point[0] * Point[0] - 4.5 * Point[0]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
-	DPsi(27, 1) = (-27. * Point[0] * Point[1] - 40.5 * Point[1] * Point[1] + 4.5 * Point[0] + 36. * Point[1] - 4.5) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
-	DPsi(28, 1) = (27. * Point[0] * Point[1] - 4.5 * Point[0]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
-	DPsi(29, 1) = (13.5 * Point[1] * Point[1] - 9. * Point[1] + 1.) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
-	DPsi(30, 1) = (-13.5 * Point[0] * Point[0] - 27. * Point[0] * Point[1] - 13.5 * Point[1] * Point[1] + 18. * Point[0] + 18. * Point[1] - 5.5) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
-	DPsi(31, 1) = (27. * Point[0] * Point[0] + 27. * Point[0] * Point[1] - 22.5 * Point[0]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
-	DPsi(32, 1) = (-13.5 * Point[0] * Point[0] + 4.5 * Point[0]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
-	DPsi(33, 1) = 0.;
-	DPsi(34, 1) = (13.5 * Point[0] * Point[0] + 54. * Point[0] * Point[1] + 40.5 * Point[1] * Point[1] - 22.5 * Point[0] - 45. * Point[1] + 9.) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
-	DPsi(35, 1) = (-27. * Point[0] * Point[0] - 54. * Point[0] * Point[1] + 27. * Point[0]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
-	DPsi(36, 1) = (13.5 * Point[0] * Point[0] - 4.5 * Point[0]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
-	DPsi(37, 1) = (-27. * Point[0] * Point[1] - 40.5 * Point[1] * Point[1] + 4.5 * Point[0] + 36. * Point[1] - 4.5) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
-	DPsi(38, 1) = (27. * Point[0] * Point[1] - 4.5 * Point[0]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
-	DPsi(39, 1) = (13.5 * Point[1] * Point[1] - 9. * Point[1] + 1.) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
+	mi_DPsi.at(40) = (-13.5 * Point[0] * Point[0] - 27. * Point[0] * Point[1] - 13.5 * Point[1] * Point[1] + 18. * Point[0] + 18. * Point[1] - 5.5) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
+	mi_DPsi.at(41) = (27. * Point[0] * Point[0] + 27. * Point[0] * Point[1] - 22.5 * Point[0]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
+	mi_DPsi.at(42) = (-13.5 * Point[0] * Point[0] + 4.5 * Point[0]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
+	mi_DPsi.at(43) = 0.;
+	mi_DPsi.at(44) = (13.5 * Point[0] * Point[0] + 54. * Point[0] * Point[1] + 40.5 * Point[1] * Point[1] - 22.5 * Point[0] - 45. * Point[1] + 9.) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
+	mi_DPsi.at(45) = (-27. * Point[0] * Point[0] - 54. * Point[0] * Point[1] + 27. * Point[0]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
+	mi_DPsi.at(46) = (13.5 * Point[0] * Point[0] - 4.5 * Point[0]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
+	mi_DPsi.at(47) = (-27. * Point[0] * Point[1] - 40.5 * Point[1] * Point[1] + 4.5 * Point[0] + 36. * Point[1] - 4.5) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
+	mi_DPsi.at(48) = (27. * Point[0] * Point[1] - 4.5 * Point[0]) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
+	mi_DPsi.at(49) = (13.5 * Point[1] * Point[1] - 9. * Point[1] + 1.) * 0.0625 * (-9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] + Point[2] - 1.);
+	mi_DPsi.at(50) = (-13.5 * Point[0] * Point[0] - 27. * Point[0] * Point[1] - 13.5 * Point[1] * Point[1] + 18. * Point[0] + 18. * Point[1] - 5.5) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
+	mi_DPsi.at(51) = (27. * Point[0] * Point[0] + 27. * Point[0] * Point[1] - 22.5 * Point[0]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
+	mi_DPsi.at(52) = (-13.5 * Point[0] * Point[0] + 4.5 * Point[0]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
+	mi_DPsi.at(53) = 0.;
+	mi_DPsi.at(54) = (13.5 * Point[0] * Point[0] + 54. * Point[0] * Point[1] + 40.5 * Point[1] * Point[1] - 22.5 * Point[0] - 45. * Point[1] + 9.) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
+	mi_DPsi.at(55) = (-27. * Point[0] * Point[0] - 54. * Point[0] * Point[1] + 27. * Point[0]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
+	mi_DPsi.at(56) = (13.5 * Point[0] * Point[0] - 4.5 * Point[0]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
+	mi_DPsi.at(57) = (-27. * Point[0] * Point[1] - 40.5 * Point[1] * Point[1] + 4.5 * Point[0] + 36. * Point[1] - 4.5) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
+	mi_DPsi.at(58) = (27. * Point[0] * Point[1] - 4.5 * Point[0]) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
+	mi_DPsi.at(59) = (13.5 * Point[1] * Point[1] - 9. * Point[1] + 1.) * 0.5625 * (3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] - 3. * Point[2] + 1.);
+	mi_DPsi.at(60) = (-13.5 * Point[0] * Point[0] - 27. * Point[0] * Point[1] - 13.5 * Point[1] * Point[1] + 18. * Point[0] + 18. * Point[1] - 5.5) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
+	mi_DPsi.at(61) = (27. * Point[0] * Point[0] + 27. * Point[0] * Point[1] - 22.5 * Point[0]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
+	mi_DPsi.at(62) = (-13.5 * Point[0] * Point[0] + 4.5 * Point[0]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
+	mi_DPsi.at(63) = 0.;
+	mi_DPsi.at(64) = (13.5 * Point[0] * Point[0] + 54. * Point[0] * Point[1] + 40.5 * Point[1] * Point[1] - 22.5 * Point[0] - 45. * Point[1] + 9.) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
+	mi_DPsi.at(65) = (-27. * Point[0] * Point[0] - 54. * Point[0] * Point[1] + 27. * Point[0]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
+	mi_DPsi.at(66) = (13.5 * Point[0] * Point[0] - 4.5 * Point[0]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
+	mi_DPsi.at(67) = (-27. * Point[0] * Point[1] - 40.5 * Point[1] * Point[1] + 4.5 * Point[0] + 36. * Point[1] - 4.5) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
+	mi_DPsi.at(68) = (27. * Point[0] * Point[1] - 4.5 * Point[0]) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
+	mi_DPsi.at(69) = (13.5 * Point[1] * Point[1] - 9. * Point[1] + 1.) * 0.5625 * (-3. * Point[2] * Point[2] * Point[2] - Point[2] * Point[2] + 3. * Point[2] + 1.);
+	mi_DPsi.at(70) = (-13.5 * Point[0] * Point[0] - 27. * Point[0] * Point[1] - 13.5 * Point[1] * Point[1] + 18. * Point[0] + 18. * Point[1] - 5.5) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
+	mi_DPsi.at(71) = (27. * Point[0] * Point[0] + 27. * Point[0] * Point[1] - 22.5 * Point[0]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
+	mi_DPsi.at(72) = (-13.5 * Point[0] * Point[0] + 4.5 * Point[0]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
+	mi_DPsi.at(73) = 0.;
+	mi_DPsi.at(74) = (13.5 * Point[0] * Point[0] + 54. * Point[0] * Point[1] + 40.5 * Point[1] * Point[1] - 22.5 * Point[0] - 45. * Point[1] + 9.) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
+	mi_DPsi.at(75) = (-27. * Point[0] * Point[0] - 54. * Point[0] * Point[1] + 27. * Point[0]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
+	mi_DPsi.at(76) = (13.5 * Point[0] * Point[0] - 4.5 * Point[0]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
+	mi_DPsi.at(77) = (-27. * Point[0] * Point[1] - 40.5 * Point[1] * Point[1] + 4.5 * Point[0] + 36. * Point[1] - 4.5) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
+	mi_DPsi.at(78) = (27. * Point[0] * Point[1] - 4.5 * Point[0]) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
+	mi_DPsi.at(79) = (13.5 * Point[1] * Point[1] - 9. * Point[1] + 1.) * 0.0625 * (9. * Point[2] * Point[2] * Point[2] + 9. * Point[2] * Point[2] - Point[2] - 1.);
 
-	DPsi(0, 2) = (-4.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] - 13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] * Point[1] + 9. * Point[0] * Point[0] + 18. * Point[0] * Point[1] + 9. * Point[1] * Point[1] - 5.5 * Point[0] - 5.5 * Point[1] + 1.) * 0.0625 * (-27. * Point[2] * Point[2] + 18. * Point[2] + 1.);
-	DPsi(1, 2) = (13.5 * Point[0] * Point[0] * Point[0] + 27. * Point[0] * Point[0] * Point[1] + 13.5 * Point[0] * Point[1] * Point[1] - 22.5 * Point[0] * Point[0] - 22.5 * Point[0] * Point[1] + 9. * Point[0]) * 0.0625 * (-27. * Point[2] * Point[2] + 18. * Point[2] + 1.);
-	DPsi(2, 2) = (-13.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] + 18. * Point[0] * Point[0] + 4.5 * Point[0] * Point[1] - 4.5 * Point[0]) * 0.0625 * (-27. * Point[2] * Point[2] + 18. * Point[2] + 1.);
-	DPsi(3, 2) = (4.5 * Point[0] * Point[0] * Point[0] - 4.5 * Point[0] * Point[0] + Point[0]) * 0.0625 * (-27. * Point[2] * Point[2] + 18. * Point[2] + 1.);
-	DPsi(4, 2) = (13.5 * Point[0] * Point[0] * Point[1] + 27. * Point[0] * Point[1] * Point[1] + 13.5 * Point[1] * Point[1] * Point[1] - 22.5 * Point[0] * Point[1] - 22.5 * Point[1] * Point[1] + 9. * Point[1]) * 0.0625 * (-27. * Point[2] * Point[2] + 18. * Point[2] + 1.);
-	DPsi(5, 2) = (-27. * Point[0] * Point[0] * Point[1] - 27. * Point[0] * Point[1] * Point[1] + 27. * Point[0] * Point[1]) * 0.0625 * (-27. * Point[2] * Point[2] + 18. * Point[2] + 1.);
-	DPsi(6, 2) = (13.5 * Point[0] * Point[0] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.0625 * (-27. * Point[2] * Point[2] + 18. * Point[2] + 1.);
-	DPsi(7, 2) = (-13.5 * Point[0] * Point[1] * Point[1] - 13.5 * Point[1] * Point[1] * Point[1] + 4.5 * Point[0] * Point[1] + 18. * Point[1] * Point[1] - 4.5 * Point[1]) * 0.0625 * (-27. * Point[2] * Point[2] + 18. * Point[2] + 1.);
-	DPsi(8, 2) = (13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.0625 * (-27. * Point[2] * Point[2] + 18. * Point[2] + 1.);
-	DPsi(9, 2) = (4.5 * Point[1] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] + Point[1]) * 0.0625 * (-27. * Point[2] * Point[2] + 18. * Point[2] + 1.);
-	DPsi(10, 2) = (-4.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] - 13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] * Point[1] + 9. * Point[0] * Point[0] + 18. * Point[0] * Point[1] + 9. * Point[1] * Point[1] - 5.5 * Point[0] - 5.5 * Point[1] + 1.) * 0.5625 * (9. * Point[2] * Point[2] - 2. * Point[2] - 3.);
-	DPsi(11, 2) = (13.5 * Point[0] * Point[0] * Point[0] + 27. * Point[0] * Point[0] * Point[1] + 13.5 * Point[0] * Point[1] * Point[1] - 22.5 * Point[0] * Point[0] - 22.5 * Point[0] * Point[1] + 9. * Point[0]) * 0.5625 * (9. * Point[2] * Point[2] - 2. * Point[2] - 3.);
-	DPsi(12, 2) = (-13.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] + 18. * Point[0] * Point[0] + 4.5 * Point[0] * Point[1] - 4.5 * Point[0]) * 0.5625 * (9. * Point[2] * Point[2] - 2. * Point[2] - 3.);
-	DPsi(13, 2) = (4.5 * Point[0] * Point[0] * Point[0] - 4.5 * Point[0] * Point[0] + Point[0]) * 0.5625 * (9. * Point[2] * Point[2] - 2. * Point[2] - 3.);
-	DPsi(14, 2) = (13.5 * Point[0] * Point[0] * Point[1] + 27. * Point[0] * Point[1] * Point[1] + 13.5 * Point[1] * Point[1] * Point[1] - 22.5 * Point[0] * Point[1] - 22.5 * Point[1] * Point[1] + 9. * Point[1]) * 0.5625 * (9. * Point[2] * Point[2] - 2. * Point[2] - 3.);
-	DPsi(15, 2) = (-27. * Point[0] * Point[0] * Point[1] - 27. * Point[0] * Point[1] * Point[1] + 27. * Point[0] * Point[1]) * 0.5625 * (9. * Point[2] * Point[2] - 2. * Point[2] - 3.);
-	DPsi(16, 2) = (13.5 * Point[0] * Point[0] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.5625 * (9. * Point[2] * Point[2] - 2. * Point[2] - 3.);
-	DPsi(17, 2) = (-13.5 * Point[0] * Point[1] * Point[1] - 13.5 * Point[1] * Point[1] * Point[1] + 4.5 * Point[0] * Point[1] + 18. * Point[1] * Point[1] - 4.5 * Point[1]) * 0.5625 * (9. * Point[2] * Point[2] - 2. * Point[2] - 3.);
-	DPsi(18, 2) = (13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.5625 * (9. * Point[2] * Point[2] - 2. * Point[2] - 3.);
-	DPsi(19, 2) = (4.5 * Point[1] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] + Point[1]) * 0.5625 * (9. * Point[2] * Point[2] - 2. * Point[2] - 3.);
-	DPsi(20, 2) = (-4.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] - 13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] * Point[1] + 9. * Point[0] * Point[0] + 18. * Point[0] * Point[1] + 9. * Point[1] * Point[1] - 5.5 * Point[0] - 5.5 * Point[1] + 1.) * 0.5625 * (-9. * Point[2] * Point[2] - 2. * Point[2] + 3.);
-	DPsi(21, 2) = (13.5 * Point[0] * Point[0] * Point[0] + 27. * Point[0] * Point[0] * Point[1] + 13.5 * Point[0] * Point[1] * Point[1] - 22.5 * Point[0] * Point[0] - 22.5 * Point[0] * Point[1] + 9. * Point[0]) * 0.5625 * (-9. * Point[2] * Point[2] - 2. * Point[2] + 3.);
-	DPsi(22, 2) = (-13.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] + 18. * Point[0] * Point[0] + 4.5 * Point[0] * Point[1] - 4.5 * Point[0]) * 0.5625 * (-9. * Point[2] * Point[2] - 2. * Point[2] + 3.);
-	DPsi(23, 2) = (4.5 * Point[0] * Point[0] * Point[0] - 4.5 * Point[0] * Point[0] + Point[0]) * 0.5625 * (-9. * Point[2] * Point[2] - 2. * Point[2] + 3.);
-	DPsi(24, 2) = (13.5 * Point[0] * Point[0] * Point[1] + 27. * Point[0] * Point[1] * Point[1] + 13.5 * Point[1] * Point[1] * Point[1] - 22.5 * Point[0] * Point[1] - 22.5 * Point[1] * Point[1] + 9. * Point[1]) * 0.5625 * (-9. * Point[2] * Point[2] - 2. * Point[2] + 3.);
-	DPsi(25, 2) = (-27. * Point[0] * Point[0] * Point[1] - 27. * Point[0] * Point[1] * Point[1] + 27. * Point[0] * Point[1]) * 0.5625 * (-9. * Point[2] * Point[2] - 2. * Point[2] + 3.);
-	DPsi(26, 2) = (13.5 * Point[0] * Point[0] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.5625 * (-9. * Point[2] * Point[2] - 2. * Point[2] + 3.);
-	DPsi(27, 2) = (-13.5 * Point[0] * Point[1] * Point[1] - 13.5 * Point[1] * Point[1] * Point[1] + 4.5 * Point[0] * Point[1] + 18. * Point[1] * Point[1] - 4.5 * Point[1]) * 0.5625 * (-9. * Point[2] * Point[2] - 2. * Point[2] + 3.);
-	DPsi(28, 2) = (13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.5625 * (-9. * Point[2] * Point[2] - 2. * Point[2] + 3.);
-	DPsi(29, 2) = (4.5 * Point[1] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] + Point[1]) * 0.5625 * (-9. * Point[2] * Point[2] - 2. * Point[2] + 3.);
-	DPsi(30, 2) = (-4.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] - 13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] * Point[1] + 9. * Point[0] * Point[0] + 18. * Point[0] * Point[1] + 9. * Point[1] * Point[1] - 5.5 * Point[0] - 5.5 * Point[1] + 1.) * 0.0625 * (27. * Point[2] * Point[2] + 18. * Point[2] - 1.);
-	DPsi(31, 2) = (13.5 * Point[0] * Point[0] * Point[0] + 27. * Point[0] * Point[0] * Point[1] + 13.5 * Point[0] * Point[1] * Point[1] - 22.5 * Point[0] * Point[0] - 22.5 * Point[0] * Point[1] + 9. * Point[0]) * 0.0625 * (27. * Point[2] * Point[2] + 18. * Point[2] - 1.);
-	DPsi(32, 2) = (-13.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] + 18. * Point[0] * Point[0] + 4.5 * Point[0] * Point[1] - 4.5 * Point[0]) * 0.0625 * (27. * Point[2] * Point[2] + 18. * Point[2] - 1.);
-	DPsi(33, 2) = (4.5 * Point[0] * Point[0] * Point[0] - 4.5 * Point[0] * Point[0] + Point[0]) * 0.0625 * (27. * Point[2] * Point[2] + 18. * Point[2] - 1.);
-	DPsi(34, 2) = (13.5 * Point[0] * Point[0] * Point[1] + 27. * Point[0] * Point[1] * Point[1] + 13.5 * Point[1] * Point[1] * Point[1] - 22.5 * Point[0] * Point[1] - 22.5 * Point[1] * Point[1] + 9. * Point[1]) * 0.0625 * (27. * Point[2] * Point[2] + 18. * Point[2] - 1.);
-	DPsi(35, 2) = (-27. * Point[0] * Point[0] * Point[1] - 27. * Point[0] * Point[1] * Point[1] + 27. * Point[0] * Point[1]) * 0.0625 * (27. * Point[2] * Point[2] + 18. * Point[2] - 1.);
-	DPsi(36, 2) = (13.5 * Point[0] * Point[0] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.0625 * (27. * Point[2] * Point[2] + 18. * Point[2] - 1.);
-	DPsi(37, 2) = (-13.5 * Point[0] * Point[1] * Point[1] - 13.5 * Point[1] * Point[1] * Point[1] + 4.5 * Point[0] * Point[1] + 18. * Point[1] * Point[1] - 4.5 * Point[1]) * 0.0625 * (27. * Point[2] * Point[2] + 18. * Point[2] - 1.);
-	DPsi(38, 2) = (13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.0625 * (27. * Point[2] * Point[2] + 18. * Point[2] - 1.);
-	DPsi(39, 2) = (4.5 * Point[1] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] + Point[1]) * 0.0625 * (27. * Point[2] * Point[2] + 18. * Point[2] - 1.);
+	mi_DPsi.at(80) = (-4.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] - 13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] * Point[1] + 9. * Point[0] * Point[0] + 18. * Point[0] * Point[1] + 9. * Point[1] * Point[1] - 5.5 * Point[0] - 5.5 * Point[1] + 1.) * 0.0625 * (-27. * Point[2] * Point[2] + 18. * Point[2] + 1.);
+	mi_DPsi.at(81) = (13.5 * Point[0] * Point[0] * Point[0] + 27. * Point[0] * Point[0] * Point[1] + 13.5 * Point[0] * Point[1] * Point[1] - 22.5 * Point[0] * Point[0] - 22.5 * Point[0] * Point[1] + 9. * Point[0]) * 0.0625 * (-27. * Point[2] * Point[2] + 18. * Point[2] + 1.);
+	mi_DPsi.at(82) = (-13.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] + 18. * Point[0] * Point[0] + 4.5 * Point[0] * Point[1] - 4.5 * Point[0]) * 0.0625 * (-27. * Point[2] * Point[2] + 18. * Point[2] + 1.);
+	mi_DPsi.at(83) = (4.5 * Point[0] * Point[0] * Point[0] - 4.5 * Point[0] * Point[0] + Point[0]) * 0.0625 * (-27. * Point[2] * Point[2] + 18. * Point[2] + 1.);
+	mi_DPsi.at(84) = (13.5 * Point[0] * Point[0] * Point[1] + 27. * Point[0] * Point[1] * Point[1] + 13.5 * Point[1] * Point[1] * Point[1] - 22.5 * Point[0] * Point[1] - 22.5 * Point[1] * Point[1] + 9. * Point[1]) * 0.0625 * (-27. * Point[2] * Point[2] + 18. * Point[2] + 1.);
+	mi_DPsi.at(85) = (-27. * Point[0] * Point[0] * Point[1] - 27. * Point[0] * Point[1] * Point[1] + 27. * Point[0] * Point[1]) * 0.0625 * (-27. * Point[2] * Point[2] + 18. * Point[2] + 1.);
+	mi_DPsi.at(86) = (13.5 * Point[0] * Point[0] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.0625 * (-27. * Point[2] * Point[2] + 18. * Point[2] + 1.);
+	mi_DPsi.at(87) = (-13.5 * Point[0] * Point[1] * Point[1] - 13.5 * Point[1] * Point[1] * Point[1] + 4.5 * Point[0] * Point[1] + 18. * Point[1] * Point[1] - 4.5 * Point[1]) * 0.0625 * (-27. * Point[2] * Point[2] + 18. * Point[2] + 1.);
+	mi_DPsi.at(88) = (13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.0625 * (-27. * Point[2] * Point[2] + 18. * Point[2] + 1.);
+	mi_DPsi.at(89) = (4.5 * Point[1] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] + Point[1]) * 0.0625 * (-27. * Point[2] * Point[2] + 18. * Point[2] + 1.);
+	mi_DPsi.at(90) = (-4.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] - 13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] * Point[1] + 9. * Point[0] * Point[0] + 18. * Point[0] * Point[1] + 9. * Point[1] * Point[1] - 5.5 * Point[0] - 5.5 * Point[1] + 1.) * 0.5625 * (9. * Point[2] * Point[2] - 2. * Point[2] - 3.);
+	mi_DPsi.at(91) = (13.5 * Point[0] * Point[0] * Point[0] + 27. * Point[0] * Point[0] * Point[1] + 13.5 * Point[0] * Point[1] * Point[1] - 22.5 * Point[0] * Point[0] - 22.5 * Point[0] * Point[1] + 9. * Point[0]) * 0.5625 * (9. * Point[2] * Point[2] - 2. * Point[2] - 3.);
+	mi_DPsi.at(92) = (-13.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] + 18. * Point[0] * Point[0] + 4.5 * Point[0] * Point[1] - 4.5 * Point[0]) * 0.5625 * (9. * Point[2] * Point[2] - 2. * Point[2] - 3.);
+	mi_DPsi.at(93) = (4.5 * Point[0] * Point[0] * Point[0] - 4.5 * Point[0] * Point[0] + Point[0]) * 0.5625 * (9. * Point[2] * Point[2] - 2. * Point[2] - 3.);
+	mi_DPsi.at(94) = (13.5 * Point[0] * Point[0] * Point[1] + 27. * Point[0] * Point[1] * Point[1] + 13.5 * Point[1] * Point[1] * Point[1] - 22.5 * Point[0] * Point[1] - 22.5 * Point[1] * Point[1] + 9. * Point[1]) * 0.5625 * (9. * Point[2] * Point[2] - 2. * Point[2] - 3.);
+	mi_DPsi.at(95) = (-27. * Point[0] * Point[0] * Point[1] - 27. * Point[0] * Point[1] * Point[1] + 27. * Point[0] * Point[1]) * 0.5625 * (9. * Point[2] * Point[2] - 2. * Point[2] - 3.);
+	mi_DPsi.at(96) = (13.5 * Point[0] * Point[0] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.5625 * (9. * Point[2] * Point[2] - 2. * Point[2] - 3.);
+	mi_DPsi.at(97) = (-13.5 * Point[0] * Point[1] * Point[1] - 13.5 * Point[1] * Point[1] * Point[1] + 4.5 * Point[0] * Point[1] + 18. * Point[1] * Point[1] - 4.5 * Point[1]) * 0.5625 * (9. * Point[2] * Point[2] - 2. * Point[2] - 3.);
+	mi_DPsi.at(98) = (13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.5625 * (9. * Point[2] * Point[2] - 2. * Point[2] - 3.);
+	mi_DPsi.at(99) = (4.5 * Point[1] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] + Point[1]) * 0.5625 * (9. * Point[2] * Point[2] - 2. * Point[2] - 3.);
+	mi_DPsi.at(100) = (-4.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] - 13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] * Point[1] + 9. * Point[0] * Point[0] + 18. * Point[0] * Point[1] + 9. * Point[1] * Point[1] - 5.5 * Point[0] - 5.5 * Point[1] + 1.) * 0.5625 * (-9. * Point[2] * Point[2] - 2. * Point[2] + 3.);
+	mi_DPsi.at(101) = (13.5 * Point[0] * Point[0] * Point[0] + 27. * Point[0] * Point[0] * Point[1] + 13.5 * Point[0] * Point[1] * Point[1] - 22.5 * Point[0] * Point[0] - 22.5 * Point[0] * Point[1] + 9. * Point[0]) * 0.5625 * (-9. * Point[2] * Point[2] - 2. * Point[2] + 3.);
+	mi_DPsi.at(102) = (-13.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] + 18. * Point[0] * Point[0] + 4.5 * Point[0] * Point[1] - 4.5 * Point[0]) * 0.5625 * (-9. * Point[2] * Point[2] - 2. * Point[2] + 3.);
+	mi_DPsi.at(103) = (4.5 * Point[0] * Point[0] * Point[0] - 4.5 * Point[0] * Point[0] + Point[0]) * 0.5625 * (-9. * Point[2] * Point[2] - 2. * Point[2] + 3.);
+	mi_DPsi.at(104) = (13.5 * Point[0] * Point[0] * Point[1] + 27. * Point[0] * Point[1] * Point[1] + 13.5 * Point[1] * Point[1] * Point[1] - 22.5 * Point[0] * Point[1] - 22.5 * Point[1] * Point[1] + 9. * Point[1]) * 0.5625 * (-9. * Point[2] * Point[2] - 2. * Point[2] + 3.);
+	mi_DPsi.at(105) = (-27. * Point[0] * Point[0] * Point[1] - 27. * Point[0] * Point[1] * Point[1] + 27. * Point[0] * Point[1]) * 0.5625 * (-9. * Point[2] * Point[2] - 2. * Point[2] + 3.);
+	mi_DPsi.at(106) = (13.5 * Point[0] * Point[0] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.5625 * (-9. * Point[2] * Point[2] - 2. * Point[2] + 3.);
+	mi_DPsi.at(107) = (-13.5 * Point[0] * Point[1] * Point[1] - 13.5 * Point[1] * Point[1] * Point[1] + 4.5 * Point[0] * Point[1] + 18. * Point[1] * Point[1] - 4.5 * Point[1]) * 0.5625 * (-9. * Point[2] * Point[2] - 2. * Point[2] + 3.);
+	mi_DPsi.at(108) = (13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.5625 * (-9. * Point[2] * Point[2] - 2. * Point[2] + 3.);
+	mi_DPsi.at(109) = (4.5 * Point[1] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] + Point[1]) * 0.5625 * (-9. * Point[2] * Point[2] - 2. * Point[2] + 3.);
+	mi_DPsi.at(110) = (-4.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] - 13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] * Point[1] + 9. * Point[0] * Point[0] + 18. * Point[0] * Point[1] + 9. * Point[1] * Point[1] - 5.5 * Point[0] - 5.5 * Point[1] + 1.) * 0.0625 * (27. * Point[2] * Point[2] + 18. * Point[2] - 1.);
+	mi_DPsi.at(111) = (13.5 * Point[0] * Point[0] * Point[0] + 27. * Point[0] * Point[0] * Point[1] + 13.5 * Point[0] * Point[1] * Point[1] - 22.5 * Point[0] * Point[0] - 22.5 * Point[0] * Point[1] + 9. * Point[0]) * 0.0625 * (27. * Point[2] * Point[2] + 18. * Point[2] - 1.);
+	mi_DPsi.at(112) = (-13.5 * Point[0] * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[1] + 18. * Point[0] * Point[0] + 4.5 * Point[0] * Point[1] - 4.5 * Point[0]) * 0.0625 * (27. * Point[2] * Point[2] + 18. * Point[2] - 1.);
+	mi_DPsi.at(113) = (4.5 * Point[0] * Point[0] * Point[0] - 4.5 * Point[0] * Point[0] + Point[0]) * 0.0625 * (27. * Point[2] * Point[2] + 18. * Point[2] - 1.);
+	mi_DPsi.at(114) = (13.5 * Point[0] * Point[0] * Point[1] + 27. * Point[0] * Point[1] * Point[1] + 13.5 * Point[1] * Point[1] * Point[1] - 22.5 * Point[0] * Point[1] - 22.5 * Point[1] * Point[1] + 9. * Point[1]) * 0.0625 * (27. * Point[2] * Point[2] + 18. * Point[2] - 1.);
+	mi_DPsi.at(115) = (-27. * Point[0] * Point[0] * Point[1] - 27. * Point[0] * Point[1] * Point[1] + 27. * Point[0] * Point[1]) * 0.0625 * (27. * Point[2] * Point[2] + 18. * Point[2] - 1.);
+	mi_DPsi.at(116) = (13.5 * Point[0] * Point[0] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.0625 * (27. * Point[2] * Point[2] + 18. * Point[2] - 1.);
+	mi_DPsi.at(117) = (-13.5 * Point[0] * Point[1] * Point[1] - 13.5 * Point[1] * Point[1] * Point[1] + 4.5 * Point[0] * Point[1] + 18. * Point[1] * Point[1] - 4.5 * Point[1]) * 0.0625 * (27. * Point[2] * Point[2] + 18. * Point[2] - 1.);
+	mi_DPsi.at(118) = (13.5 * Point[0] * Point[1] * Point[1] - 4.5 * Point[0] * Point[1]) * 0.0625 * (27. * Point[2] * Point[2] + 18. * Point[2] - 1.);
+	mi_DPsi.at(119) = (4.5 * Point[1] * Point[1] * Point[1] - 4.5 * Point[1] * Point[1] + Point[1]) * 0.0625 * (27. * Point[2] * Point[2] + 18. * Point[2] - 1.);
 
-	return DPsi;
+	return mi_DPsi;
 };
 
 
@@ -370,39 +370,39 @@ inline void O2P2::Prep::Elem::Elem_Pri40::setGeomProperties() {
 
 	const int nVertices = 6;
 
-	// Allocate an array with size m_Dim to which m_Centroid points to.
-	m_Centroid = std::make_unique<double[]>(m_Dim);
+	// Allocate an array with size mv_Dim to which mv_Centroid points to.
+	mv_Centroid = std::make_unique<double[]>(mv_Dim);
 
 	// Create a temporary array with the vertices of the polygon
-	std::array<O2P2::Prep::Node<m_Dim>*, nVertices> vertices;
-	vertices[0] = v_Conect[0].get();
-	vertices[1] = v_Conect[3].get();
-	vertices[2] = v_Conect[9].get();
-	vertices[3] = v_Conect[30].get();
-	vertices[4] = v_Conect[33].get();
-	vertices[5] = v_Conect[39].get();
+	std::array<O2P2::Prep::Node<mv_Dim>*, nVertices> vertices;
+	vertices[0] = mv_Conect[0].get();
+	vertices[1] = mv_Conect[3].get();
+	vertices[2] = mv_Conect[9].get();
+	vertices[3] = mv_Conect[30].get();
+	vertices[4] = mv_Conect[33].get();
+	vertices[5] = mv_Conect[39].get();
 
 	// Memory requested by make_unique is not empty
-	for (int i = 0; i < m_Dim; i++) m_Centroid[i] = 0.;
+	for (int i = 0; i < mv_Dim; i++) mv_Centroid[i] = 0.;
 
 	for (auto& node : vertices) {
-		std::array<double, m_Dim> x = node->getInitPos();
+		std::array<double, mv_Dim> x = node->getInitPos();
 
-		for (int i = 0; i < m_Dim; i++) m_Centroid[i] += x[i];
+		for (int i = 0; i < mv_Dim; i++) mv_Centroid[i] += x[i];
 	}
 
 	// Finishing up
-	for (int i = 0; i < m_Dim; i++) m_Centroid[i] /= nVertices;
+	for (int i = 0; i < mv_Dim; i++) mv_Centroid[i] /= nVertices;
 
 	// Distance from centroid to vertices
 	double dist[nVertices] = {};
 	int i = 0;
 
 	for (auto& node : vertices) {
-		std::array<double, m_Dim> x = node->getInitPos();
+		std::array<double, mv_Dim> x = node->getInitPos();
 
-		for (int j = 0; j < m_Dim; j++) {
-			dist[i] += (m_Centroid[j] - x[j]) * (m_Centroid[j] - x[j]);
+		for (int j = 0; j < mv_Dim; j++) {
+			dist[i] += (mv_Centroid[j] - x[j]) * (mv_Centroid[j] - x[j]);
 		}
 		dist[i] = std::sqrt(dist[i]);
 
@@ -410,7 +410,7 @@ inline void O2P2::Prep::Elem::Elem_Pri40::setGeomProperties() {
 	}
 
 	// Since centroid is not the circumcenter, the radius is related to the minimum bounding circle
-	m_Radius = *std::max_element(dist, dist + nVertices);
+	mv_Radius = *std::max_element(dist, dist + nVertices);
 };
 
 
@@ -420,18 +420,18 @@ inline void O2P2::Prep::Elem::Elem_Pri40::setGeomProperties() {
 // Return the values on the integration points currently known in the element' nodes
 // 
 // ================================================================================================
-inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Pri40::getValueOnIPs(const double* value) {
+inline std::vector<double> O2P2::Prep::Elem::Elem_Pri40::getValueOnIPs(const double* value) {
 
 	// return value
-	Eigen::VectorXd valueOnIp = Eigen::VectorXd::Zero(m_NumNodes);
+	std::vector<double> mi_valueOnIp(mv_numIP, 0.);
 
-	for (int i = 0; i < m_NumIP; i++) {
-		for (int j = 0; j < this->m_NumNodes; j++) {
-			valueOnIp(i) += value[i] * m_Psi[i][j];
+	for (int i = 0; i < mv_numIP; i++) {
+		for (int j = 0; j < this->mv_numNodes; j++) {
+			mi_valueOnIp.at(i) += value[i] * mv_Psi[i][j];
 		}
 	}
 
-	return valueOnIp;
+	return mi_valueOnIp;
 };
 
 
@@ -440,7 +440,7 @@ inline Eigen::VectorXd O2P2::Prep::Elem::Elem_Pri40::getValueOnIPs(const double*
 // Integration Points
 //
 // ================================================================================================
-inline const double O2P2::Prep::Elem::Elem_Pri40::m_xsi[m_NumIP][m_Dim] = {
+inline const double O2P2::Prep::Elem::Elem_Pri40::m_xsi[mv_numIP][mv_Dim] = {
 	{ 0.333333333333333, 0.333333333333333, -0.8611363115940525752239465 },
 	{ 0.797426985353087, 0.101286507323456, -0.8611363115940525752239465 },
 	{ 0.101286507323456, 0.797426985353087, -0.8611363115940525752239465 },
@@ -478,7 +478,7 @@ inline const double O2P2::Prep::Elem::Elem_Pri40::m_xsi[m_NumIP][m_Dim] = {
 // Weights for numerical integration
 //
 // ================================================================================================
-inline const double O2P2::Prep::Elem::Elem_Pri40::m_weight[m_NumIP] = { 0.03913367007796355895446968875, 0.0219042770725793188985520972023, 0.0219042770725793188985520972023, 0.0219042770725793188985520972023, 0.02302697375767507970299446697206, 0.02302697375767507970299446697206, 0.02302697375767507970299446697206, 0.03913367007796355895446968875, 0.0219042770725793188985520972023, 0.0219042770725793188985520972023, 0.0219042770725793188985520972023, 0.02302697375767507970299446697206, 0.02302697375767507970299446697206, 0.02302697375767507970299446697206, 0.07336632992203644104553031125, 0.0410653131998341811014479027977, 0.0410653131998341811014479027977, 0.0410653131998341811014479027977, 0.04317010263657792029700553302794, 0.04317010263657792029700553302794, 0.04317010263657792029700553302794, 0.07336632992203644104553031125, 0.0410653131998341811014479027977, 0.0410653131998341811014479027977, 0.0410653131998341811014479027977, 0.04317010263657792029700553302794, 0.04317010263657792029700553302794, 0.04317010263657792029700553302794 };
+inline const double O2P2::Prep::Elem::Elem_Pri40::mv_weight[mv_numIP] = { 0.03913367007796355895446968875, 0.0219042770725793188985520972023, 0.0219042770725793188985520972023, 0.0219042770725793188985520972023, 0.02302697375767507970299446697206, 0.02302697375767507970299446697206, 0.02302697375767507970299446697206, 0.03913367007796355895446968875, 0.0219042770725793188985520972023, 0.0219042770725793188985520972023, 0.0219042770725793188985520972023, 0.02302697375767507970299446697206, 0.02302697375767507970299446697206, 0.02302697375767507970299446697206, 0.07336632992203644104553031125, 0.0410653131998341811014479027977, 0.0410653131998341811014479027977, 0.0410653131998341811014479027977, 0.04317010263657792029700553302794, 0.04317010263657792029700553302794, 0.04317010263657792029700553302794, 0.07336632992203644104553031125, 0.0410653131998341811014479027977, 0.0410653131998341811014479027977, 0.0410653131998341811014479027977, 0.04317010263657792029700553302794, 0.04317010263657792029700553302794, 0.04317010263657792029700553302794 };
 
 
 // ================================================================================================
@@ -486,7 +486,7 @@ inline const double O2P2::Prep::Elem::Elem_Pri40::m_weight[m_NumIP] = { 0.039133
 // Shape function
 //
 // ================================================================================================
-inline const double O2P2::Prep::Elem::Elem_Pri40::m_Psi[m_NumIP][m_NumNodes] = {
+inline const double O2P2::Prep::Elem::Elem_Pri40::mv_Psi[mv_numIP][mv_numNodes] = {
 	{ (-4.5 * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] - 13.5 * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] - 13.5 * m_xsi[0][0] * m_xsi[0][1] * m_xsi[0][1] - 4.5 * m_xsi[0][1] * m_xsi[0][1] * m_xsi[0][1] + 9. * m_xsi[0][0] * m_xsi[0][0] + 18. * m_xsi[0][0] * m_xsi[0][1] + 9. * m_xsi[0][1] * m_xsi[0][1] - 5.5 * m_xsi[0][0] - 5.5 * m_xsi[0][1] + 1.) * 0.0625 * (-9. * m_xsi[0][2] * m_xsi[0][2] * m_xsi[0][2] + 9. * m_xsi[0][2] * m_xsi[0][2] + m_xsi[0][2] - 1.),
 	  (13.5 * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] + 27. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] + 13.5 * m_xsi[0][0] * m_xsi[0][1] * m_xsi[0][1] - 22.5 * m_xsi[0][0] * m_xsi[0][0] - 22.5 * m_xsi[0][0] * m_xsi[0][1] + 9. * m_xsi[0][0]) * 0.0625 * (-9. * m_xsi[0][2] * m_xsi[0][2] * m_xsi[0][2] + 9. * m_xsi[0][2] * m_xsi[0][2] + m_xsi[0][2] - 1.),
 	  (-13.5 * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] - 13.5 * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] + 18. * m_xsi[0][0] * m_xsi[0][0] + 4.5 * m_xsi[0][0] * m_xsi[0][1] - 4.5 * m_xsi[0][0]) * 0.0625 * (-9. * m_xsi[0][2] * m_xsi[0][2] * m_xsi[0][2] + 9. * m_xsi[0][2] * m_xsi[0][2] + m_xsi[0][2] - 1.),
@@ -1641,7 +1641,7 @@ inline const double O2P2::Prep::Elem::Elem_Pri40::m_Psi[m_NumIP][m_NumNodes] = {
 // Shape functions derivative
 //
 // ================================================================================================
-inline const double O2P2::Prep::Elem::Elem_Pri40::m_DPsi[m_NumIP][m_NumNodes][m_Dim] = {
+inline const double O2P2::Prep::Elem::Elem_Pri40::mv_DPsi[mv_numIP][mv_numNodes][mv_Dim] = {
 	{ { (-13.5 * m_xsi[0][0] * m_xsi[0][0] - 27. * m_xsi[0][0] * m_xsi[0][1] - 13.5 * m_xsi[0][1] * m_xsi[0][1] + 18. * m_xsi[0][0] + 18. * m_xsi[0][1] - 5.5) * 0.0625 * (-9. * m_xsi[0][2] * m_xsi[0][2] * m_xsi[0][2] + 9. * m_xsi[0][2] * m_xsi[0][2] + m_xsi[0][2] - 1.),
 		(-13.5 * m_xsi[0][0] * m_xsi[0][0] - 27. * m_xsi[0][0] * m_xsi[0][1] - 13.5 * m_xsi[0][1] * m_xsi[0][1] + 18. * m_xsi[0][0] + 18. * m_xsi[0][1] - 5.5) * 0.0625 * (-9. * m_xsi[0][2] * m_xsi[0][2] * m_xsi[0][2] + 9. * m_xsi[0][2] * m_xsi[0][2] + m_xsi[0][2] - 1.),
 		(-4.5 * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] - 13.5 * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] - 13.5 * m_xsi[0][0] * m_xsi[0][1] * m_xsi[0][1] - 4.5 * m_xsi[0][1] * m_xsi[0][1] * m_xsi[0][1] + 9. * m_xsi[0][0] * m_xsi[0][0] + 18. * m_xsi[0][0] * m_xsi[0][1] + 9. * m_xsi[0][1] * m_xsi[0][1] - 5.5 * m_xsi[0][0] - 5.5 * m_xsi[0][1] + 1.) * 0.0625 * (-27. * m_xsi[0][2] * m_xsi[0][2] + 18. * m_xsi[0][2] + 1.) },

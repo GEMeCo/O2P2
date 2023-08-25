@@ -2,7 +2,7 @@
 // 
 // This file is part of O2P2, an object oriented environment for the positional FEM
 //
-// Copyright(C) 2022 Rogerio Carrazedo - All Rights Reserved.
+// Copyright(C) 2023 GEMeCO - All Rights Reserved.
 // 
 // This source code form is subject to the terms of the Apache License 2.0.
 // If a copy of Apache License 2.0 was not distributed with this file, you can obtain one at
@@ -10,9 +10,6 @@
 // 
 // ================================================================================================
 #include "Mesh.h"
-
-#include <algorithm>			// for_each
-#include <execution>			// parallel for_each
 
 // ================================================================================================
 //
@@ -24,17 +21,15 @@ void O2P2::Proc::Mesh::initDirichletBC(const int& loadStep)
 	LOG("Mesh.initDirichletBC: Initiating Dirichlet BC system for load step " << std::to_string(loadStep));
 
 	// Register the current load step for latter.
-	m_curLoadStep = loadStep;
+	mv_curLoadStep = loadStep;
 
-	// Clear all boundary that was once here.
-	m_BCIndex.clear();
-
-	// Assign 1 to all DOFs, resizing it.
-	m_BCIndex.assign(m_TotalDof, 1);
+	// Clear all boundary that was once here, and assign 1 to all.
+	mv_BCindex.clear();
+	mv_BCindex.assign(mv_TotalDof, 1);
 
 	// If a Dirichlet boundary condition is imposed, m_BCIndex is changed to zero
-	for (auto& DBC : m_LoadStep.at(loadStep)->v_DirichletBC) {
-		m_BCIndex[DBC->m_Dof] = 0;
+	for (auto& DBC : mv_LoadStep.at(loadStep)->mv_DirichletBC) {
+		mv_BCindex.at(DBC->mv_Dof) = 0;
 	}
 }
 
@@ -53,27 +48,25 @@ template class O2P2::Proc::Mesh_MQS<3>;
 // Implementation of Mesh Member Function: imposeNeumannBC
 //
 // ================================================================================================
-template<int nDim> void O2P2::Proc::Mesh_MQS<nDim>::imposeNeumannBC(Eigen::VectorXd& RHS)
+template<int nDim> void O2P2::Proc::Mesh_MQS<nDim>::imposeNeumannBC(std::vector<double>& RHS)
 {
 	LOG("Mesh.imposeNeumannBC: Initiating current load vector");
 
-	// If a Dirichlet boundary vector is imposed (like a prescribed displacement), it is first imposed to the RHS 
-	for (auto& DBC : m_LoadStep.at(m_curLoadStep)->v_DirichletBC) {
-		double value = DBC->m_Value * (DBC->m_TimeVar[0] + DBC->m_TimeVar[1] * m_curTimeStep * m_LoadStep[m_curLoadStep]->m_TimeStep
-			+ DBC->m_TimeVar[2] * (m_curTimeStep * m_LoadStep[m_curLoadStep]->m_TimeStep) * (m_curTimeStep * m_LoadStep[m_curLoadStep]->m_TimeStep));
+	double mi_curTime = mv_curTimeStep * mv_LoadStep.at(mv_curLoadStep)->mv_timeStep;
 
-		RHS(DBC->m_Dof) = value;
+	// If a Dirichlet boundary vector is imposed (like a prescribed displacement), it is first imposed to the RHS 
+	for (auto& DBC : mv_LoadStep.at(mv_curLoadStep)->mv_DirichletBC) {
+		RHS.at(DBC->mv_Dof) = DBC->mv_value * (DBC->mv_timeVar[0] + DBC->mv_timeVar[1] * mi_curTime + DBC->mv_timeVar[2] * mi_curTime * mi_curTime);
 	}
 
 	// Boundary conditions are saved directly on DOF number
-	for (auto& NBC : m_LoadStep[m_curLoadStep]->v_NeumannBC) {
-		RHS(NBC->m_Dof) += NBC->m_Value * (NBC->m_TimeVar[0] + NBC->m_TimeVar[1] * m_curTimeStep * m_LoadStep[m_curLoadStep]->m_TimeStep
-			+ NBC->m_TimeVar[2] * (m_curTimeStep * m_LoadStep[m_curLoadStep]->m_TimeStep) * (m_curTimeStep * m_LoadStep[m_curLoadStep]->m_TimeStep));
+	for (auto& NBC : mv_LoadStep.at(mv_curLoadStep)->mv_NeumannBC) {
+		RHS.at(NBC->mv_Dof) = NBC->mv_value * (NBC->mv_timeVar[0] + NBC->mv_timeVar[1] * mi_curTime + NBC->mv_timeVar[2] * mi_curTime * mi_curTime);
 	}
 
 	// Even though there are BC imposed, the load vector must be set ot zero
 	//for (size_t i = 0; i < RHS.size(); ++i) {
-	//	RHS(i) *= this->m_BCIndex[i];
+	//	RHS.at(i) *= this->m_BCIndex[i];
 	//}
 }
 
@@ -83,85 +76,62 @@ template<int nDim> void O2P2::Proc::Mesh_MQS<nDim>::imposeNeumannBC(Eigen::Vecto
 // Implementation of Template Member Function (2D and 3D): assembleSOE
 //
 // ================================================================================================
-template<int nDim> void O2P2::Proc::Mesh_MQS<nDim>::assembleSOE(Eigen::SparseMatrix<double>& Hessian, Eigen::VectorXd& RHS)
+template<int nDim> void O2P2::Proc::Mesh_MQS<nDim>::assembleSOE(M2S2::sparseMatrix& Hessian, std::vector<double>& RHS)
 {
 	PROFILE_FUNCTION();
 
-	// Every new iteration requires Hessian to be populated
-	Hessian.setZero();
+	// Set Hessian to zero
+	Hessian.clear();
 
 	// Fourth nested loop - Elements
-	std::for_each(std::execution::par, this->m_meshElem.begin(), this->m_meshElem.end(), [&](auto& elem)
+	std::for_each(std::execution::par, this->mv_meshElem.begin(), this->mv_meshElem.end(), [&](auto& elem)
 		{
-			// Matrices sizes
-			int nDof = elem->m_nDof;
+			// Fastest way to set a vector to zero
+			memset(&elem->mv_elFor[0], 0., elem->mv_elFor.size() * sizeof(double));
 
-			// Local element Hessian matrix
-			Eigen::MatrixXd elemMat = Eigen::MatrixXd::Zero(nDof, nDof);
+			// The rest, is up to the library
+			elem->mv_elHes.clear();
+			elem->getContribution();
 
-			// Get element contributions for internal force and hessian matrix
-			elem->m_elFor.setZero();
-			elem->getContribution(elemMat);
+			// Impose restrictions in every element (faster)
+			for (int i = 0; i < elem->mv_elIndex.size(); ++i) {
+				int mi_gdof = elem->mv_elIndex.at(i);
 
-			// Register element contribution to local triplet
-			// Dirichlet Boundary condition is applied as triplet is written (not writing it if BC is applied)
-			for (int i = 0; i < elem->v_Conect.size(); ++i) {
-				for (int j = 0; j < nDim; ++j) {
-					// Global dof 1
-					size_t gdof1 = elem->v_Conect.at(i)->m_DofIndex + j;
-					// local dof 1
-					size_t ldof1 = i * nDim + j;
-
-					if (this->m_BCIndex.at(gdof1)) {
-						for (int k = 0; k < elem->v_Conect.size(); ++k) {
-							for (int l = 0; l < nDim; ++l) {
-								// Global dof 2
-								size_t gdof2 = elem->v_Conect.at(k)->m_DofIndex + l;
-								// local dof 1
-								size_t ldof2 = k * nDim + l;
-
-								if (this->m_BCIndex.at(gdof2)) {
-									elem->m_elHes.push_back(Eigen::Triplet<double>(
-										static_cast<int>(gdof2),
-										static_cast<int>(gdof1),
-										elemMat(ldof2, ldof1)));
-								}
-							}
-						}
+				if (!this->mv_BCindex.at(mi_gdof)) {
+					for (int j = 0; j < elem->mv_elIndex.size(); ++j) {
+						elem->mv_elHes.at(i, j) = 0.;
 					}
-					else
-					{
-						elem->m_elFor(ldof1) *= this->m_BCIndex.at(gdof1);
 
-						elem->m_elHes.push_back(Eigen::Triplet<double>(
-							static_cast<int>(gdof1), static_cast<int>(gdof1), 1.));
-					}
+					elem->mv_elHes.at(i, i) = 1.;
+					elem->mv_elFor.at(i) *= this->mv_BCindex.at(mi_gdof);
 				}
 			}
+
+			// Impose restriction directly in the sparse matrix (down below)
+			//for (int i = 0; i < elem->mv_elIndex.size(); ++i) {
+			//	int mi_gdof = elem->mv_elIndex.at(i);
+			//	elem->mv_elFor.at(i) *= this->mv_BCindex.at(mi_gdof);
+			//}
 		}
 	);
 
 	// Add element contribution to global system
-	std::vector<Eigen::Triplet<double>> gl_triplets;
-
-	for (auto& elem : this->m_meshElem) {
-		std::move(elem->m_elHes.begin(), elem->m_elHes.end(), std::back_inserter(gl_triplets));
-		elem->m_elHes.clear();
+	for (auto& elem : this->mv_meshElem) {
+		Hessian.push(elem->mv_elHes, elem->mv_elIndex);
 
 		// Add element contribution to the right hand side vector
-		for (int i = 0; i < elem->v_Conect.size(); ++i) {
-			for (int j = 0; j < nDim; ++j) {
-				// global dof
-				size_t gdof = elem->v_Conect.at(i)->m_DofIndex + j;
-				// Local dof
-				size_t ldof = i * nDim + j;
-
-				RHS(gdof) -= elem->m_elFor(ldof);
-			}
+		for (int i = 0; i < elem->mv_elIndex.size(); ++i) {
+			int mi_gdof = elem->mv_elIndex.at(i);
+			RHS.at(mi_gdof) -= elem->mv_elFor.at(i);
 		}
+
 	}
 
-	Hessian.setFromTriplets(gl_triplets.begin(), gl_triplets.end());
+	// Once every contribution was added, imposed boundary conditions
+	//for (auto& DBC : mv_LoadStep.at(mv_curLoadStep)->mv_DirichletBC) {
+	//	Hessian.zeroRowAndColumn(DBC->mv_Dof);
+	//}
+
 }
 
 
@@ -170,25 +140,28 @@ template<int nDim> void O2P2::Proc::Mesh_MQS<nDim>::assembleSOE(Eigen::SparseMat
 // Implementation of Template Member Function (2D and 3D): setTrial
 //
 // ================================================================================================
-template<int nDim> void O2P2::Proc::Mesh_MQS<nDim>::setTrial(Eigen::VectorXd& LHS)
+template<int nDim> void O2P2::Proc::Mesh_MQS<nDim>::setTrial(std::vector<double>& LHS)
 {
 	//LOG("Mesh_MQS.setTrial: Updating trial solution to nodes");
 	double* sol = new double[nDim];
-	for (auto& node : m_meshNode) {
-		// Number of DOF associated to node - since is fixed, using outside loop
-		//double* sol = new double[node->v_DofIndex.size()];
 
-		int i = 0;
+	for (int k = 0; k < LHS.size(); ++k) {
+		LHS.at(k) *= this->mv_BCindex.at(k);
+	}
+
+	for (auto& node : mv_meshNode) {
+
+		// Number of DOF associated to node - since it is fixed, using outside loop
+		// double* sol = new double[node->v_DofIndex.size()];
+		size_t i = 0;
 		//for (int j = 0; j < node->m_nDOF; ++j) {
 		for (int j = 0; j < nDim; ++j) {
-			sol[i] = LHS(node->m_DofIndex + j);
+			sol[i] = LHS.at(node->mv_DofIndex + j);
 			i++;
 		}
-
 		node->updateTrial(sol);
 		//delete[] sol;
 	}
-
 	delete[] sol;
 }
 
@@ -202,27 +175,26 @@ template<int nDim> void O2P2::Proc::Mesh_MQS<nDim>::setCommit()
 {
 	LOG("Mesh_MQS.setCommit: Committing solution to nodes and saving for post-process");
 
-	// Commit the solution and transfer it to Sol (for post-processing).
-
+	// Commit the solution and transfer it to mi_sol (for post-processing).
 	// This was made only for displacement, nothing else.
-	std::vector<double> Sol(m_TotalDof);
+
+	std::vector<double> mi_sol(mv_TotalDof);
 
 	size_t i = 0;
-	for (auto& node : m_meshNode) {
+	for (auto& node : mv_meshNode) {
 		// Set trial position as current (commit position)
 		node->setCurrent();
 
 		// Save current position to Sol vector for post-processing
 		auto y = node->getCurPos();
-
 		for (size_t j = 0; j < node->getNumDOF(); ++j) {
-			Sol[i] = *(y + j);
+			mi_sol.at(i) = *(y + j);
 			i++;
 		}
 	}
 
 	// Send the information to the post-process container.
-	this->m_PostPt->addSolution(this->m_currentTime, Sol);
+	this->m_PostPt->addSolution(this->mv_currentTime, mi_sol);
 }
 
 
@@ -240,26 +212,29 @@ template class O2P2::Proc::Mesh_MD<3>;
 // Implementation of Template Member Function (2D and 3D): setTimeStep
 //
 // ================================================================================================
-template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::setTimeStep(const int& timeStep, const double& beta, const double& gamma)
+template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::setTimeStep(const int& timeStep, const double& beta, const  double& gamma)
 {
 	// Set the current step
-	this->m_curTimeStep = timeStep;
+	this->mv_curTimeStep = timeStep;
 
 	// Saves Newmark parameters
-	m_beta = beta;
-	m_gamma = gamma;
+	this->mv_beta = beta;
+	this->mv_gamma = gamma;
 
 	// time step
-	double dt = this->m_LoadStep[this->m_curLoadStep]->m_TimeStep;
+	double dt = this->mv_LoadStep.at(this->mv_curLoadStep)->mv_timeStep;
 
 	// Evalutes the dynamic contribution from previous step
 	// downcast meshNode to dynamic type
-	for (auto& node : this->m_meshNode) {
+	for (auto& node : this->mv_meshNode) {
 		O2P2::Proc::Comp::MeshNode_MD<nDim>* pNode = static_cast<O2P2::Proc::Comp::MeshNode_MD<nDim>*>(node.get());
 
-		for (int j = 0; j < nDim; ++j) {
-			v_Qs(pNode->m_DofIndex + j) = pNode->getCurPos()[j] / (beta * dt * dt) + pNode->getPrevVel()[j] / (beta * dt) + pNode->getPrevAcc()[j] * (0.5 / beta - 1.);
-			v_Rs(pNode->m_DofIndex + j) = pNode->getPrevVel()[j] + pNode->getPrevAcc()[j] * dt * (1. - gamma);
+		for (int j = 0; j < nDim; j++) {
+			mv_Qs.at(pNode->mv_DofIndex + j) = pNode->getCurPos()[j] / (beta * dt * dt) +
+				pNode->getPrevVel()[j] / (beta * dt) +
+				pNode->getPrevAcc()[j] * (0.5 / beta - 1.);
+			mv_Rs.at(pNode->mv_DofIndex + j) = pNode->getPrevVel()[j] +
+				pNode->getPrevAcc()[j] * dt * (1. - gamma);
 		}
 	}
 }
@@ -270,67 +245,51 @@ template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::setTimeStep(const int& timeSt
 // Implementation of Mesh Member Function: imposeInertiaBC
 //
 // ================================================================================================
-template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::imposeInertiaBC(Eigen::VectorXd& RHS)
+template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::imposeInertiaBC(std::vector<double>& RHS)
 {
 	PROFILE_FUNCTION();
 
-	// time step
-	double dt = this->m_LoadStep[this->m_curLoadStep]->m_TimeStep;
+	double dt = this->mv_LoadStep[this->mv_curLoadStep]->mv_timeStep;
 
-	// Fourth nested loop - Elements
-	std::for_each(std::execution::par, this->m_meshElem.begin(), this->m_meshElem.end(), 
-		// Execute this lambda function in parallel
+	std::for_each(std::execution::par, this->mv_meshElem.begin(), this->mv_meshElem.end(),
 		[&](auto& elem)
 		{
-			// Matrices sizes
-			int nDof = elem->m_nDof;
-
-			// Local element mass matrix
-			Eigen::MatrixXd elemMat = Eigen::MatrixXd::Zero(nDof, nDof);
-
-			// Pointer to the material
 			O2P2::Prep::Material* pMat = elem->getMaterial();
 
 			double Rho = pMat->getDensity();
 			double Cm = pMat->getDamping();
 
-			// Evaluate element mass matrix
-			elem->addMassContrib(Rho, elemMat);
+			elem->mv_elHes.clear();
+			elem->addMassContrib(Rho);
 
-			// Will save element inertia forces in m_elFor
-			elem->m_elFor.setZero();
+			// Set element forces to zero and then evaluate inertia contribution
+			memset(&elem->mv_elFor[0], 0., elem->mv_elFor.size() * sizeof(double));
 
-			for (int i = 0; i < elem->v_Conect.size(); ++i) {
-				for (int j = 0; j < elem->v_Conect.size(); ++j) {
-					
-					// Number of DOF per node
-					int nDof = elem->v_Conect[j]->getNumDOF();
-					size_t nodeDof = elem->v_Conect[j]->m_DofIndex;
-					
-					double mass = elemMat(i * nDof, j * nDof);
+			for (int i = 0; i < elem->mv_conect.size(); ++i) {
+				for (int j = 0; j < elem->mv_conect.size(); ++j) {
+					int nDof = elem->mv_conect.at(j)->getNumDOF();
+					size_t nodeDof = elem->mv_conect.at(j)->mv_DofIndex;
+
+					double mass = elem->mv_elHes(i * nDof, j * nDof);
+
 					for (int k = 0; k < nDof; ++k) {
-						double yt = elem->v_Conect[j]->getTrialPos()[k];
-						elem->m_elFor(i * nDof + k) += mass * v_Qs(nodeDof + k) - mass * yt / (m_beta * dt * dt) - mass * Cm * v_Rs(nodeDof + k)
-							- mass * Cm * yt * m_gamma / (m_beta * dt) + mass * Cm * v_Qs(nodeDof + k) * m_gamma * dt;
+						double yt = elem->mv_conect.at(j)->getTrialPos()[k];
+
+						elem->mv_elFor.at(i * nDof + k) += mass * mv_Qs.at(nodeDof + k) - mass * yt / (mv_beta * dt * dt)
+							- mass * Cm * mv_Rs.at(nodeDof + k) - mass * Cm * yt * mv_gamma / (mv_beta * dt)
+							+ mass * Cm * mv_Qs.at(nodeDof + k) * mv_gamma * dt;
 					}
 				}
 			}
+
 		}
 	);
 
-	// Got the elemental inertial force, now transfer to RHS
-	for (auto& elem : this->m_meshElem) {
-
+	for (auto& elem : this->mv_meshElem) {
 		// Add element contribution to the right hand side vector
-		for (int i = 0; i < elem->v_Conect.size(); ++i) {
-			for (int j = 0; j < nDim; ++j) {
-				// global dof
-				size_t gdof = elem->v_Conect.at(i)->m_DofIndex + j;
-				// Local dof
-				size_t ldof = i * nDim + j;
-
-				RHS(gdof) += elem->m_elFor(ldof);
-			}
+		for (int i = 0; i < elem->mv_elIndex.size(); ++i) {
+			int mi_gdof = elem->mv_elIndex.at(i);
+			RHS.at(mi_gdof) += elem->mv_elFor.at(i);
 		}
 	}
 }
@@ -341,107 +300,60 @@ template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::imposeInertiaBC(Eigen::Vector
 // Implementation of Template Member Function (2D and 3D): assembleSOE
 //
 // ================================================================================================
-template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::assembleSOE(Eigen::SparseMatrix<double>& Hessian, Eigen::VectorXd& RHS)
+template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::assembleSOE(M2S2::sparseMatrix& Hessian, std::vector<double>& RHS)
 {
 	PROFILE_FUNCTION();
 
-	// Every new iteration requires Hessian to be populated
-	Hessian.setZero();
+	// Set Hessian to zero
+	Hessian.clear();
 
-	// Impose inertia to RHS
 	imposeInertiaBC(RHS);
 
-	// time step
-	double dt = this->m_LoadStep[this->m_curLoadStep]->m_TimeStep;
+	double dt = this->mv_LoadStep[this->mv_curLoadStep]->mv_timeStep;
 
 	// Fourth nested loop - Elements
-	std::for_each(std::execution::par, this->m_meshElem.begin(), this->m_meshElem.end(),
-		// Execute this lambda function in parallel
-		[&](auto& elem)
+	std::for_each(std::execution::par, this->mv_meshElem.begin(), this->mv_meshElem.end(), [&](auto& elem)
 		{
-			// Matrices sizes
-			int nDof = elem->m_nDof;
+			// Fastest way to set a vector to zero
+			memset(&elem->mv_elFor[0], 0., elem->mv_elFor.size() * sizeof(double));
 
-			// Local element Hessian matrix
-			Eigen::MatrixXd elemMat = Eigen::MatrixXd::Zero(nDof, nDof);
+			elem->mv_elHes.clear();
+			elem->getContribution();
 
-			// Get element contributions for internal force and hessian matrix
-			elem->m_elFor.setZero();
-			elem->getContribution(elemMat);
-
-			// -------------------------------------------------------------------------------------------
-			// Add mass contribution (this is only needed in Dynamic processes)
-			// This is the difference from Quasi-Static
-
-			// Pointer to the material
+			// Add mass contribution
 			O2P2::Prep::Material* pMat = elem->getMaterial();
 
 			double Rho = pMat->getDensity();
 			double Cm = pMat->getDamping();
-			double mult = Rho * (1 + this->m_gamma * Cm * dt) / (this->m_beta * dt * dt);
+			double mult = Rho * (1 + this->mv_gamma * Cm * dt) / (this->mv_beta * dt * dt);
 
-			elem->addMassContrib(mult, elemMat);
-			// -------------------------------------------------------------------------------------------
+			elem->addMassContrib(mult);
 
-			// Register element contribution to local triplet
-			// Dirichlet Boundary condition is applied as triplet is written (not writing it if BC is applied)
-			for (int i = 0; i < elem->v_Conect.size(); ++i) {
-				for (int j = 0; j < nDim; ++j) {
-					// Global dof 1
-					size_t gdof1 = elem->v_Conect.at(i)->m_DofIndex + j;
-					// local dof 1
-					size_t ldof1 = i * nDim + j;
+			for (int i = 0; i < elem->mv_elIndex.size(); ++i) {
+				int mi_gdof = elem->mv_elIndex.at(i);
 
-					if (this->m_BCIndex.at(gdof1)) {
-						for (int k = 0; k < elem->v_Conect.size(); ++k) {
-							for (int l = 0; l < nDim; ++l) {
-								// Global dof 2
-								size_t gdof2 = elem->v_Conect.at(k)->m_DofIndex + l;
-								// local dof 1
-								size_t ldof2 = k * nDim + l;
-
-								if (this->m_BCIndex.at(gdof2)) {
-									elem->m_elHes.push_back(Eigen::Triplet<double>(
-										static_cast<int>(gdof2),
-										static_cast<int>(gdof1),
-										elemMat(ldof2, ldof1)));
-								}
-							}
-						}
+				if (!this->mv_BCindex.at(mi_gdof)) {
+					for (int j = 0; j < elem->mv_elIndex.size(); ++j) {
+						elem->mv_elHes.at(i, j) = 0.;
 					}
-					else
-					{
-						elem->m_elFor(ldof1) *= this->m_BCIndex.at(gdof1);
 
-						elem->m_elHes.push_back(Eigen::Triplet<double>(
-							static_cast<int>(gdof1), static_cast<int>(gdof1), 1.));
-					}
+					elem->mv_elHes.at(i, i) = 1.;
+					elem->mv_elFor.at(i) *= this->mv_BCindex.at(mi_gdof);
 				}
 			}
 		}
 	);
 
 	// Add element contribution to global system
-	std::vector<Eigen::Triplet<double>> gl_triplets;
-
-	for (auto& elem : this->m_meshElem) {
-		std::move(elem->m_elHes.begin(), elem->m_elHes.end(), std::back_inserter(gl_triplets));
-		elem->m_elHes.clear();
+	for (auto& elem : this->mv_meshElem) {
+		Hessian.push(elem->mv_elHes, elem->mv_elIndex);
 
 		// Add element contribution to the right hand side vector
-		for (int i = 0; i < elem->v_Conect.size(); ++i) {
-			for (int j = 0; j < nDim; ++j) {
-				// global dof
-				size_t gdof = elem->v_Conect.at(i)->m_DofIndex + j;
-				// Local dof
-				size_t ldof = i * nDim + j;
-
-				RHS(gdof) -= elem->m_elFor(ldof);
-			}
+		for (int i = 0; i < elem->mv_elIndex.size(); ++i) {
+			int mi_gdof = elem->mv_elIndex.at(i);
+			RHS.at(mi_gdof) -= elem->mv_elFor.at(i);
 		}
 	}
-
-	Hessian.setFromTriplets(gl_triplets.begin(), gl_triplets.end());
 }
 
 
@@ -450,35 +362,30 @@ template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::assembleSOE(Eigen::SparseMatr
 // Implementation of Template Member Function (2D and 3D): setTrial
 //
 // ================================================================================================
-template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::setTrial(Eigen::VectorXd& LHS)
+template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::setTrial(std::vector<double>& LHS)
 {
 	//LOG("Mesh_MD.setTrial: Updating trial solution to nodes");
-	double* sol = new double[nDim*3];
+	double* sol = new double[nDim * 3];
+	double dt = this->mv_LoadStep[this->mv_curLoadStep]->mv_timeStep;
 
-	// time step
-	double dt = this->m_LoadStep[this->m_curLoadStep]->m_TimeStep;
-
-	for (auto& node : this->m_meshNode) {
-		// Number of DOF associated to node - since is fixed, using outside loop
-		//double* sol = new double[node->v_DofIndex.size()];
-		O2P2::Proc::Comp::MeshNode_MD<nDim>* pNode = static_cast<O2P2::Proc::Comp::MeshNode_MD<nDim>*>(node.get());
-
-		int i = 0;
-		//for (int j = 0; j < node->m_nDOF; ++j) {
-		for (int j = 0; j < nDim; ++j) {
-			// New position
-			sol[i] = pNode->getTrialPos()[j] + LHS(pNode->m_DofIndex + j);
-			// Update acceleration
-			sol[2 * nDim + i] = sol[i] / (m_beta * dt * dt) - v_Qs(pNode->m_DofIndex + j);
-			// Update velocity
-			sol[nDim + i] = pNode->getPrevVel()[j] + dt * (1. - m_gamma) * pNode->getPrevAcc()[j] + dt * m_gamma * sol[2 * nDim + i];
-			i++;
-		}
-
-		pNode->updateTrial(sol);
-		//delete[] sol;
+	for (int k = 0; k < LHS.size(); ++k) {
+		LHS.at(k) *= this->mv_BCindex.at(k);
 	}
 
+	for (auto& node : this->mv_meshNode) {
+		O2P2::Proc::Comp::MeshNode_MD<nDim>* pNode = static_cast<O2P2::Proc::Comp::MeshNode_MD<nDim>*>(node.get());
+		size_t i = 0;
+		for (int j = 0; j < nDim; ++j) {
+			// position variation
+			sol[i] = LHS.at(node->mv_DofIndex + j);
+			// updated acceleration
+			sol[2 * nDim + i] = (pNode->getTrialPos()[j] + sol[i]) / (mv_beta * dt * dt) - mv_Qs.at(pNode->mv_DofIndex + j);
+			// updated velocity
+			sol[nDim + i] = pNode->getPrevVel()[j] + dt * (1. - mv_gamma) * pNode->getPrevAcc()[j] + dt * mv_gamma * sol[2 * nDim + i];
+			i++;
+		}
+		pNode->updateTrial(sol);
+	}
 	delete[] sol;
 }
 
@@ -490,31 +397,27 @@ template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::setTrial(Eigen::VectorXd& LHS
 // ================================================================================================
 template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::setCommit()
 {
-	LOG("Mesh_MQS.setCommit: Committing solution to nodes and saving for post-process");
+	LOG("Mesh_MD.setCommit: Committing solution to nodes and saving for post-process");
 
-	// Commit the solution and transfer it to Sol (for post-processing).
-
+	// Commit the solution and transfer it to mi_sol (for post-processing).
 	// This was made only for displacement, nothing else.
-	std::vector<double> Sol(this->m_TotalDof);
+	std::vector<double> mi_sol(this->mv_TotalDof);
 
 	size_t i = 0;
-	for (auto& node : this->m_meshNode) {
+	for (auto& node : this->mv_meshNode) {
 		// Set trial position as current (commit position)
 		node->setCurrent();
 
 		// Save current position to Sol vector for post-processing
 		auto y = node->getCurPos();
-
 		for (size_t j = 0; j < node->getNumDOF(); ++j) {
-			Sol[i] = *(y + j);
+			mi_sol.at(i) = *(y + j);
 			i++;
 		}
 	}
-
 	// Send the information to the post-process container.
-	this->m_PostPt->addSolution(this->m_currentTime, Sol);
+	this->m_PostPt->addSolution(this->mv_currentTime, mi_sol);
 }
-
 
 // ================================================================================================
 //
@@ -526,134 +429,83 @@ template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::setAccel()
 	PROFILE_FUNCTION();
 	LOG("Mesh_MD.setAccel: Set initial acceleration");
 
-	std::for_each(std::execution::par, this->m_meshElem.begin(), this->m_meshElem.end(),
-		// Execute this lambda function in parallel
-		[&](auto& elem)
+	// Fourth nested loop - Elements
+	std::for_each(std::execution::par, this->mv_meshElem.begin(), this->mv_meshElem.end(), [&](auto& elem)
 		{
-			// Matrices sizes
-			int nDof = elem->m_nDof;
+			// Fastest way to set a vector to zero
+			memset(&elem->mv_elFor[0], 0., elem->mv_elFor.size() * sizeof(double));
 
-			// Local element mass matrix
-			Eigen::MatrixXd elemMat = Eigen::MatrixXd::Zero(nDof, nDof);
+			elem->mv_elHes.clear();
+			elem->getContribution();
 
 			// Get element contribution for the initial force
 			// Although the local hessiam matrix is evaluated, is not required - Only the internal force is needed (saved in elem->m_elFor)
-			elem->getContribution(elemMat);
+			elem->mv_elHes.clear();
 
-			// Set the elemental Hessian to zero
-			elemMat.setZero();
-
-			// Pointer to the material
+			// Add mass contribution
 			O2P2::Prep::Material* pMat = elem->getMaterial();
 
 			double Rho = pMat->getDensity();
 			double Cm = pMat->getDamping();
 
-			// Evaluate element mass matrix
-			elem->addMassContrib(Rho, elemMat);
+			elem->addMassContrib(Rho);
 
-			// Damping force
-			elem->m_elFor.setZero();
+			// Evaluate initial velocity field
+			std::vector<double> va(elem->mv_nDof);
 
-			// Creates an auxiliary vector
-			Eigen::VectorXd va(nDof);
-
-			// Register the velocity in the auxiliary vector
 			int i = 0;
-			for (auto& node : elem->v_Conect) {
+			for (auto& node : elem->mv_conect) {
 				O2P2::Proc::Comp::MeshNode_MD<nDim>* pNode = static_cast<O2P2::Proc::Comp::MeshNode_MD<nDim>*>(node.get());
 
 				for (int j = 0; j < nDim; ++j) {
-					va(i + j) = pNode->getPrevVel()[j];
+					va.at(i + j) = pNode->getPrevVel()[j];
 				}
 				i++;
 			}
 
-			// Evaluates the elemental damping force
-			elem->m_elFor -= Cm * elemMat * va;
-
-			// Register element mass contribution to local triplet
-			for (int i = 0; i < elem->v_Conect.size(); ++i) {
-				for (int j = 0; j < nDim; ++j) {
-					// Global dof 1
-					size_t gdof1 = elem->v_Conect.at(i)->m_DofIndex + j;
-					// local dof 1
-					size_t ldof1 = i * nDim + j;
-
-					for (int k = 0; k < elem->v_Conect.size(); ++k) {
-						for (int l = 0; l < nDim; ++l) {
-							// Global dof 2
-							size_t gdof2 = elem->v_Conect.at(k)->m_DofIndex + l;
-							// local dof 1
-							size_t ldof2 = k * nDim + l;
-
-							elem->m_elHes.push_back(Eigen::Triplet<double>(
-								static_cast<int>(gdof2),
-								static_cast<int>(gdof1),
-								elemMat(ldof2, ldof1)));
-						}
-					}
-				}
-			}
-
+			elem->mv_elFor = Cm * elem->mv_elHes * va;
 		}
 	);
 
-	// Got what I need from the element, now lets creates the global matrix and vetors
-	Eigen::SparseMatrix<double> GlMass(this->m_TotalDof, this->m_TotalDof);
+	// System of equations to be solved
+	int size = this->mv_TotalDof;
 
-	// Vector of independent terms, the right hand side
-	Eigen::VectorXd RHS = Eigen::VectorXd::Zero(this->m_TotalDof);
-
-	// Vector of solution, the left hand side
-	Eigen::VectorXd LHS = Eigen::VectorXd::Zero(this->m_TotalDof);
-
-	// Sparse solver
-	Eigen::PardisoLU<Eigen::SparseMatrix<double>> solver;
+	M2S2::sparseMatrix GlMass(size, true);
+	std::vector<double> mi_RHS(size);
+	std::vector<double> mi_LHS(size);
 
 	// Add element contribution to global system
-	std::vector<Eigen::Triplet<double>> gl_triplets;
-
-	for (auto& elem : this->m_meshElem) {
-		std::move(elem->m_elHes.begin(), elem->m_elHes.end(), std::back_inserter(gl_triplets));
-		elem->m_elHes.clear();
+	for (auto& elem : this->mv_meshElem) {
+		GlMass.push(elem->mv_elHes, elem->mv_elIndex);
 
 		// Add element contribution to the right hand side vector
-		for (int i = 0; i < elem->v_Conect.size(); ++i) {
-			for (int j = 0; j < nDim; ++j) {
-				// global dof
-				size_t gdof = elem->v_Conect.at(i)->m_DofIndex + j;
-				// Local dof
-				size_t ldof = i * nDim + j;
-
-				RHS(gdof) -= elem->m_elFor(ldof);
-			}
+		for (int i = 0; i < elem->mv_elIndex.size(); ++i) {
+			int mi_gdof = elem->mv_elIndex.at(i);
+			mi_RHS.at(mi_gdof) += elem->mv_elFor.at(i);
 		}
 
-		// Lets clean for next use
-		elem->m_elFor.setZero();
+		// Fastest way to set a vector to zero
+		memset(&elem->mv_elFor[0], 0., elem->mv_elFor.size() * sizeof(double));
 	}
 
-	GlMass.setFromTriplets(gl_triplets.begin(), gl_triplets.end());
-
-	// Find the inverse of GlMass (with very high memory cost)
-	solver.compute(GlMass);
-
-	// Still need the external forces at t = 0
-	for (auto& NBC : this->m_LoadStep[0]->v_NeumannBC) {
-		RHS(NBC->m_Dof) += NBC->m_Value * (NBC->m_TimeVar[0]);
+	for (auto& NBC : this->mv_LoadStep.at(0)->mv_NeumannBC) {
+		mi_RHS.at(NBC->mv_Dof) += NBC->mv_value * (NBC->mv_timeVar[0]);
 	}
 
-	// Finally evaluates the initial acceleration
-	// Acc = M^-1.RHS
-	LHS = solver.solve(RHS);
+	// LHS = GlMass^-1 * RHS;
+	M2S2::CSR mi_csrMatrix;
+	GlMass.saveAsCSR(mi_csrMatrix);
 
-	for (int i = 0; i < this->m_meshNode.size(); i++) {
-		for (int j = 0; j < this->m_meshNode[i]->getNumDOF(); j++) {
-			// Donwcast node to set the acceleration
-			O2P2::Proc::Comp::MeshNode_MD<nDim>* pNode = static_cast<O2P2::Proc::Comp::MeshNode_MD<nDim>*>(this->m_meshNode[i].get());
+	{
+		PROFILE_SCOPE("setAccel");
+		solve(size, mi_csrMatrix, mi_RHS, mi_LHS);
+	}
 
-			pNode->setAcc(j, LHS(pNode->m_DofIndex + j));
+	for (int i = 0; i < this->mv_meshNode.size(); ++i) {
+		for (int j = 0; j < this->mv_meshNode.at(i)->getNumDOF(); ++j) {
+			O2P2::Proc::Comp::MeshNode_MD<nDim>* pNode = static_cast<O2P2::Proc::Comp::MeshNode_MD<nDim>*>(this->mv_meshNode.at(i).get());
+
+			pNode->setAcc(j, mi_LHS.at(pNode->mv_DofIndex + j) * (this->mv_BCindex.at(pNode->mv_DofIndex + j)));
 		}
 	}
 }

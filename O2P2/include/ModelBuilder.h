@@ -2,7 +2,7 @@
 // 
 // This file is part of O2P2, an object oriented environment for the positional FEM
 //
-// Copyright(C) 2022 Rogerio Carrazedo - All Rights Reserved.
+// Copyright(C) 2023 GEMeCO - All Rights Reserved.
 // 
 // This source code form is subject to the terms of the Apache License 2.0.
 // If a copy of Apache License 2.0 was not distributed with this file, you can obtain one at
@@ -15,7 +15,6 @@
 #include "Common.h"
 #include "Domain.h"
 #include "SolutionAlgorithm.h"
-#include "NonLinearSolver.h"
 
 namespace O2P2 {
 	/** @ingroup PreProcessor_Module
@@ -28,44 +27,40 @@ namespace O2P2 {
 	  * @tparam nDim The dimensionality of the problem. It is either 2 or 3 (bidimensional or tridimensional).
 	  */
 	template<int nDim>
-	class ModelBuilder {
-
+	class ModelBuilder
+	{
 	public:
 		// Default constructor.
-		ModelBuilder() { };
+		ModelBuilder() {};
 
-		// Destructor. Should closes all files.
-		~ModelBuilder() {
-			m_fileNode.close();
-			m_fileElem.close();
-			m_fileMat.close();
-			m_fileDOF.close();
-			LOG("ModelBuilder.destructor: All project files were closed");
-		};
+		// Destructor.
+		~ModelBuilder() {};
 
 		/** Reads the project file, defining the type of analysis and initiating Domain component.
 		  * @return a pointer to a Domain object already initialized.
-		  * @param fileProj Project file (Main file).
+		  * @param file Project file (Main file).
 		  */
-		std::unique_ptr<O2P2::Prep::Domain<nDim>> initMesh(std::istream& fileProj);
+		std::unique_ptr<O2P2::Prep::Domain<nDim>> initMesh(std::istream& file);
 
 		/** Reads the project file, defines the type of analysis and initiates SolutionAlgorithm component.
 		 * @return a pointer to a SolutionAlgorithm object, after initialization.
-		 * @param fileProj Project file (Main file).
+		 * @param file Project file (Main file).
 		*/
-		std::unique_ptr<O2P2::Proc::SolutionAlgorithm> initAnalyzer(std::istream& fileProj);
+		std::unique_ptr<O2P2::Proc::SolutionAlgorithm> initAnalyzer(std::istream& file);
 
 		/** Populates nodes, materials, sections, elements, loads ands constrains.
 		  * @return True if mesh components were correctly initiated.
+		  * @param file Project file (Main file).
 		  * @param theDomain Domain container of all mesh components, holded by FEAnalysis.
 		  *
 		  * @sa FEAnalysis
 		  * @sa Domain
 		  */
-		bool populateDomain(O2P2::Prep::Domain<nDim>* theDomain);
+		bool populateDomain(std::istream& file, O2P2::Prep::Domain<nDim>* theDomain);
 
 		/** Reads the Neumann and Dirichlet Boundary Conditions for all Load Steps.
 		  * @return the total number of steps (load and time steps).
+		  * @param file Project file (Main file).
 		  * @param theDomain Domain container of all mesh components, holded by FEAnalysis.
 		  * @param theAnalyzer SolutionAlgorithm object, that manages the processing unity, holded by FEAnalysis.
 		  *
@@ -73,11 +68,11 @@ namespace O2P2 {
 		  * @sa Domain
 		  * @sa SolutionAlgorithm
 		  */
-		int readBondaryConditions(O2P2::Prep::Domain<nDim>* theDomain, O2P2::Proc::SolutionAlgorithm* theAnalyzer);
+		int readBondaryConditions(std::istream& file, O2P2::Prep::Domain<nDim>* theDomain, O2P2::Proc::SolutionAlgorithm* theAnalyzer);
 
 	public:
 		/** @brief Indicates whether input begins with 0 or 1. */
-		int m_indexingInit{ 0 };
+		int mv_indexingInit{ 0 };
 
 	private:
 		// ModelBuilder is unique, therefore it must not be copied. Thus, copy constructor will be deleted.
@@ -87,34 +82,22 @@ namespace O2P2 {
 		ModelBuilder(ModelBuilder&& other) = delete;
 
 		// Reads node file and creates nodes and points.
-		bool populateNodes(O2P2::Prep::Domain<nDim>* theDomain);
+		bool populateNodes(std::istream& file, O2P2::Prep::Domain<nDim>* theDomain);
 
 		// Reads materials file and creates materials and sections.
-		bool populateMaterials(O2P2::Prep::Domain<nDim>* theDomain);
+		bool populateMaterials(std::istream& file, O2P2::Prep::Domain<nDim>* theDomain);
 
 		// Reads elements file and creates elements and inclusions (particles and fibers).
-		bool populateElements(O2P2::Prep::Domain<nDim>* theDomain);
+		bool populateElements(std::istream& file, O2P2::Prep::Domain<nDim>* theDomain);
 
 	private:
-		// File with nodes and points information.
-		std::ifstream m_fileNode;
-
-		// File with elements conectivity.
-		std::ifstream m_fileElem;
-
-		// File with material properties.
-		std::ifstream m_fileMat;
-
-		// File with boundary conditions.
-		std::ifstream m_fileDOF;
-
 		// Mesh boolean.
-		bool m_IsDomainPopulated{ false };
+		bool mv_IsDomainPopulated{ false };
 
 		// Type of analysis
-		AnalysisType m_AnalysisType{ AnalysisType::STATIC };
+		AnalysisType mv_AnalysisType{ AnalysisType::STATIC };
 
 		// Type of problem
-		ProblemType m_ProblemType{ ProblemType::MECHANICAL };
+		ProblemType mv_ProblemType{ ProblemType::MECHANICAL };
 	};
 } // End of O2P2 namespace

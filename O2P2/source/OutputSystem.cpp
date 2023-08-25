@@ -2,7 +2,7 @@
 // 
 // This file is part of O2P2, an object oriented environment for the positional FEM
 //
-// Copyright(C) 2022 Rogerio Carrazedo - All Rights Reserved.
+// Copyright(C) 2023 GEMeCO - All Rights Reserved.
 // 
 // This source code form is subject to the terms of the Apache License 2.0.
 // If a copy of Apache License 2.0 was not distributed with this file, you can obtain one at
@@ -42,8 +42,8 @@ void O2P2::Post::OutputSystem<nDim>::draw_AcadView_Node(std::ofstream& file, O2P
 	}
 
 	// Total number of nodes and elements
-	file << theDomain->m_nNodes << " "
-		 << nFaces << " " << thePost->m_SolOnNode.size() * nDim << "\n#\n";
+	file << theDomain->mv_nNodes << " "
+		<< nFaces << " " << thePost->mv_SolOnNode.size() * nDim << "\n#\n";
 
 	for (auto& node : theDomain->getNode()) {
 		file << *node;
@@ -62,21 +62,21 @@ void O2P2::Post::OutputSystem<nDim>::draw_AcadView_Node(std::ofstream& file, O2P
 		file << elem->printByIndex_AV(1);
 	}
 
-	for (int i = 0; i < thePost->m_SolOnNode.size(); ++i) {
+	for (int i = 0; i < thePost->mv_SolOnNode.size(); ++i) {
 		for (int j = 0; j < nDim; ++j) {
-			file << "#\n" << "Desl_" << j << "_t_" << std::defaultfloat << std::get<0>(thePost->m_SolOnNode[i]) << "\n";
+			file << "#\n" << "Desl_" << j << "_t_" << std::defaultfloat << std::get<0>(thePost->mv_SolOnNode[i]) << "\n";
 
-			for (size_t k = 0; k < theDomain->m_nNodes; ++k) {
+			for (size_t k = 0; k < theDomain->mv_nNodes; ++k) {
 				// Must write four data here -> disp x, y, z, "color" - value to be ploted
 				const auto& node = theDomain->getNode(k);
 				const auto& x = node->getInitPos();
 
 				for (int l = 0; l < nDim; l++) {
-					file << formatScien << std::get<1>(thePost->m_SolOnNode[i])[k * nDim + l] - x[l];
+					file << formatScien << std::get<1>(thePost->mv_SolOnNode[i])[k * nDim + l] - x[l];
 				}
 				if (nDim == 2) file << formatScien << 0.F;
 
-				file << formatScien << std::get<1>(thePost->m_SolOnNode[i])[k * nDim + j] - x[j] << "\n";
+				file << formatScien << std::get<1>(thePost->mv_SolOnNode[i])[k * nDim + j] - x[j] << "\n";
 			}
 		}
 	}
@@ -106,8 +106,8 @@ void O2P2::Post::OutputSystem<nDim>::draw_AcadView_Elem(std::ofstream& file, O2P
 	for (auto& elem : theDomain->getElem()) {
 		iNd += elem->getNumNodes();
 	}
-	file << iNd << " " << theDomain->m_nElem << " " << thePost->m_SolOnNode.size()*nDim << "\n#\n";
-	
+	file << iNd << " " << theDomain->mv_nElem << " " << thePost->mv_SolOnNode.size() * nDim << "\n#\n";
+
 	for (auto& elem : theDomain->getElem()) {
 		for (auto& node : elem->getConectivity()) {
 			file << *node;
@@ -128,25 +128,24 @@ void O2P2::Post::OutputSystem<nDim>::draw_AcadView_Elem(std::ofstream& file, O2P
 		iS += elem->getNumNodes();
 	}
 
-	for (int i = 0; i < thePost->m_SolOnNode.size(); ++i) {
+	for (int i = 0; i < thePost->mv_SolOnNode.size(); ++i) {
 		for (int j = 0; j < nDim; ++j) {
-			file << "#\n" << "Desl_" << j << "_t_" << std::defaultfloat << std::get<0>(thePost->m_SolOnNode[i]) << "\n";
+			file << "#\n" << "Desl_" << j << "_t_" << std::defaultfloat << std::get<0>(thePost->mv_SolOnNode[i]) << "\n";
 
 			for (auto& elem : theDomain->getElem()) {
 				for (auto& node : elem->getConectivity()) {
-					size_t pos = node->m_index * nDim;
+					size_t pos = node->mv_index * nDim;
 
 					// Must write four data here -> disp x, y, z, color
 					for (int k = 0; k < nDim; ++k) {
-						file << formatScien << std::get<1>(thePost->m_SolOnNode[i])[pos + k];
+						file << formatScien << std::get<1>(thePost->mv_SolOnNode[i])[pos + k];
 					}
 					if (nDim == 2) file << formatScien << 0.F;
 
-					file << formatScien << std::get<1>(thePost->m_SolOnNode[i])[pos + j] << "\n";
+					file << formatScien << std::get<1>(thePost->mv_SolOnNode[i])[pos + j] << "\n";
 				}
 			}
 		}
 	}
 	file.close();
 }
-
