@@ -3,6 +3,8 @@
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
+[Bb]inaries/
+[Ii]ntermed/
 x64/
 x86/
 [Ww][Ii][Nn]32/
@@ -75,5 +77,5 @@ ipch/
 [Vv]alidacao
 *.ogl
 *.log
-/results.json
+[Rr]esults.json
 *.txt

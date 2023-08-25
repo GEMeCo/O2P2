@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32516.85
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "O2P2", "O2P2.vcxproj", "{9938DBDA-0574-40CE-B9B9-80CB96B3C05B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "O2P2", "O2P2\O2P2.vcxproj", "{9938DBDA-0574-40CE-B9B9-80CB96B3C05B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

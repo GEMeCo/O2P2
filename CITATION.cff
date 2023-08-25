@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+title: "O2P2: Pre-alpha release"
+abstract: "Under development for non-linear coupled thermo-mechanical analyzes with the finite element method based on positions."
+message: "If you use this software, please cite it using the metadata from this file."
+authors:
+  - family-names: Carrazedo
+    given-names: Rogério
+    orcid: "https://orcid.org/0000-0003-2750-034X"
+  - family-names: Salomão
+    given-names: "Rafael Correa"
+    website: "http://lattes.cnpq.br/4408319800130401"
+  - family-names: Felix
+    given-names: "Emerson Felipe"
+    orcid: "https://orcid.org/0000-0002-8928-9474"
+  - family-names: Matté
+    given-names: "Alexandre Ten Cate"
+    website: "https://lattes.cnpq.br/8144116395864291"
+  - family-names: Teodoro
+    given-names: "Chiara Pinheiro"
+    website: "http://lattes.cnpq.br/6999948388655115"
+keywords:
+  - Thermomechanics
+  - "Positional Finite Element Method"
+  - "FEM based on positions"
+identifiers:
+  - description: "This is the collection of archived versions of O2P2"
+    type: doi
+    value: 10.5281/zenodo.7102198
+  - description: "This is the archived version 0.1.0 of O2P2"
+    type: doi
+    value: 10.5281/zenodo.7102199
+date-released: 2022-09-21
+license: Apache-2.0
+repository-code: "https://github.com/GEMeCo/O2P2"
+version: v0.2.0
