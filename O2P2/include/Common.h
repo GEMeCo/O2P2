@@ -24,6 +24,7 @@
 #include <map>				// required by std::map
 #include <algorithm>		// std::max / std::max_element
 #include <chrono>			// standard timing functions
+#include <limits>			// required by std::numeric_limits
 
 #include <algorithm>		// for_each
 #include <execution>		// parallel for_each

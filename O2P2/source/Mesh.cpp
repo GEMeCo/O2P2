@@ -476,7 +476,23 @@ template<int nDim> void O2P2::Proc::Mesh_MD<nDim>::setAccel()
 
 	// Add element contribution to global system
 	for (auto& elem : this->mv_meshElem) {
-		GlMass.push(elem->mv_elHes, elem->mv_elIndex);
+		//GlMass.push(elem->mv_elHes, elem->mv_elIndex);
+		std::vector<M2S2::triplet> mi_triplets;
+
+		for (int i = 0; i < elem->mv_elHes.rows(); i++) {
+			for (int j = i; j < elem->mv_elHes.cols(); j++) {
+				if (std::abs(elem->mv_elHes.at(i, j)) > std::numeric_limits<double>::epsilon()) {
+					if (elem->mv_elIndex.at(i) >= elem->mv_elIndex.at(j)) {
+						mi_triplets.emplace_back(elem->mv_elIndex.at(j), elem->mv_elIndex.at(i), elem->mv_elHes.at(i, j));
+					}
+					else {
+						mi_triplets.emplace_back(elem->mv_elIndex.at(i), elem->mv_elIndex.at(j), elem->mv_elHes.at(i, j));
+					}
+				}
+			}
+		}
+		// Push triplet to the sparse matrix
+		GlMass.push(mi_triplets);
 
 		// Add element contribution to the right hand side vector
 		for (int i = 0; i < elem->mv_elIndex.size(); ++i) {
