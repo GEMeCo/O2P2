@@ -34,7 +34,7 @@
   * @section citation How to cite
   * Whether it was used in whole or parts, citation is a must! Our software is under development, and a proper presentation paper is underway.
   * 
-  * Our software is in Zenodo - thus, we got a DOI: [doi.org/10.5281/zenodo.7102198](https://doi.org/10.5281/zenodo.7102198)
+  * Our software is in Zenodo - thus, we got a DOI: [doi.org/10.5281/zenodo.8283439](https://doi.org/10.5281/zenodo.8283439)
   * 
   * @section features Features
   * - v0.2.0: Dynamic mechanical analysis.
