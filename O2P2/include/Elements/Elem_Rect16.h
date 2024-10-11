@@ -20,7 +20,7 @@
 #include "IntegrationPoint.h"
 
 namespace O2P2 {
-	namespace Prep {
+	namespace Geom {
 		namespace Elem {
 			/** @ingroup Elements
 			  * @class Elem_Rect16
@@ -30,18 +30,19 @@ namespace O2P2 {
 			  * Options for integration points: 9 and 16. Nevertheless, hourglass may result from 9 Gauss points.
 			  * @image html Elem_Quad16.png height=300
 			  */
-			class Elem_Rect16 : public ElementPlane
+			class Elem_Rect16 : public ElemPlane
 			{
 			private:
+				// Default constructor is deleted. Use explicit constructor only.
 				Elem_Rect16() = delete;
 
 			protected:
 				/** Constructor for rectangular cubic elements.
 				  * @param Material Pointer to Material class.
-				  * @param Section Pointer to Section class.
+				  * @param Section Pointer to PlaneSection class.
 				  */
-				Elem_Rect16(std::shared_ptr<O2P2::Prep::Material>& Material, std::shared_ptr<O2P2::Prep::Section>& Section)
-					: ElementPlane(Material, Section) { }
+				explicit Elem_Rect16(std::shared_ptr<O2P2::Geom::Material>& Material, std::shared_ptr<O2P2::Geom::PlaneSection>& Section)
+					: ElemPlane(Material, Section) { }
 
 			public:
 				// Output function for AcadView, based on element index.
@@ -77,17 +78,19 @@ namespace O2P2 {
 				std::vector<double> getShapeDerivOnPoint(const double* Point) override;
 
 				// Returns the number of nodes of current element.
-				int getNumNodes() override { return mv_numNodes; }
+				const int getNumNodes() const override { return mv_numNodes; }
 
 				// Returns the number of faces of current element.
-				int getNumFaces() override { return mv_numFaces; }
+				const int getNumFaces() const override { return mv_numFaces; }
 
-				/** Verifies dimensionless coordinates from input - if it is immersed on the element.
-				  * @return True if input falls within the element.
-				  * @param xsi Trial dimensionless coordinates.
-				  */
-				inline bool evaluateXsi(const std::array<double, mv_Dim> xsi) override {
-					const auto [min, max] = std::minmax_element(xsi.begin(), xsi.end());
+				// Verifies dimensionless coordinates from input - if it is immersed on the element.
+				inline bool evaluateXsi(const double* xsi) override {
+					std::array<double, mv_ElDim> new_xsi = {};
+					for (int i = 0; i < mv_ElDim; ++i) {
+						new_xsi.at(i) = *(xsi + i);
+					}
+
+					const auto [min, max] = std::minmax_element(new_xsi.begin(), new_xsi.end());
 					if (*max < 1.000001 && *min > -1.000001) return true;
 					return false;
 				}
@@ -117,14 +120,15 @@ namespace O2P2 {
 			class Elem_Rect16_IP : public Elem_Rect16
 			{
 			private:
+				// Default constructor is deleted. Use explicit constructor only.
 				Elem_Rect16_IP() = delete;
 
 			public:
 				/** Constructor for rectangular cubic elements.
 				  * @param Material Pointer to Material class.
-				  * @param Section Pointer to Section class.
+				  * @param Section Pointer to PlaneSection class.
 				  */
-				explicit Elem_Rect16_IP(std::shared_ptr<O2P2::Prep::Material>& Material, std::shared_ptr<O2P2::Prep::Section>& Section)
+				explicit Elem_Rect16_IP(std::shared_ptr<O2P2::Geom::Material>& Material, std::shared_ptr<O2P2::Geom::PlaneSection>& Section)
 					: Elem_Rect16(Material, Section) { }
 
 				// Return a vector with values on the integration points currently known in the element' nodes.
@@ -133,14 +137,14 @@ namespace O2P2 {
 				// Returns a pointer to the first element of the shape functions (with size [nIP][mv_numNodes]).
 				double const* getShapeFc() const override { return &mv_Psi[0][0]; }
 
-				// Returns a pointer to the first element of the derivative of shape functions (with size [nIP][mv_numNodes][mv_Dim]).
+				// Returns a pointer to the first element of the derivative of shape functions (with size [nIP][mv_numNodes][mv_ElDim]).
 				double const* getShapeDerivative() const override { return &mv_DPsi[0][0][0]; }
 
 				// Returns a pointer to the weight of the integation points (with size [nIP]).
 				double const* getWeight() const override { return mv_weight; }
 
 				// Returns the number of integration points of current element.
-				int getNumIP() override { return nIP; }
+				const int getNumIP() const override { return nIP; }
 
 			private:
 				// Weights for numerical integration
@@ -150,10 +154,10 @@ namespace O2P2 {
 				static const double mv_Psi[nIP][mv_numNodes];
 
 				// Shape functions derivative
-				static const double mv_DPsi[nIP][mv_numNodes][mv_Dim];
+				static const double mv_DPsi[nIP][mv_numNodes][mv_ElDim];
 			};
 		} // End of Elem Namespace
-	} // End of Prep Namespace
+	} // End of Geom Namespace
 } // End of O2P2 Namespace
 
 
@@ -163,7 +167,7 @@ namespace O2P2 {
 // Shape functions evaluated on Point
 // 
 // ================================================================================================
-inline std::vector<double> O2P2::Prep::Elem::Elem_Rect16::getShapeFcOnPoint(const double* Point) {
+inline std::vector<double> O2P2::Geom::Elem::Elem_Rect16::getShapeFcOnPoint(const double* Point) {
 	std::vector<double> mi_Psi(16);
 
 	mi_Psi.at(0) = 0.00390625 * (-9. * Point[0] * Point[0] * Point[0] + 9. * Point[0] * Point[0] + Point[0] - 1.) * (-9. * Point[1] * Point[1] * Point[1] + 9. * Point[1] * Point[1] + Point[1] - 1.);
@@ -192,7 +196,7 @@ inline std::vector<double> O2P2::Prep::Elem::Elem_Rect16::getShapeFcOnPoint(cons
 // Shape functions derivative evaluated on Point
 // 
 // ================================================================================================
-inline std::vector<double> O2P2::Prep::Elem::Elem_Rect16::getShapeDerivOnPoint(const double* Point) {
+inline std::vector<double> O2P2::Geom::Elem::Elem_Rect16::getShapeDerivOnPoint(const double* Point) {
 	std::vector<double> mi_DPsi(16 * 2);
 
 	mi_DPsi.at(0) = 0.00390625 * (-27. * Point[0] * Point[0] + 18. * Point[0] + 1.) * (-9. * Point[1] * Point[1] * Point[1] + 9. * Point[1] * Point[1] + Point[1] - 1.);
@@ -238,44 +242,39 @@ inline std::vector<double> O2P2::Prep::Elem::Elem_Rect16::getShapeDerivOnPoint(c
 // Evaluate initial properties
 // 
 // ================================================================================================
-inline void O2P2::Prep::Elem::Elem_Rect16::setGeomProperties() {
+inline void O2P2::Geom::Elem::Elem_Rect16::setGeomProperties() {
 
 	const int nVertices = 4;
+	const int mi_Dim = mv_Conect.at(0)->getDIM();	// Dimensionality of vector space (2D or 3D)
 	
-	// Allocate an array with size mv_Dim to which mv_Centroid points to.
-	mv_Centroid = std::make_unique<double[]>(mv_Dim);
+	mv_Centroid = std::make_unique<double[]>(mi_Dim);
 
 	// Create a temporary array with the vertices of the polygon
-	std::array<O2P2::Prep::Node<mv_Dim>*, nVertices> vertices;
+	std::array<O2P2::Geom::Node*, nVertices> vertices;
 	vertices[0] = mv_Conect[0].get();
 	vertices[1] = mv_Conect[3].get();
 	vertices[2] = mv_Conect[12].get();
 	vertices[3] = mv_Conect[15].get();
 
 	// Memory requested by make_unique is not empty
-	for (int i = 0; i < mv_Dim; i++) mv_Centroid[i] = 0.;
+	for (int i = 0; i < mi_Dim; i++) mv_Centroid[i] = 0.;
 
 	for (auto& node : vertices) {
-		std::array<double, mv_Dim> x = node->getInitPos();
-
-		for (int i = 0; i < mv_Dim; i++) mv_Centroid[i] += x[i];
+		for (int i = 0; i < mi_Dim; i++) mv_Centroid[i] += node->getInitPos()[i];
 	}
 
 	// Finishing up
-	for (int i = 0; i < mv_Dim; i++) mv_Centroid[i] /= nVertices;
+	for (int i = 0; i < mi_Dim; i++) mv_Centroid[i] /= nVertices;
 
 	// Distance from centroid to vertices
 	double dist[nVertices] = {};
 	int i = 0;
 
 	for (auto& node : vertices) {
-		std::array<double, mv_Dim> x = node->getInitPos();
-
-		for (int j = 0; j < mv_Dim; j++) {
-			dist[i] += (mv_Centroid[j] - x[j]) * (mv_Centroid[j] - x[j]);
+		for (int j = 0; j < mi_Dim; j++) {
+			dist[i] += (mv_Centroid[j] - node->getInitPos()[j]) * (mv_Centroid[j] - node->getInitPos()[j]);
 		}
 		dist[i] = std::sqrt(dist[i]);
-
 		i++;
 	}
 
@@ -291,7 +290,7 @@ inline void O2P2::Prep::Elem::Elem_Rect16::setGeomProperties() {
 // 
 // ================================================================================================
 template<int nIP>
-inline std::vector<double> O2P2::Prep::Elem::Elem_Rect16_IP<nIP>::getValueOnIPs(const double* value) {
+inline std::vector<double> O2P2::Geom::Elem::Elem_Rect16_IP<nIP>::getValueOnIPs(const double* value) {
 
 	// return value
 	std::vector<double> mi_valueOnIp(nIP, 0.);
@@ -311,15 +310,15 @@ inline std::vector<double> O2P2::Prep::Elem::Elem_Rect16_IP<nIP>::getValueOnIPs(
 // Weights for numerical integration
 //
 // ================================================================================================
-template<> const double* O2P2::Prep::Elem::Elem_Rect16_IP<9>::mv_weight = &Gauss2D::Wg_9P[0];
-template<> const double* O2P2::Prep::Elem::Elem_Rect16_IP<16>::mv_weight = &Gauss2D::Wg_16P[0];
+template<> const double* O2P2::Geom::Elem::Elem_Rect16_IP<9>::mv_weight = &Gauss2D::Wg_9P[0];
+template<> const double* O2P2::Geom::Elem::Elem_Rect16_IP<16>::mv_weight = &Gauss2D::Wg_16P[0];
 
 // ================================================================================================
 //
 // Shape functions
 //
 // ================================================================================================
-template<> const double O2P2::Prep::Elem::Elem_Rect16_IP<9>::mv_Psi[9][mv_numNodes] = {
+template<> const double O2P2::Geom::Elem::Elem_Rect16_IP<9>::mv_Psi[9][mv_numNodes] = {
 	{ 0.00390625 * (-9. * Gauss2D::Qsi_9P[0][0] * Gauss2D::Qsi_9P[0][0] * Gauss2D::Qsi_9P[0][0] + 9. * Gauss2D::Qsi_9P[0][0] * Gauss2D::Qsi_9P[0][0] + Gauss2D::Qsi_9P[0][0] - 1.) * (-9. * Gauss2D::Qsi_9P[0][1] * Gauss2D::Qsi_9P[0][1] * Gauss2D::Qsi_9P[0][1] + 9. * Gauss2D::Qsi_9P[0][1] * Gauss2D::Qsi_9P[0][1] + Gauss2D::Qsi_9P[0][1] - 1.),
 	  0.03515625 * (3. * Gauss2D::Qsi_9P[0][0] * Gauss2D::Qsi_9P[0][0] * Gauss2D::Qsi_9P[0][0] - Gauss2D::Qsi_9P[0][0] * Gauss2D::Qsi_9P[0][0] - 3. * Gauss2D::Qsi_9P[0][0] + 1.) * (-9. * Gauss2D::Qsi_9P[0][1] * Gauss2D::Qsi_9P[0][1] * Gauss2D::Qsi_9P[0][1] + 9. * Gauss2D::Qsi_9P[0][1] * Gauss2D::Qsi_9P[0][1] + Gauss2D::Qsi_9P[0][1] - 1.),
 	  0.03515625 * (-3. * Gauss2D::Qsi_9P[0][0] * Gauss2D::Qsi_9P[0][0] * Gauss2D::Qsi_9P[0][0] - Gauss2D::Qsi_9P[0][0] * Gauss2D::Qsi_9P[0][0] + 3. * Gauss2D::Qsi_9P[0][0] + 1.) * (-9. * Gauss2D::Qsi_9P[0][1] * Gauss2D::Qsi_9P[0][1] * Gauss2D::Qsi_9P[0][1] + 9. * Gauss2D::Qsi_9P[0][1] * Gauss2D::Qsi_9P[0][1] + Gauss2D::Qsi_9P[0][1] - 1.),
@@ -473,7 +472,7 @@ template<> const double O2P2::Prep::Elem::Elem_Rect16_IP<9>::mv_Psi[9][mv_numNod
 	  0.03515625 * (-3. * Gauss2D::Qsi_9P[8][0] * Gauss2D::Qsi_9P[8][0] * Gauss2D::Qsi_9P[8][0] - Gauss2D::Qsi_9P[8][0] * Gauss2D::Qsi_9P[8][0] + 3. * Gauss2D::Qsi_9P[8][0] + 1.) * (9. * Gauss2D::Qsi_9P[8][1] * Gauss2D::Qsi_9P[8][1] * Gauss2D::Qsi_9P[8][1] + 9. * Gauss2D::Qsi_9P[8][1] * Gauss2D::Qsi_9P[8][1] - Gauss2D::Qsi_9P[8][1] - 1.),
 	  0.00390625 * (9. * Gauss2D::Qsi_9P[8][0] * Gauss2D::Qsi_9P[8][0] * Gauss2D::Qsi_9P[8][0] + 9. * Gauss2D::Qsi_9P[8][0] * Gauss2D::Qsi_9P[8][0] - Gauss2D::Qsi_9P[8][0] - 1.) * (9. * Gauss2D::Qsi_9P[8][1] * Gauss2D::Qsi_9P[8][1] * Gauss2D::Qsi_9P[8][1] + 9. * Gauss2D::Qsi_9P[8][1] * Gauss2D::Qsi_9P[8][1] - Gauss2D::Qsi_9P[8][1] - 1.) } };
 
-template<> const double O2P2::Prep::Elem::Elem_Rect16_IP<16>::mv_Psi[16][mv_numNodes] = {
+template<> const double O2P2::Geom::Elem::Elem_Rect16_IP<16>::mv_Psi[16][mv_numNodes] = {
 	{ 0.00390625 * (-9. * Gauss2D::Qsi_16P[0][0] * Gauss2D::Qsi_16P[0][0] * Gauss2D::Qsi_16P[0][0] + 9. * Gauss2D::Qsi_16P[0][0] * Gauss2D::Qsi_16P[0][0] + Gauss2D::Qsi_16P[0][0] - 1.) * (-9. * Gauss2D::Qsi_16P[0][1] * Gauss2D::Qsi_16P[0][1] * Gauss2D::Qsi_16P[0][1] + 9. * Gauss2D::Qsi_16P[0][1] * Gauss2D::Qsi_16P[0][1] + Gauss2D::Qsi_16P[0][1] - 1.),
 	  0.03515625 * (3. * Gauss2D::Qsi_16P[0][0] * Gauss2D::Qsi_16P[0][0] * Gauss2D::Qsi_16P[0][0] - Gauss2D::Qsi_16P[0][0] * Gauss2D::Qsi_16P[0][0] - 3. * Gauss2D::Qsi_16P[0][0] + 1.) * (-9. * Gauss2D::Qsi_16P[0][1] * Gauss2D::Qsi_16P[0][1] * Gauss2D::Qsi_16P[0][1] + 9. * Gauss2D::Qsi_16P[0][1] * Gauss2D::Qsi_16P[0][1] + Gauss2D::Qsi_16P[0][1] - 1.),
 	  0.03515625 * (-3. * Gauss2D::Qsi_16P[0][0] * Gauss2D::Qsi_16P[0][0] * Gauss2D::Qsi_16P[0][0] - Gauss2D::Qsi_16P[0][0] * Gauss2D::Qsi_16P[0][0] + 3. * Gauss2D::Qsi_16P[0][0] + 1.) * (-9. * Gauss2D::Qsi_16P[0][1] * Gauss2D::Qsi_16P[0][1] * Gauss2D::Qsi_16P[0][1] + 9. * Gauss2D::Qsi_16P[0][1] * Gauss2D::Qsi_16P[0][1] + Gauss2D::Qsi_16P[0][1] - 1.),
@@ -751,7 +750,7 @@ template<> const double O2P2::Prep::Elem::Elem_Rect16_IP<16>::mv_Psi[16][mv_numN
 // Shape functions derivative
 // 
 // ================================================================================================
-template<> const double O2P2::Prep::Elem::Elem_Rect16_IP<9>::mv_DPsi[9][mv_numNodes][mv_Dim] = {
+template<> const double O2P2::Geom::Elem::Elem_Rect16_IP<9>::mv_DPsi[9][mv_numNodes][mv_ElDim] = {
 	{ { 0.00390625 * (-27. * Gauss2D::Qsi_9P[0][0] * Gauss2D::Qsi_9P[0][0] + 18. * Gauss2D::Qsi_9P[0][0] + 1.) * (-9. * Gauss2D::Qsi_9P[0][1] * Gauss2D::Qsi_9P[0][1] * Gauss2D::Qsi_9P[0][1] + 9. * Gauss2D::Qsi_9P[0][1] * Gauss2D::Qsi_9P[0][1] + Gauss2D::Qsi_9P[0][1] - 1.),
 		0.00390625 * (-9. * Gauss2D::Qsi_9P[0][0] * Gauss2D::Qsi_9P[0][0] * Gauss2D::Qsi_9P[0][0] + 9. * Gauss2D::Qsi_9P[0][0] * Gauss2D::Qsi_9P[0][0] + Gauss2D::Qsi_9P[0][0] - 1.) * (-27. * Gauss2D::Qsi_9P[0][1] * Gauss2D::Qsi_9P[0][1] + 18. * Gauss2D::Qsi_9P[0][1] + 1.) },
 	  { 0.03515625 * (9. * Gauss2D::Qsi_9P[0][0] * Gauss2D::Qsi_9P[0][0] - 2. * Gauss2D::Qsi_9P[0][0] - 3.) * (-9. * Gauss2D::Qsi_9P[0][1] * Gauss2D::Qsi_9P[0][1] * Gauss2D::Qsi_9P[0][1] + 9. * Gauss2D::Qsi_9P[0][1] * Gauss2D::Qsi_9P[0][1] + Gauss2D::Qsi_9P[0][1] - 1.),
@@ -1049,7 +1048,7 @@ template<> const double O2P2::Prep::Elem::Elem_Rect16_IP<9>::mv_DPsi[9][mv_numNo
 	  { 0.00390625 * (27. * Gauss2D::Qsi_9P[8][0] * Gauss2D::Qsi_9P[8][0] + 18. * Gauss2D::Qsi_9P[8][0] - 1.) * (9. * Gauss2D::Qsi_9P[8][1] * Gauss2D::Qsi_9P[8][1] * Gauss2D::Qsi_9P[8][1] + 9. * Gauss2D::Qsi_9P[8][1] * Gauss2D::Qsi_9P[8][1] - Gauss2D::Qsi_9P[8][1] - 1.),
 		0.00390625 * (9. * Gauss2D::Qsi_9P[8][0] * Gauss2D::Qsi_9P[8][0] * Gauss2D::Qsi_9P[8][0] + 9. * Gauss2D::Qsi_9P[8][0] * Gauss2D::Qsi_9P[8][0] - Gauss2D::Qsi_9P[8][0] - 1.) * (27. * Gauss2D::Qsi_9P[8][1] * Gauss2D::Qsi_9P[8][1] + 18. * Gauss2D::Qsi_9P[8][1] - 1.) } } };
 
-template<> const double O2P2::Prep::Elem::Elem_Rect16_IP<16>::mv_DPsi[16][mv_numNodes][mv_Dim] = {
+template<> const double O2P2::Geom::Elem::Elem_Rect16_IP<16>::mv_DPsi[16][mv_numNodes][mv_ElDim] = {
 	{ { 0.00390625 * (-27. * Gauss2D::Qsi_16P[0][0] * Gauss2D::Qsi_16P[0][0] + 18. * Gauss2D::Qsi_16P[0][0] + 1.) * (-9. * Gauss2D::Qsi_16P[0][1] * Gauss2D::Qsi_16P[0][1] * Gauss2D::Qsi_16P[0][1] + 9. * Gauss2D::Qsi_16P[0][1] * Gauss2D::Qsi_16P[0][1] + Gauss2D::Qsi_16P[0][1] - 1.),
 		0.00390625 * (-9. * Gauss2D::Qsi_16P[0][0] * Gauss2D::Qsi_16P[0][0] * Gauss2D::Qsi_16P[0][0] + 9. * Gauss2D::Qsi_16P[0][0] * Gauss2D::Qsi_16P[0][0] + Gauss2D::Qsi_16P[0][0] - 1.) * (-27. * Gauss2D::Qsi_16P[0][1] * Gauss2D::Qsi_16P[0][1] + 18. * Gauss2D::Qsi_16P[0][1] + 1.) },
 	  { 0.03515625 * (9. * Gauss2D::Qsi_16P[0][0] * Gauss2D::Qsi_16P[0][0] - 2. * Gauss2D::Qsi_16P[0][0] - 3.) * (-9. * Gauss2D::Qsi_16P[0][1] * Gauss2D::Qsi_16P[0][1] * Gauss2D::Qsi_16P[0][1] + 9. * Gauss2D::Qsi_16P[0][1] * Gauss2D::Qsi_16P[0][1] + Gauss2D::Qsi_16P[0][1] - 1.),

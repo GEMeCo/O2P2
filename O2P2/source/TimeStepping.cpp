@@ -34,8 +34,9 @@ void O2P2::Proc::TimeStep_QsiStatic::runTimeLoop(O2P2::Proc::Mesh* theMesh, O2P2
 		theMesh->setTimeStep(mi_timeIt);
 
 		// Call loop of non-linear solver
-		bool mi_feasible = theSolver->runNLS(theMesh, theMesh->mv_initialNorm, true);
+		bool mi_feasible = theSolver->runNLS(theMesh, theMesh->mv_initialNorm, true, true);
 		LOG("NLSolver.runNLS: Solution attained - feasibility: " << std::boolalpha << mi_feasible << std::noboolalpha);
+		std::cout << "\nSolution attained - feasibility: " << std::boolalpha << mi_feasible << std::noboolalpha;
 		std::cout << "\n------------------------------------------------------------";
 	}
 }
@@ -51,7 +52,7 @@ void O2P2::Proc::TimeStep_2ndNew::runTimeLoop(O2P2::Proc::Mesh* theMesh, O2P2::P
 	PROFILE_FUNCTION();
 
 	// At the beggining of the first load step (at which currentTime is zero), the initial acceleration must be evaluated
-	if ((int)(theMesh->mv_currentTime * 1000000) == 0) theMesh->setAccel();
+	if ((int)(theMesh->mv_currentTime * 1000000) == 0) theMesh->setInitAccel();
 
 	// Loop on time step
 	for (int mi_timeIt = 0; mi_timeIt < theMesh->getLoadStep()->mv_numSteps; ++mi_timeIt) {
@@ -67,8 +68,9 @@ void O2P2::Proc::TimeStep_2ndNew::runTimeLoop(O2P2::Proc::Mesh* theMesh, O2P2::P
 		theMesh->setTimeStep(mi_timeIt, mv_beta, mv_gamma);
 
 		// Call loop of non-linear solver
-		bool mi_feasible = theSolver->runNLS(theMesh, theMesh->mv_initialNorm, true);
+		bool mi_feasible = theSolver->runNLS(theMesh, theMesh->mv_initialNorm, true, true);
 		LOG("NLSolver.runNLS: Solution attained - feasibility: " << std::boolalpha << mi_feasible << std::noboolalpha);
+		std::cout << "\nSolution attained - feasibility: " << std::boolalpha << mi_feasible << std::noboolalpha;
 		std::cout << "\n------------------------------------------------------------";
 	}
 

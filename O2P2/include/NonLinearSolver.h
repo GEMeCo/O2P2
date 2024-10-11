@@ -30,7 +30,14 @@ namespace O2P2 {
 		class NonLinearSolver
 		{
 		private:
+			// Default constructor
 			NonLinearSolver() = delete;
+
+			// Copy constructor.
+			NonLinearSolver(const NonLinearSolver& other) = delete;
+
+			// Move constructor.
+			NonLinearSolver(NonLinearSolver&& other) = delete;
 
 		public:
 			// Default destructor of private / protected pointers.
@@ -49,16 +56,37 @@ namespace O2P2 {
 			  *
 			  * @param theFEModel Container of solution components.
 			  * @param initialNorm Initial norm to normalize the solution (norm = norm / initialNorm).
+			  * @param symmetry Choose wheter the system is symmetric or not.
 			  * @param output Choose whether to output results or not.
 			  */
-			virtual bool runNLS(O2P2::Proc::Mesh* theFEModel, const double initialNorm = 1., const bool output = false) = 0;
+			virtual bool runNLS(O2P2::Proc::Mesh* theFEModel, const double initialNorm = 1., const bool symmetry = true, const bool output = false) = 0;
+
+			/** Loop iterator for the selected NonLinear Solver.
+			  * @return true if solution is feasible, false otherwise.
+			  *
+			  * @param theModel Container of solution components.
+			  * @param initialNorm Initial norm to normalize the solution (norm = norm / initialNorm).
+			  * @param symmetry Choose wheter the system is symmetric or not.
+			  * @param output Choose whether to output results or not.
+			  */
+			virtual bool runNLS(O2P2::Proc::Comp::MeshPoint<2>* theModel, const double initialNorm = 1., const bool symmetry = false, const bool output = false) = 0;
+
+			/** Loop iterator for the selected NonLinear Solver.
+			  * @return true if solution is feasible, false otherwise.
+			  *
+			  * @param theModel Container of solution components.
+			  * @param initialNorm Initial norm to normalize the solution (norm = norm / initialNorm).
+			  * @param symmetry Choose wheter the system is symmetric or not.
+			  * @param output Choose whether to output results or not.
+			  */
+			virtual bool runNLS(O2P2::Proc::Comp::MeshPoint<3>* theModel, const double initialNorm = 1., const bool symmetry = false, const bool output = false) = 0;
 
 		protected:
 			/** @brief Hidden Constructor - Implemented in derived classes.
 			  * @param MaxIt Maximum number of iterations.
 			  * @param Tol Tolerance.
 			  */
-			NonLinearSolver(const int& MaxIt, const double& Tol)
+			explicit NonLinearSolver(const int& MaxIt, const double& Tol)
 				: mv_minIt(0), mv_maxIt(MaxIt), mv_tolerance(Tol) {};
 
 			/** @brief Hidden Constructor - Implemented in derived classes.
@@ -66,7 +94,7 @@ namespace O2P2 {
 			  * @param MaxIt Maximum number of iterations.
 			  * @param Tol Tolerance.
 			  */
-			NonLinearSolver(const int& MinIt, const int& MaxIt, const double& Tol)
+			explicit NonLinearSolver(const int& MinIt, const int& MaxIt, const double& Tol)
 				: mv_minIt(MinIt), mv_maxIt(MaxIt), mv_tolerance(Tol) {};
 
 		protected:
@@ -106,6 +134,7 @@ namespace O2P2 {
 		class NLS_NewtonRaphson : public NonLinearSolver
 		{
 		private:
+			// Default constructor is deleted. Use explicit constructor only.
 			NLS_NewtonRaphson() = delete;
 
 		public:
@@ -114,28 +143,38 @@ namespace O2P2 {
 			  * @param MaxIt Maximum number of iterations.
 			  * @param Tol Tolerance.
 			  */
-			NLS_NewtonRaphson(const int& MinIt, const int& MaxIt, const double& Tol)
+			explicit NLS_NewtonRaphson(const int& MinIt, const int& MaxIt, const double& Tol)
 				: NonLinearSolver(MinIt, MaxIt, Tol) {}
 
 			/** Constructor for Newton-Raphson solver.
 			  * @param MaxIt Maximum number of iterations.
 			  * @param Tol Tolerance.
 			  */
-			NLS_NewtonRaphson(const int& MaxIt, const double& Tol)
+			explicit NLS_NewtonRaphson(const int& MaxIt, const double& Tol)
 				: NonLinearSolver(MaxIt, Tol) {}
 
 			// Default destructor of private / protected pointers.
 			~NLS_NewtonRaphson() = default;
 
 			// Loop iterator for the selected NonLinear Solver.
-			bool runNLS(O2P2::Proc::Mesh* theFEModel, const double initialNorm = 1., const bool output = false) override {
+			bool runNLS(O2P2::Proc::Mesh* theFEModel, const double initialNorm = 1., const bool symmetry = true, const bool output = true) override {
 				PROFILE_FUNCTION();
-				return this->runNonLinearSolver(theFEModel, initialNorm, output);
+				return this->runNonLinearSolver(theFEModel, initialNorm, symmetry, output);
 			};
+
+			// Loop iterator for the selected NonLinear Solver.
+			bool runNLS(O2P2::Proc::Comp::MeshPoint<2>* theModel, const double initialNorm = 1., const bool symmetry = false, const bool output = false) override {
+				return this->runNonLinearSolver(theModel, initialNorm, symmetry, output);
+			}
+
+			// Loop iterator for the selected NonLinear Solver.
+			bool runNLS(O2P2::Proc::Comp::MeshPoint<3>* theModel, const double initialNorm = 1., const bool symmetry = false, const bool output = false) override {
+				return this->runNonLinearSolver(theModel, initialNorm, symmetry, output);
+			}
 
 		private:
 			// Actual Implementation of non-linear solver.
-			template<class T> bool runNonLinearSolver(T* theModel, const double initialNorm, const bool output);
+			template<class T> bool runNonLinearSolver(T* theModel, const double initialNorm, const bool symmetry, const bool output);
 		};
 
 	} // End of Proc Namespace

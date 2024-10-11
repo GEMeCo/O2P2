@@ -19,7 +19,7 @@
 #include "Element.h"
 
 namespace O2P2 {
-	namespace Prep {
+	namespace Geom {
 		namespace Elem {
 			/** @ingroup Elements
 			  * @class Elem_Rect8
@@ -28,18 +28,19 @@ namespace O2P2 {
 			  * @details Plane element, with cubic interpolation functions in one direction and linear function in the other, rectangular shaped.
 			  * @image html Elem_Quad8.png height=300
 			  */
-			class Elem_Rect8 : public ElementPlane
+			class Elem_Rect8 : public ElemPlane
 			{
 			private:
+				// Default constructor is deleted. Use explicit constructor only.
 				Elem_Rect8() = delete;
 
 			public:
 				/** Constructor for rectangular cubic / linear elements.
 				  * @param Material Pointer to Material class.
-				  * @param Section Pointer to Section class.
+				  * @param Section Pointer to PlaneSection class.
 				  */
-				explicit Elem_Rect8(std::shared_ptr<O2P2::Prep::Material>& Material, std::shared_ptr<O2P2::Prep::Section>& Section)
-					: ElementPlane(Material, Section) { }
+				explicit Elem_Rect8(std::shared_ptr<O2P2::Geom::Material>& Material, std::shared_ptr<O2P2::Geom::PlaneSection>& Section)
+					: ElemPlane(Material, Section) { }
 
 				// Output function for AcadView, based on element index.
 				const std::string printByIndex_AV(const size_t add) const override {
@@ -82,27 +83,29 @@ namespace O2P2 {
 				// Returns a pointer to the first element of the shape functions (with size [nIP][mv_numNodes]).
 				double const* getShapeFc() const override { return &mv_Psi[0][0]; }
 
-				// Returns a pointer to the first element of the derivative of shape functions (with size [nIP][mv_numNodes][mv_Dim]).
+				// Returns a pointer to the first element of the derivative of shape functions (with size [nIP][mv_numNodes][mv_ElDim]).
 				double const* getShapeDerivative() const override { return &mv_DPsi[0][0][0]; }
 
 				// Returns a pointer to the weight of the integation points (with size [nIP]).
 				double const* getWeight() const override { return &mv_weight[0]; }
 
 				// Returns the number of nodes of current element.
-				int getNumNodes() override { return mv_numNodes; }
+				const int getNumNodes() const override { return mv_numNodes; }
 
 				// Returns the number of faces of current element.
-				int getNumFaces() override { return mv_numFaces; }
+				const int getNumFaces() const override { return mv_numFaces; }
 
 				// Returns the number of integration points of current element.
-				int getNumIP() override { return mv_numIP; }
+				const int getNumIP() const override { return mv_numIP; }
 
-				/** Verifies dimensionless coordinates from input - if it is immersed on the element.
-				  * @return True if input falls within the element.
-				  * @param xsi Trial dimensionless coordinates.
-				  */
-				inline bool evaluateXsi(const std::array<double, mv_Dim> xsi) override {
-					const auto [min, max] = std::minmax_element(xsi.begin(), xsi.end());
+				// Verifies dimensionless coordinates from input - if it is immersed on the element.
+				inline bool evaluateXsi(const double* xsi) override {
+					std::array<double, mv_ElDim> new_xsi = {};
+					for (int i = 0; i < mv_ElDim; ++i) {
+						new_xsi.at(i) = *(xsi + i);
+					}
+
+					const auto [min, max] = std::minmax_element(new_xsi.begin(), new_xsi.end());
 					if (*max < 1.000001 && *min > -1.000001) return true;
 					return false;
 				}
@@ -128,13 +131,13 @@ namespace O2P2 {
 				static const double mv_Psi[mv_numIP][mv_numNodes];
 
 				/** @brief Shape functions derivative */
-				static const double mv_DPsi[mv_numIP][mv_numNodes][mv_Dim];
+				static const double mv_DPsi[mv_numIP][mv_numNodes][mv_ElDim];
 
 				/** @brief Integration points */
-				static const double m_xsi[mv_numIP][mv_Dim];
+				static const double mv_xsi[mv_numIP][mv_ElDim];
 			};
 		} // End of Elem Namespace
-	} // End of Prep Namespace
+	} // End of Geom Namespace
 } // End of O2P2 Namespace
 
 
@@ -144,7 +147,7 @@ namespace O2P2 {
 // Shape functions evaluated on Point
 // 
 // ================================================================================================
-inline std::vector<double> O2P2::Prep::Elem::Elem_Rect8::getShapeFcOnPoint(const double* Point) {
+inline std::vector<double> O2P2::Geom::Elem::Elem_Rect8::getShapeFcOnPoint(const double* Point) {
 	std::vector<double> mi_Psi(8);
 
 	mi_Psi.at(0) = 0.03125 * (9. * Point[0] * Point[0] * Point[0] * Point[1] - 9. * Point[0] * Point[0] * Point[0] - 9. * Point[0] * Point[0] * Point[1] + 9. * Point[0] * Point[0] - Point[0] * Point[1] + Point[0] + Point[1] - 1.);
@@ -165,7 +168,7 @@ inline std::vector<double> O2P2::Prep::Elem::Elem_Rect8::getShapeFcOnPoint(const
 // Shape functions derivative evaluated on Point
 // 
 // ================================================================================================
-inline std::vector<double> O2P2::Prep::Elem::Elem_Rect8::getShapeDerivOnPoint(const double* Point) {
+inline std::vector<double> O2P2::Geom::Elem::Elem_Rect8::getShapeDerivOnPoint(const double* Point) {
 	std::vector<double> mi_DPsi(8 * 2);
 
 	mi_DPsi.at(0) = 0.03125 * (27. * Point[0] * Point[0] * Point[1] - 27. * Point[0] * Point[0] - 18. * Point[0] * Point[1] + 18. * Point[0] - Point[1] + 1.);
@@ -196,44 +199,39 @@ inline std::vector<double> O2P2::Prep::Elem::Elem_Rect8::getShapeDerivOnPoint(co
 // Evaluate initial properties
 // 
 // ================================================================================================
-inline void O2P2::Prep::Elem::Elem_Rect8::setGeomProperties() {
+inline void O2P2::Geom::Elem::Elem_Rect8::setGeomProperties() {
 
 	const int nVertices = 4;
+	const int mi_Dim = mv_Conect.at(0)->getDIM();	// Dimensionality of vector space (2D or 3D)
 
-	// Allocate an array with size mv_Dim to which mv_Centroid points to.
-	mv_Centroid = std::make_unique<double[]>(mv_Dim);
+	mv_Centroid = std::make_unique<double[]>(mi_Dim);
 
 	// Create a temporary array with the vertices of the polygon
-	std::array<O2P2::Prep::Node<mv_Dim>*, nVertices> vertices;
+	std::array<O2P2::Geom::Node*, nVertices> vertices;
 	vertices[0] = mv_Conect[0].get();
 	vertices[1] = mv_Conect[3].get();
 	vertices[2] = mv_Conect[4].get();
 	vertices[3] = mv_Conect[7].get();
 
 	// Memory requested by make_unique is not empty
-	for (int i = 0; i < mv_Dim; i++) mv_Centroid[i] = 0.;
+	for (int i = 0; i < mi_Dim; i++) mv_Centroid[i] = 0.;
 
 	for (auto& node : vertices) {
-		std::array<double, mv_Dim> x = node->getInitPos();
-
-		for (int i = 0; i < mv_Dim; i++) mv_Centroid[i] += x[i];
+		for (int i = 0; i < mi_Dim; i++) mv_Centroid[i] += node->getInitPos()[i];
 	}
 
 	// Finishing up
-	for (int i = 0; i < mv_Dim; i++) mv_Centroid[i] /= nVertices;
+	for (int i = 0; i < mi_Dim; i++) mv_Centroid[i] /= nVertices;
 
 	// Distance from centroid to vertices
 	double dist[nVertices] = {};
 	int i = 0;
 
 	for (auto& node : vertices) {
-		std::array<double, mv_Dim> x = node->getInitPos();
-
-		for (int j = 0; j < mv_Dim; j++) {
-			dist[i] += (mv_Centroid[j] - x[j]) * (mv_Centroid[j] - x[j]);
+		for (int j = 0; j < mi_Dim; j++) {
+			dist[i] += (mv_Centroid[j] - node->getInitPos()[j]) * (mv_Centroid[j] - node->getInitPos()[j]);
 		}
 		dist[i] = std::sqrt(dist[i]);
-
 		i++;
 	}
 
@@ -248,7 +246,7 @@ inline void O2P2::Prep::Elem::Elem_Rect8::setGeomProperties() {
 // Return the values on the integration points currently known in the element' nodes
 // 
 // ================================================================================================
-inline std::vector<double> O2P2::Prep::Elem::Elem_Rect8::getValueOnIPs(const double* value) {
+inline std::vector<double> O2P2::Geom::Elem::Elem_Rect8::getValueOnIPs(const double* value) {
 
 	// return value
 	std::vector<double> mi_valueOnIp(mv_numIP, 0.);
@@ -269,7 +267,7 @@ inline std::vector<double> O2P2::Prep::Elem::Elem_Rect8::getValueOnIPs(const dou
 // Integration Points
 //
 // ================================================================================================
-inline const double O2P2::Prep::Elem::Elem_Rect8::m_xsi[mv_numIP][mv_Dim] = {
+inline const double O2P2::Geom::Elem::Elem_Rect8::mv_xsi[mv_numIP][mv_ElDim] = {
 	{ -0.861136311594053, -0.577350269189626 } ,
 	{ -0.861136311594053,  0.577350269189626 } ,
 	{  0.861136311594053, -0.577350269189626 } ,
@@ -284,224 +282,224 @@ inline const double O2P2::Prep::Elem::Elem_Rect8::m_xsi[mv_numIP][mv_Dim] = {
 // Weights for numerical integration
 //
 // ================================================================================================
-inline const double O2P2::Prep::Elem::Elem_Rect8::mv_weight[mv_numIP] = { 0.347854845137454, 0.347854845137454, 0.347854845137454, 0.347854845137454, 0.652145154862546, 0.652145154862546, 0.652145154862546, 0.652145154862546 };
+inline const double O2P2::Geom::Elem::Elem_Rect8::mv_weight[mv_numIP] = { 0.347854845137454, 0.347854845137454, 0.347854845137454, 0.347854845137454, 0.652145154862546, 0.652145154862546, 0.652145154862546, 0.652145154862546 };
 
 // ================================================================================================
 //
 // Shape function
 //
 // ================================================================================================
-inline const double O2P2::Prep::Elem::Elem_Rect8::mv_Psi[mv_numIP][mv_numNodes] = {
-	{ 0.03125 * (9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] - 9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] - 9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] + 9. * m_xsi[0][0] * m_xsi[0][0] - m_xsi[0][0] * m_xsi[0][1] + m_xsi[0][0] + m_xsi[0][1] - 1.),
-	  0.03125 * (-27. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] + 27. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] + 9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] - 9. * m_xsi[0][0] * m_xsi[0][0] + 27. * m_xsi[0][0] * m_xsi[0][1] - 27. * m_xsi[0][0] - 9. * m_xsi[0][1] + 9.),
-	  0.03125 * (27. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] - 27. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] + 9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] - 9. * m_xsi[0][0] * m_xsi[0][0] - 27. * m_xsi[0][0] * m_xsi[0][1] + 27. * m_xsi[0][0] - 9. * m_xsi[0][1] + 9.),
-	  0.03125 * (-9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] + 9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] - 9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] + 9. * m_xsi[0][0] * m_xsi[0][0] + m_xsi[0][0] * m_xsi[0][1] - m_xsi[0][0] + m_xsi[0][1] - 1.),
-	  0.03125 * (-9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] - 9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] + 9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] + 9. * m_xsi[0][0] * m_xsi[0][0] + m_xsi[0][0] * m_xsi[0][1] + m_xsi[0][0] - m_xsi[0][1] - 1.),
-	  0.03125 * (27. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] + 27. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] - 9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] - 9. * m_xsi[0][0] * m_xsi[0][0] - 27. * m_xsi[0][0] * m_xsi[0][1] - 27. * m_xsi[0][0] + 9. * m_xsi[0][1] + 9.),
-	  0.03125 * (-27. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] - 27. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] - 9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] - 9. * m_xsi[0][0] * m_xsi[0][0] + 27. * m_xsi[0][0] * m_xsi[0][1] + 27. * m_xsi[0][0] + 9. * m_xsi[0][1] + 9.),
-	  0.03125 * (9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] + 9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] + 9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] + 9. * m_xsi[0][0] * m_xsi[0][0] - m_xsi[0][0] * m_xsi[0][1] - m_xsi[0][0] - m_xsi[0][1] - 1.) },
+inline const double O2P2::Geom::Elem::Elem_Rect8::mv_Psi[mv_numIP][mv_numNodes] = {
+	{ 0.03125 * (9. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][1] - 9. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][0] - 9. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][1] + 9. * mv_xsi[0][0] * mv_xsi[0][0] - mv_xsi[0][0] * mv_xsi[0][1] + mv_xsi[0][0] + mv_xsi[0][1] - 1.),
+	  0.03125 * (-27. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][1] + 27. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][0] + 9. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][1] - 9. * mv_xsi[0][0] * mv_xsi[0][0] + 27. * mv_xsi[0][0] * mv_xsi[0][1] - 27. * mv_xsi[0][0] - 9. * mv_xsi[0][1] + 9.),
+	  0.03125 * (27. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][1] - 27. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][0] + 9. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][1] - 9. * mv_xsi[0][0] * mv_xsi[0][0] - 27. * mv_xsi[0][0] * mv_xsi[0][1] + 27. * mv_xsi[0][0] - 9. * mv_xsi[0][1] + 9.),
+	  0.03125 * (-9. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][1] + 9. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][0] - 9. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][1] + 9. * mv_xsi[0][0] * mv_xsi[0][0] + mv_xsi[0][0] * mv_xsi[0][1] - mv_xsi[0][0] + mv_xsi[0][1] - 1.),
+	  0.03125 * (-9. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][1] - 9. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][0] + 9. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][1] + 9. * mv_xsi[0][0] * mv_xsi[0][0] + mv_xsi[0][0] * mv_xsi[0][1] + mv_xsi[0][0] - mv_xsi[0][1] - 1.),
+	  0.03125 * (27. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][1] + 27. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][0] - 9. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][1] - 9. * mv_xsi[0][0] * mv_xsi[0][0] - 27. * mv_xsi[0][0] * mv_xsi[0][1] - 27. * mv_xsi[0][0] + 9. * mv_xsi[0][1] + 9.),
+	  0.03125 * (-27. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][1] - 27. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][0] - 9. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][1] - 9. * mv_xsi[0][0] * mv_xsi[0][0] + 27. * mv_xsi[0][0] * mv_xsi[0][1] + 27. * mv_xsi[0][0] + 9. * mv_xsi[0][1] + 9.),
+	  0.03125 * (9. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][1] + 9. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][0] + 9. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][1] + 9. * mv_xsi[0][0] * mv_xsi[0][0] - mv_xsi[0][0] * mv_xsi[0][1] - mv_xsi[0][0] - mv_xsi[0][1] - 1.) },
 
-	{ 0.03125 * (9. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][1] - 9. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][0] - 9. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][1] + 9. * m_xsi[1][0] * m_xsi[1][0] - m_xsi[1][0] * m_xsi[1][1] + m_xsi[1][0] + m_xsi[1][1] - 1.),
-	  0.03125 * (-27. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][1] + 27. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][0] + 9. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][1] - 9. * m_xsi[1][0] * m_xsi[1][0] + 27. * m_xsi[1][0] * m_xsi[1][1] - 27. * m_xsi[1][0] - 9. * m_xsi[1][1] + 9.),
-	  0.03125 * (27. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][1] - 27. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][0] + 9. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][1] - 9. * m_xsi[1][0] * m_xsi[1][0] - 27. * m_xsi[1][0] * m_xsi[1][1] + 27. * m_xsi[1][0] - 9. * m_xsi[1][1] + 9.),
-	  0.03125 * (-9. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][1] + 9. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][0] - 9. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][1] + 9. * m_xsi[1][0] * m_xsi[1][0] + m_xsi[1][0] * m_xsi[1][1] - m_xsi[1][0] + m_xsi[1][1] - 1.),
-	  0.03125 * (-9. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][1] - 9. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][0] + 9. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][1] + 9. * m_xsi[1][0] * m_xsi[1][0] + m_xsi[1][0] * m_xsi[1][1] + m_xsi[1][0] - m_xsi[1][1] - 1.),
-	  0.03125 * (27. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][1] + 27. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][0] - 9. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][1] - 9. * m_xsi[1][0] * m_xsi[1][0] - 27. * m_xsi[1][0] * m_xsi[1][1] - 27. * m_xsi[1][0] + 9. * m_xsi[1][1] + 9.),
-	  0.03125 * (-27. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][1] - 27. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][0] - 9. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][1] - 9. * m_xsi[1][0] * m_xsi[1][0] + 27. * m_xsi[1][0] * m_xsi[1][1] + 27. * m_xsi[1][0] + 9. * m_xsi[1][1] + 9.),
-	  0.03125 * (9. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][1] + 9. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][0] + 9. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][1] + 9. * m_xsi[1][0] * m_xsi[1][0] - m_xsi[1][0] * m_xsi[1][1] - m_xsi[1][0] - m_xsi[1][1] - 1.) },
+	{ 0.03125 * (9. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][1] - 9. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][0] - 9. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][1] + 9. * mv_xsi[1][0] * mv_xsi[1][0] - mv_xsi[1][0] * mv_xsi[1][1] + mv_xsi[1][0] + mv_xsi[1][1] - 1.),
+	  0.03125 * (-27. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][1] + 27. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][0] + 9. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][1] - 9. * mv_xsi[1][0] * mv_xsi[1][0] + 27. * mv_xsi[1][0] * mv_xsi[1][1] - 27. * mv_xsi[1][0] - 9. * mv_xsi[1][1] + 9.),
+	  0.03125 * (27. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][1] - 27. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][0] + 9. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][1] - 9. * mv_xsi[1][0] * mv_xsi[1][0] - 27. * mv_xsi[1][0] * mv_xsi[1][1] + 27. * mv_xsi[1][0] - 9. * mv_xsi[1][1] + 9.),
+	  0.03125 * (-9. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][1] + 9. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][0] - 9. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][1] + 9. * mv_xsi[1][0] * mv_xsi[1][0] + mv_xsi[1][0] * mv_xsi[1][1] - mv_xsi[1][0] + mv_xsi[1][1] - 1.),
+	  0.03125 * (-9. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][1] - 9. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][0] + 9. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][1] + 9. * mv_xsi[1][0] * mv_xsi[1][0] + mv_xsi[1][0] * mv_xsi[1][1] + mv_xsi[1][0] - mv_xsi[1][1] - 1.),
+	  0.03125 * (27. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][1] + 27. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][0] - 9. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][1] - 9. * mv_xsi[1][0] * mv_xsi[1][0] - 27. * mv_xsi[1][0] * mv_xsi[1][1] - 27. * mv_xsi[1][0] + 9. * mv_xsi[1][1] + 9.),
+	  0.03125 * (-27. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][1] - 27. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][0] - 9. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][1] - 9. * mv_xsi[1][0] * mv_xsi[1][0] + 27. * mv_xsi[1][0] * mv_xsi[1][1] + 27. * mv_xsi[1][0] + 9. * mv_xsi[1][1] + 9.),
+	  0.03125 * (9. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][1] + 9. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][0] + 9. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][1] + 9. * mv_xsi[1][0] * mv_xsi[1][0] - mv_xsi[1][0] * mv_xsi[1][1] - mv_xsi[1][0] - mv_xsi[1][1] - 1.) },
 
-	{ 0.03125 * (9. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][1] - 9. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][0] - 9. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][1] + 9. * m_xsi[2][0] * m_xsi[2][0] - m_xsi[2][0] * m_xsi[2][1] + m_xsi[2][0] + m_xsi[2][1] - 1.),
-	  0.03125 * (-27. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][1] + 27. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][0] + 9. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][1] - 9. * m_xsi[2][0] * m_xsi[2][0] + 27. * m_xsi[2][0] * m_xsi[2][1] - 27. * m_xsi[2][0] - 9. * m_xsi[2][1] + 9.),
-	  0.03125 * (27. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][1] - 27. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][0] + 9. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][1] - 9. * m_xsi[2][0] * m_xsi[2][0] - 27. * m_xsi[2][0] * m_xsi[2][1] + 27. * m_xsi[2][0] - 9. * m_xsi[2][1] + 9.),
-	  0.03125 * (-9. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][1] + 9. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][0] - 9. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][1] + 9. * m_xsi[2][0] * m_xsi[2][0] + m_xsi[2][0] * m_xsi[2][1] - m_xsi[2][0] + m_xsi[2][1] - 1.),
-	  0.03125 * (-9. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][1] - 9. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][0] + 9. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][1] + 9. * m_xsi[2][0] * m_xsi[2][0] + m_xsi[2][0] * m_xsi[2][1] + m_xsi[2][0] - m_xsi[2][1] - 1.),
-	  0.03125 * (27. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][1] + 27. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][0] - 9. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][1] - 9. * m_xsi[2][0] * m_xsi[2][0] - 27. * m_xsi[2][0] * m_xsi[2][1] - 27. * m_xsi[2][0] + 9. * m_xsi[2][1] + 9.),
-	  0.03125 * (-27. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][1] - 27. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][0] - 9. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][1] - 9. * m_xsi[2][0] * m_xsi[2][0] + 27. * m_xsi[2][0] * m_xsi[2][1] + 27. * m_xsi[2][0] + 9. * m_xsi[2][1] + 9.),
-	  0.03125 * (9. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][1] + 9. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][0] + 9. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][1] + 9. * m_xsi[2][0] * m_xsi[2][0] - m_xsi[2][0] * m_xsi[2][1] - m_xsi[2][0] - m_xsi[2][1] - 1.) },
+	{ 0.03125 * (9. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][1] - 9. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][0] - 9. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][1] + 9. * mv_xsi[2][0] * mv_xsi[2][0] - mv_xsi[2][0] * mv_xsi[2][1] + mv_xsi[2][0] + mv_xsi[2][1] - 1.),
+	  0.03125 * (-27. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][1] + 27. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][0] + 9. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][1] - 9. * mv_xsi[2][0] * mv_xsi[2][0] + 27. * mv_xsi[2][0] * mv_xsi[2][1] - 27. * mv_xsi[2][0] - 9. * mv_xsi[2][1] + 9.),
+	  0.03125 * (27. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][1] - 27. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][0] + 9. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][1] - 9. * mv_xsi[2][0] * mv_xsi[2][0] - 27. * mv_xsi[2][0] * mv_xsi[2][1] + 27. * mv_xsi[2][0] - 9. * mv_xsi[2][1] + 9.),
+	  0.03125 * (-9. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][1] + 9. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][0] - 9. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][1] + 9. * mv_xsi[2][0] * mv_xsi[2][0] + mv_xsi[2][0] * mv_xsi[2][1] - mv_xsi[2][0] + mv_xsi[2][1] - 1.),
+	  0.03125 * (-9. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][1] - 9. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][0] + 9. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][1] + 9. * mv_xsi[2][0] * mv_xsi[2][0] + mv_xsi[2][0] * mv_xsi[2][1] + mv_xsi[2][0] - mv_xsi[2][1] - 1.),
+	  0.03125 * (27. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][1] + 27. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][0] - 9. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][1] - 9. * mv_xsi[2][0] * mv_xsi[2][0] - 27. * mv_xsi[2][0] * mv_xsi[2][1] - 27. * mv_xsi[2][0] + 9. * mv_xsi[2][1] + 9.),
+	  0.03125 * (-27. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][1] - 27. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][0] - 9. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][1] - 9. * mv_xsi[2][0] * mv_xsi[2][0] + 27. * mv_xsi[2][0] * mv_xsi[2][1] + 27. * mv_xsi[2][0] + 9. * mv_xsi[2][1] + 9.),
+	  0.03125 * (9. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][1] + 9. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][0] + 9. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][1] + 9. * mv_xsi[2][0] * mv_xsi[2][0] - mv_xsi[2][0] * mv_xsi[2][1] - mv_xsi[2][0] - mv_xsi[2][1] - 1.) },
 
-	{ 0.03125 * (9. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][1] - 9. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][0] - 9. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][1] + 9. * m_xsi[3][0] * m_xsi[3][0] - m_xsi[3][0] * m_xsi[3][1] + m_xsi[3][0] + m_xsi[3][1] - 1.),
-	  0.03125 * (-27. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][1] + 27. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][0] + 9. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][1] - 9. * m_xsi[3][0] * m_xsi[3][0] + 27. * m_xsi[3][0] * m_xsi[3][1] - 27. * m_xsi[3][0] - 9. * m_xsi[3][1] + 9.),
-	  0.03125 * (27. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][1] - 27. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][0] + 9. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][1] - 9. * m_xsi[3][0] * m_xsi[3][0] - 27. * m_xsi[3][0] * m_xsi[3][1] + 27. * m_xsi[3][0] - 9. * m_xsi[3][1] + 9.),
-	  0.03125 * (-9. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][1] + 9. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][0] - 9. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][1] + 9. * m_xsi[3][0] * m_xsi[3][0] + m_xsi[3][0] * m_xsi[3][1] - m_xsi[3][0] + m_xsi[3][1] - 1.),
-	  0.03125 * (-9. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][1] - 9. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][0] + 9. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][1] + 9. * m_xsi[3][0] * m_xsi[3][0] + m_xsi[3][0] * m_xsi[3][1] + m_xsi[3][0] - m_xsi[3][1] - 1.),
-	  0.03125 * (27. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][1] + 27. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][0] - 9. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][1] - 9. * m_xsi[3][0] * m_xsi[3][0] - 27. * m_xsi[3][0] * m_xsi[3][1] - 27. * m_xsi[3][0] + 9. * m_xsi[3][1] + 9.),
-	  0.03125 * (-27. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][1] - 27. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][0] - 9. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][1] - 9. * m_xsi[3][0] * m_xsi[3][0] + 27. * m_xsi[3][0] * m_xsi[3][1] + 27. * m_xsi[3][0] + 9. * m_xsi[3][1] + 9.),
-	  0.03125 * (9. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][1] + 9. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][0] + 9. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][1] + 9. * m_xsi[3][0] * m_xsi[3][0] - m_xsi[3][0] * m_xsi[3][1] - m_xsi[3][0] - m_xsi[3][1] - 1.) },
+	{ 0.03125 * (9. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][1] - 9. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][0] - 9. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][1] + 9. * mv_xsi[3][0] * mv_xsi[3][0] - mv_xsi[3][0] * mv_xsi[3][1] + mv_xsi[3][0] + mv_xsi[3][1] - 1.),
+	  0.03125 * (-27. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][1] + 27. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][0] + 9. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][1] - 9. * mv_xsi[3][0] * mv_xsi[3][0] + 27. * mv_xsi[3][0] * mv_xsi[3][1] - 27. * mv_xsi[3][0] - 9. * mv_xsi[3][1] + 9.),
+	  0.03125 * (27. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][1] - 27. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][0] + 9. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][1] - 9. * mv_xsi[3][0] * mv_xsi[3][0] - 27. * mv_xsi[3][0] * mv_xsi[3][1] + 27. * mv_xsi[3][0] - 9. * mv_xsi[3][1] + 9.),
+	  0.03125 * (-9. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][1] + 9. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][0] - 9. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][1] + 9. * mv_xsi[3][0] * mv_xsi[3][0] + mv_xsi[3][0] * mv_xsi[3][1] - mv_xsi[3][0] + mv_xsi[3][1] - 1.),
+	  0.03125 * (-9. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][1] - 9. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][0] + 9. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][1] + 9. * mv_xsi[3][0] * mv_xsi[3][0] + mv_xsi[3][0] * mv_xsi[3][1] + mv_xsi[3][0] - mv_xsi[3][1] - 1.),
+	  0.03125 * (27. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][1] + 27. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][0] - 9. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][1] - 9. * mv_xsi[3][0] * mv_xsi[3][0] - 27. * mv_xsi[3][0] * mv_xsi[3][1] - 27. * mv_xsi[3][0] + 9. * mv_xsi[3][1] + 9.),
+	  0.03125 * (-27. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][1] - 27. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][0] - 9. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][1] - 9. * mv_xsi[3][0] * mv_xsi[3][0] + 27. * mv_xsi[3][0] * mv_xsi[3][1] + 27. * mv_xsi[3][0] + 9. * mv_xsi[3][1] + 9.),
+	  0.03125 * (9. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][1] + 9. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][0] + 9. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][1] + 9. * mv_xsi[3][0] * mv_xsi[3][0] - mv_xsi[3][0] * mv_xsi[3][1] - mv_xsi[3][0] - mv_xsi[3][1] - 1.) },
 
-	{ 0.03125 * (9. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][1] - 9. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][0] - 9. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][1] + 9. * m_xsi[4][0] * m_xsi[4][0] - m_xsi[4][0] * m_xsi[4][1] + m_xsi[4][0] + m_xsi[4][1] - 1.),
-	  0.03125 * (-27. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][1] + 27. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][0] + 9. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][1] - 9. * m_xsi[4][0] * m_xsi[4][0] + 27. * m_xsi[4][0] * m_xsi[4][1] - 27. * m_xsi[4][0] - 9. * m_xsi[4][1] + 9.),
-	  0.03125 * (27. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][1] - 27. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][0] + 9. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][1] - 9. * m_xsi[4][0] * m_xsi[4][0] - 27. * m_xsi[4][0] * m_xsi[4][1] + 27. * m_xsi[4][0] - 9. * m_xsi[4][1] + 9.),
-	  0.03125 * (-9. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][1] + 9. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][0] - 9. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][1] + 9. * m_xsi[4][0] * m_xsi[4][0] + m_xsi[4][0] * m_xsi[4][1] - m_xsi[4][0] + m_xsi[4][1] - 1.),
-	  0.03125 * (-9. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][1] - 9. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][0] + 9. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][1] + 9. * m_xsi[4][0] * m_xsi[4][0] + m_xsi[4][0] * m_xsi[4][1] + m_xsi[4][0] - m_xsi[4][1] - 1.),
-	  0.03125 * (27. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][1] + 27. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][0] - 9. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][1] - 9. * m_xsi[4][0] * m_xsi[4][0] - 27. * m_xsi[4][0] * m_xsi[4][1] - 27. * m_xsi[4][0] + 9. * m_xsi[4][1] + 9.),
-	  0.03125 * (-27. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][1] - 27. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][0] - 9. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][1] - 9. * m_xsi[4][0] * m_xsi[4][0] + 27. * m_xsi[4][0] * m_xsi[4][1] + 27. * m_xsi[4][0] + 9. * m_xsi[4][1] + 9.),
-	  0.03125 * (9. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][1] + 9. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][0] + 9. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][1] + 9. * m_xsi[4][0] * m_xsi[4][0] - m_xsi[4][0] * m_xsi[4][1] - m_xsi[4][0] - m_xsi[4][1] - 1.) },
+	{ 0.03125 * (9. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][1] - 9. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][0] - 9. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][1] + 9. * mv_xsi[4][0] * mv_xsi[4][0] - mv_xsi[4][0] * mv_xsi[4][1] + mv_xsi[4][0] + mv_xsi[4][1] - 1.),
+	  0.03125 * (-27. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][1] + 27. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][0] + 9. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][1] - 9. * mv_xsi[4][0] * mv_xsi[4][0] + 27. * mv_xsi[4][0] * mv_xsi[4][1] - 27. * mv_xsi[4][0] - 9. * mv_xsi[4][1] + 9.),
+	  0.03125 * (27. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][1] - 27. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][0] + 9. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][1] - 9. * mv_xsi[4][0] * mv_xsi[4][0] - 27. * mv_xsi[4][0] * mv_xsi[4][1] + 27. * mv_xsi[4][0] - 9. * mv_xsi[4][1] + 9.),
+	  0.03125 * (-9. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][1] + 9. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][0] - 9. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][1] + 9. * mv_xsi[4][0] * mv_xsi[4][0] + mv_xsi[4][0] * mv_xsi[4][1] - mv_xsi[4][0] + mv_xsi[4][1] - 1.),
+	  0.03125 * (-9. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][1] - 9. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][0] + 9. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][1] + 9. * mv_xsi[4][0] * mv_xsi[4][0] + mv_xsi[4][0] * mv_xsi[4][1] + mv_xsi[4][0] - mv_xsi[4][1] - 1.),
+	  0.03125 * (27. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][1] + 27. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][0] - 9. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][1] - 9. * mv_xsi[4][0] * mv_xsi[4][0] - 27. * mv_xsi[4][0] * mv_xsi[4][1] - 27. * mv_xsi[4][0] + 9. * mv_xsi[4][1] + 9.),
+	  0.03125 * (-27. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][1] - 27. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][0] - 9. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][1] - 9. * mv_xsi[4][0] * mv_xsi[4][0] + 27. * mv_xsi[4][0] * mv_xsi[4][1] + 27. * mv_xsi[4][0] + 9. * mv_xsi[4][1] + 9.),
+	  0.03125 * (9. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][1] + 9. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][0] + 9. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][1] + 9. * mv_xsi[4][0] * mv_xsi[4][0] - mv_xsi[4][0] * mv_xsi[4][1] - mv_xsi[4][0] - mv_xsi[4][1] - 1.) },
 
-	{ 0.03125 * (9. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][1] - 9. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][0] - 9. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][1] + 9. * m_xsi[5][0] * m_xsi[5][0] - m_xsi[5][0] * m_xsi[5][1] + m_xsi[5][0] + m_xsi[5][1] - 1.),
-	  0.03125 * (-27. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][1] + 27. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][0] + 9. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][1] - 9. * m_xsi[5][0] * m_xsi[5][0] + 27. * m_xsi[5][0] * m_xsi[5][1] - 27. * m_xsi[5][0] - 9. * m_xsi[5][1] + 9.),
-	  0.03125 * (27. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][1] - 27. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][0] + 9. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][1] - 9. * m_xsi[5][0] * m_xsi[5][0] - 27. * m_xsi[5][0] * m_xsi[5][1] + 27. * m_xsi[5][0] - 9. * m_xsi[5][1] + 9.),
-	  0.03125 * (-9. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][1] + 9. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][0] - 9. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][1] + 9. * m_xsi[5][0] * m_xsi[5][0] + m_xsi[5][0] * m_xsi[5][1] - m_xsi[5][0] + m_xsi[5][1] - 1.),
-	  0.03125 * (-9. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][1] - 9. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][0] + 9. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][1] + 9. * m_xsi[5][0] * m_xsi[5][0] + m_xsi[5][0] * m_xsi[5][1] + m_xsi[5][0] - m_xsi[5][1] - 1.),
-	  0.03125 * (27. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][1] + 27. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][0] - 9. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][1] - 9. * m_xsi[5][0] * m_xsi[5][0] - 27. * m_xsi[5][0] * m_xsi[5][1] - 27. * m_xsi[5][0] + 9. * m_xsi[5][1] + 9.),
-	  0.03125 * (-27. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][1] - 27. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][0] - 9. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][1] - 9. * m_xsi[5][0] * m_xsi[5][0] + 27. * m_xsi[5][0] * m_xsi[5][1] + 27. * m_xsi[5][0] + 9. * m_xsi[5][1] + 9.),
-	  0.03125 * (9. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][1] + 9. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][0] + 9. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][1] + 9. * m_xsi[5][0] * m_xsi[5][0] - m_xsi[5][0] * m_xsi[5][1] - m_xsi[5][0] - m_xsi[5][1] - 1.) },
+	{ 0.03125 * (9. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][1] - 9. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][0] - 9. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][1] + 9. * mv_xsi[5][0] * mv_xsi[5][0] - mv_xsi[5][0] * mv_xsi[5][1] + mv_xsi[5][0] + mv_xsi[5][1] - 1.),
+	  0.03125 * (-27. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][1] + 27. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][0] + 9. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][1] - 9. * mv_xsi[5][0] * mv_xsi[5][0] + 27. * mv_xsi[5][0] * mv_xsi[5][1] - 27. * mv_xsi[5][0] - 9. * mv_xsi[5][1] + 9.),
+	  0.03125 * (27. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][1] - 27. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][0] + 9. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][1] - 9. * mv_xsi[5][0] * mv_xsi[5][0] - 27. * mv_xsi[5][0] * mv_xsi[5][1] + 27. * mv_xsi[5][0] - 9. * mv_xsi[5][1] + 9.),
+	  0.03125 * (-9. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][1] + 9. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][0] - 9. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][1] + 9. * mv_xsi[5][0] * mv_xsi[5][0] + mv_xsi[5][0] * mv_xsi[5][1] - mv_xsi[5][0] + mv_xsi[5][1] - 1.),
+	  0.03125 * (-9. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][1] - 9. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][0] + 9. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][1] + 9. * mv_xsi[5][0] * mv_xsi[5][0] + mv_xsi[5][0] * mv_xsi[5][1] + mv_xsi[5][0] - mv_xsi[5][1] - 1.),
+	  0.03125 * (27. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][1] + 27. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][0] - 9. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][1] - 9. * mv_xsi[5][0] * mv_xsi[5][0] - 27. * mv_xsi[5][0] * mv_xsi[5][1] - 27. * mv_xsi[5][0] + 9. * mv_xsi[5][1] + 9.),
+	  0.03125 * (-27. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][1] - 27. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][0] - 9. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][1] - 9. * mv_xsi[5][0] * mv_xsi[5][0] + 27. * mv_xsi[5][0] * mv_xsi[5][1] + 27. * mv_xsi[5][0] + 9. * mv_xsi[5][1] + 9.),
+	  0.03125 * (9. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][1] + 9. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][0] + 9. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][1] + 9. * mv_xsi[5][0] * mv_xsi[5][0] - mv_xsi[5][0] * mv_xsi[5][1] - mv_xsi[5][0] - mv_xsi[5][1] - 1.) },
 
-	{ 0.03125 * (9. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][1] - 9. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][0] - 9. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][1] + 9. * m_xsi[6][0] * m_xsi[6][0] - m_xsi[6][0] * m_xsi[6][1] + m_xsi[6][0] + m_xsi[6][1] - 1.),
-	  0.03125 * (-27. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][1] + 27. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][0] + 9. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][1] - 9. * m_xsi[6][0] * m_xsi[6][0] + 27. * m_xsi[6][0] * m_xsi[6][1] - 27. * m_xsi[6][0] - 9. * m_xsi[6][1] + 9.),
-	  0.03125 * (27. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][1] - 27. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][0] + 9. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][1] - 9. * m_xsi[6][0] * m_xsi[6][0] - 27. * m_xsi[6][0] * m_xsi[6][1] + 27. * m_xsi[6][0] - 9. * m_xsi[6][1] + 9.),
-	  0.03125 * (-9. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][1] + 9. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][0] - 9. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][1] + 9. * m_xsi[6][0] * m_xsi[6][0] + m_xsi[6][0] * m_xsi[6][1] - m_xsi[6][0] + m_xsi[6][1] - 1.),
-	  0.03125 * (-9. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][1] - 9. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][0] + 9. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][1] + 9. * m_xsi[6][0] * m_xsi[6][0] + m_xsi[6][0] * m_xsi[6][1] + m_xsi[6][0] - m_xsi[6][1] - 1.),
-	  0.03125 * (27. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][1] + 27. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][0] - 9. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][1] - 9. * m_xsi[6][0] * m_xsi[6][0] - 27. * m_xsi[6][0] * m_xsi[6][1] - 27. * m_xsi[6][0] + 9. * m_xsi[6][1] + 9.),
-	  0.03125 * (-27. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][1] - 27. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][0] - 9. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][1] - 9. * m_xsi[6][0] * m_xsi[6][0] + 27. * m_xsi[6][0] * m_xsi[6][1] + 27. * m_xsi[6][0] + 9. * m_xsi[6][1] + 9.),
-	  0.03125 * (9. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][1] + 9. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][0] + 9. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][1] + 9. * m_xsi[6][0] * m_xsi[6][0] - m_xsi[6][0] * m_xsi[6][1] - m_xsi[6][0] - m_xsi[6][1] - 1.) },
+	{ 0.03125 * (9. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][1] - 9. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][0] - 9. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][1] + 9. * mv_xsi[6][0] * mv_xsi[6][0] - mv_xsi[6][0] * mv_xsi[6][1] + mv_xsi[6][0] + mv_xsi[6][1] - 1.),
+	  0.03125 * (-27. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][1] + 27. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][0] + 9. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][1] - 9. * mv_xsi[6][0] * mv_xsi[6][0] + 27. * mv_xsi[6][0] * mv_xsi[6][1] - 27. * mv_xsi[6][0] - 9. * mv_xsi[6][1] + 9.),
+	  0.03125 * (27. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][1] - 27. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][0] + 9. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][1] - 9. * mv_xsi[6][0] * mv_xsi[6][0] - 27. * mv_xsi[6][0] * mv_xsi[6][1] + 27. * mv_xsi[6][0] - 9. * mv_xsi[6][1] + 9.),
+	  0.03125 * (-9. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][1] + 9. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][0] - 9. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][1] + 9. * mv_xsi[6][0] * mv_xsi[6][0] + mv_xsi[6][0] * mv_xsi[6][1] - mv_xsi[6][0] + mv_xsi[6][1] - 1.),
+	  0.03125 * (-9. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][1] - 9. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][0] + 9. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][1] + 9. * mv_xsi[6][0] * mv_xsi[6][0] + mv_xsi[6][0] * mv_xsi[6][1] + mv_xsi[6][0] - mv_xsi[6][1] - 1.),
+	  0.03125 * (27. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][1] + 27. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][0] - 9. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][1] - 9. * mv_xsi[6][0] * mv_xsi[6][0] - 27. * mv_xsi[6][0] * mv_xsi[6][1] - 27. * mv_xsi[6][0] + 9. * mv_xsi[6][1] + 9.),
+	  0.03125 * (-27. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][1] - 27. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][0] - 9. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][1] - 9. * mv_xsi[6][0] * mv_xsi[6][0] + 27. * mv_xsi[6][0] * mv_xsi[6][1] + 27. * mv_xsi[6][0] + 9. * mv_xsi[6][1] + 9.),
+	  0.03125 * (9. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][1] + 9. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][0] + 9. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][1] + 9. * mv_xsi[6][0] * mv_xsi[6][0] - mv_xsi[6][0] * mv_xsi[6][1] - mv_xsi[6][0] - mv_xsi[6][1] - 1.) },
 
-	{ 0.03125 * (9. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][1] - 9. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][0] - 9. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][1] + 9. * m_xsi[7][0] * m_xsi[7][0] - m_xsi[7][0] * m_xsi[7][1] + m_xsi[7][0] + m_xsi[7][1] - 1.),
-	  0.03125 * (-27. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][1] + 27. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][0] + 9. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][1] - 9. * m_xsi[7][0] * m_xsi[7][0] + 27. * m_xsi[7][0] * m_xsi[7][1] - 27. * m_xsi[7][0] - 9. * m_xsi[7][1] + 9.),
-	  0.03125 * (27. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][1] - 27. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][0] + 9. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][1] - 9. * m_xsi[7][0] * m_xsi[7][0] - 27. * m_xsi[7][0] * m_xsi[7][1] + 27. * m_xsi[7][0] - 9. * m_xsi[7][1] + 9.),
-	  0.03125 * (-9. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][1] + 9. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][0] - 9. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][1] + 9. * m_xsi[7][0] * m_xsi[7][0] + m_xsi[7][0] * m_xsi[7][1] - m_xsi[7][0] + m_xsi[7][1] - 1.),
-	  0.03125 * (-9. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][1] - 9. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][0] + 9. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][1] + 9. * m_xsi[7][0] * m_xsi[7][0] + m_xsi[7][0] * m_xsi[7][1] + m_xsi[7][0] - m_xsi[7][1] - 1.),
-	  0.03125 * (27. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][1] + 27. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][0] - 9. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][1] - 9. * m_xsi[7][0] * m_xsi[7][0] - 27. * m_xsi[7][0] * m_xsi[7][1] - 27. * m_xsi[7][0] + 9. * m_xsi[7][1] + 9.),
-	  0.03125 * (-27. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][1] - 27. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][0] - 9. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][1] - 9. * m_xsi[7][0] * m_xsi[7][0] + 27. * m_xsi[7][0] * m_xsi[7][1] + 27. * m_xsi[7][0] + 9. * m_xsi[7][1] + 9.),
-	  0.03125 * (9. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][1] + 9. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][0] + 9. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][1] + 9. * m_xsi[7][0] * m_xsi[7][0] - m_xsi[7][0] * m_xsi[7][1] - m_xsi[7][0] - m_xsi[7][1] - 1.) } };
+	{ 0.03125 * (9. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][1] - 9. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][0] - 9. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][1] + 9. * mv_xsi[7][0] * mv_xsi[7][0] - mv_xsi[7][0] * mv_xsi[7][1] + mv_xsi[7][0] + mv_xsi[7][1] - 1.),
+	  0.03125 * (-27. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][1] + 27. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][0] + 9. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][1] - 9. * mv_xsi[7][0] * mv_xsi[7][0] + 27. * mv_xsi[7][0] * mv_xsi[7][1] - 27. * mv_xsi[7][0] - 9. * mv_xsi[7][1] + 9.),
+	  0.03125 * (27. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][1] - 27. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][0] + 9. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][1] - 9. * mv_xsi[7][0] * mv_xsi[7][0] - 27. * mv_xsi[7][0] * mv_xsi[7][1] + 27. * mv_xsi[7][0] - 9. * mv_xsi[7][1] + 9.),
+	  0.03125 * (-9. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][1] + 9. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][0] - 9. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][1] + 9. * mv_xsi[7][0] * mv_xsi[7][0] + mv_xsi[7][0] * mv_xsi[7][1] - mv_xsi[7][0] + mv_xsi[7][1] - 1.),
+	  0.03125 * (-9. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][1] - 9. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][0] + 9. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][1] + 9. * mv_xsi[7][0] * mv_xsi[7][0] + mv_xsi[7][0] * mv_xsi[7][1] + mv_xsi[7][0] - mv_xsi[7][1] - 1.),
+	  0.03125 * (27. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][1] + 27. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][0] - 9. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][1] - 9. * mv_xsi[7][0] * mv_xsi[7][0] - 27. * mv_xsi[7][0] * mv_xsi[7][1] - 27. * mv_xsi[7][0] + 9. * mv_xsi[7][1] + 9.),
+	  0.03125 * (-27. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][1] - 27. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][0] - 9. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][1] - 9. * mv_xsi[7][0] * mv_xsi[7][0] + 27. * mv_xsi[7][0] * mv_xsi[7][1] + 27. * mv_xsi[7][0] + 9. * mv_xsi[7][1] + 9.),
+	  0.03125 * (9. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][1] + 9. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][0] + 9. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][1] + 9. * mv_xsi[7][0] * mv_xsi[7][0] - mv_xsi[7][0] * mv_xsi[7][1] - mv_xsi[7][0] - mv_xsi[7][1] - 1.) } };
 
 // ================================================================================================
 //
 // Shape functions derivative
 //
 // ================================================================================================
-inline const double O2P2::Prep::Elem::Elem_Rect8::mv_DPsi[mv_numIP][mv_numNodes][mv_Dim] = {
-	{ { 0.03125 * (27. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] - 27. * m_xsi[0][0] * m_xsi[0][0] - 18. * m_xsi[0][0] * m_xsi[0][1] + 18. * m_xsi[0][0] - m_xsi[0][1] + 1.),
-		0.03125 * (9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] - 9. * m_xsi[0][0] * m_xsi[0][0] - m_xsi[0][0] + 1.) },
-	  { 0.03125 * (-81. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] + 81. * m_xsi[0][0] * m_xsi[0][0] + 18. * m_xsi[0][0] * m_xsi[0][1] - 18. * m_xsi[0][0] + 27. * m_xsi[0][1] - 27.),
-		0.03125 * (-27. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] + 9. * m_xsi[0][0] * m_xsi[0][0] + 27. * m_xsi[0][0] - 9.) },
-	  { 0.03125 * (81. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] - 81. * m_xsi[0][0] * m_xsi[0][0] + 18. * m_xsi[0][0] * m_xsi[0][1] - 18. * m_xsi[0][0] - 27. * m_xsi[0][1] + 27.),
-		0.03125 * (27. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] + 9. * m_xsi[0][0] * m_xsi[0][0] - 27. * m_xsi[0][0] - 9.) },
-	  { 0.03125 * (-27. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] + 27. * m_xsi[0][0] * m_xsi[0][0] - 18. * m_xsi[0][0] * m_xsi[0][1] + 18. * m_xsi[0][0] + m_xsi[0][1] - 1.),
-		0.03125 * (-9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] - 9. * m_xsi[0][0] * m_xsi[0][0] + m_xsi[0][0] + 1.) },
-	  { 0.03125 * (-27. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] - 27. * m_xsi[0][0] * m_xsi[0][0] + 18. * m_xsi[0][0] * m_xsi[0][1] + 18. * m_xsi[0][0] + m_xsi[0][1] + 1.),
-		0.03125 * (-9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] + 9. * m_xsi[0][0] * m_xsi[0][0] + m_xsi[0][0] - 1.) },
-	  { 0.03125 * (81. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] + 81. * m_xsi[0][0] * m_xsi[0][0] - 18. * m_xsi[0][0] * m_xsi[0][1] - 18. * m_xsi[0][0] - 27. * m_xsi[0][1] - 27.),
-		0.03125 * (27. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] - 9. * m_xsi[0][0] * m_xsi[0][0] - 27. * m_xsi[0][0] + 9.) },
-	  { 0.03125 * (-81. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] - 81. * m_xsi[0][0] * m_xsi[0][0] - 18. * m_xsi[0][0] * m_xsi[0][1] - 18. * m_xsi[0][0] + 27. * m_xsi[0][1] + 27.),
-		0.03125 * (-27. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] - 9. * m_xsi[0][0] * m_xsi[0][0] + 27. * m_xsi[0][0] + 9.) },
-	  { 0.03125 * (27. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][1] + 27. * m_xsi[0][0] * m_xsi[0][0] + 18. * m_xsi[0][0] * m_xsi[0][1] + 18. * m_xsi[0][0] - m_xsi[0][1] - 1.),
-		0.03125 * (9. * m_xsi[0][0] * m_xsi[0][0] * m_xsi[0][0] + 9. * m_xsi[0][0] * m_xsi[0][0] - m_xsi[0][0] - 1.) } },
+inline const double O2P2::Geom::Elem::Elem_Rect8::mv_DPsi[mv_numIP][mv_numNodes][mv_ElDim] = {
+	{ { 0.03125 * (27. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][1] - 27. * mv_xsi[0][0] * mv_xsi[0][0] - 18. * mv_xsi[0][0] * mv_xsi[0][1] + 18. * mv_xsi[0][0] - mv_xsi[0][1] + 1.),
+		0.03125 * (9. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][0] - 9. * mv_xsi[0][0] * mv_xsi[0][0] - mv_xsi[0][0] + 1.) },
+	  { 0.03125 * (-81. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][1] + 81. * mv_xsi[0][0] * mv_xsi[0][0] + 18. * mv_xsi[0][0] * mv_xsi[0][1] - 18. * mv_xsi[0][0] + 27. * mv_xsi[0][1] - 27.),
+		0.03125 * (-27. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][0] + 9. * mv_xsi[0][0] * mv_xsi[0][0] + 27. * mv_xsi[0][0] - 9.) },
+	  { 0.03125 * (81. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][1] - 81. * mv_xsi[0][0] * mv_xsi[0][0] + 18. * mv_xsi[0][0] * mv_xsi[0][1] - 18. * mv_xsi[0][0] - 27. * mv_xsi[0][1] + 27.),
+		0.03125 * (27. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][0] + 9. * mv_xsi[0][0] * mv_xsi[0][0] - 27. * mv_xsi[0][0] - 9.) },
+	  { 0.03125 * (-27. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][1] + 27. * mv_xsi[0][0] * mv_xsi[0][0] - 18. * mv_xsi[0][0] * mv_xsi[0][1] + 18. * mv_xsi[0][0] + mv_xsi[0][1] - 1.),
+		0.03125 * (-9. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][0] - 9. * mv_xsi[0][0] * mv_xsi[0][0] + mv_xsi[0][0] + 1.) },
+	  { 0.03125 * (-27. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][1] - 27. * mv_xsi[0][0] * mv_xsi[0][0] + 18. * mv_xsi[0][0] * mv_xsi[0][1] + 18. * mv_xsi[0][0] + mv_xsi[0][1] + 1.),
+		0.03125 * (-9. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][0] + 9. * mv_xsi[0][0] * mv_xsi[0][0] + mv_xsi[0][0] - 1.) },
+	  { 0.03125 * (81. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][1] + 81. * mv_xsi[0][0] * mv_xsi[0][0] - 18. * mv_xsi[0][0] * mv_xsi[0][1] - 18. * mv_xsi[0][0] - 27. * mv_xsi[0][1] - 27.),
+		0.03125 * (27. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][0] - 9. * mv_xsi[0][0] * mv_xsi[0][0] - 27. * mv_xsi[0][0] + 9.) },
+	  { 0.03125 * (-81. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][1] - 81. * mv_xsi[0][0] * mv_xsi[0][0] - 18. * mv_xsi[0][0] * mv_xsi[0][1] - 18. * mv_xsi[0][0] + 27. * mv_xsi[0][1] + 27.),
+		0.03125 * (-27. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][0] - 9. * mv_xsi[0][0] * mv_xsi[0][0] + 27. * mv_xsi[0][0] + 9.) },
+	  { 0.03125 * (27. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][1] + 27. * mv_xsi[0][0] * mv_xsi[0][0] + 18. * mv_xsi[0][0] * mv_xsi[0][1] + 18. * mv_xsi[0][0] - mv_xsi[0][1] - 1.),
+		0.03125 * (9. * mv_xsi[0][0] * mv_xsi[0][0] * mv_xsi[0][0] + 9. * mv_xsi[0][0] * mv_xsi[0][0] - mv_xsi[0][0] - 1.) } },
 
-	{ { 0.03125 * (27. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][1] - 27. * m_xsi[1][0] * m_xsi[1][0] - 18. * m_xsi[1][0] * m_xsi[1][1] + 18. * m_xsi[1][0] - m_xsi[1][1] + 1.),
-		0.03125 * (9. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][0] - 9. * m_xsi[1][0] * m_xsi[1][0] - m_xsi[1][0] + 1.) },
-	  { 0.03125 * (-81. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][1] + 81. * m_xsi[1][0] * m_xsi[1][0] + 18. * m_xsi[1][0] * m_xsi[1][1] - 18. * m_xsi[1][0] + 27. * m_xsi[1][1] - 27.),
-		0.03125 * (-27. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][0] + 9. * m_xsi[1][0] * m_xsi[1][0] + 27. * m_xsi[1][0] - 9.) },
-	  { 0.03125 * (81. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][1] - 81. * m_xsi[1][0] * m_xsi[1][0] + 18. * m_xsi[1][0] * m_xsi[1][1] - 18. * m_xsi[1][0] - 27. * m_xsi[1][1] + 27.),
-		0.03125 * (27. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][0] + 9. * m_xsi[1][0] * m_xsi[1][0] - 27. * m_xsi[1][0] - 9.) },
-	  { 0.03125 * (-27. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][1] + 27. * m_xsi[1][0] * m_xsi[1][0] - 18. * m_xsi[1][0] * m_xsi[1][1] + 18. * m_xsi[1][0] + m_xsi[1][1] - 1.),
-		0.03125 * (-9. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][0] - 9. * m_xsi[1][0] * m_xsi[1][0] + m_xsi[1][0] + 1.) },
-	  { 0.03125 * (-27. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][1] - 27. * m_xsi[1][0] * m_xsi[1][0] + 18. * m_xsi[1][0] * m_xsi[1][1] + 18. * m_xsi[1][0] + m_xsi[1][1] + 1.),
-		0.03125 * (-9. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][0] + 9. * m_xsi[1][0] * m_xsi[1][0] + m_xsi[1][0] - 1.) },
-	  { 0.03125 * (81. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][1] + 81. * m_xsi[1][0] * m_xsi[1][0] - 18. * m_xsi[1][0] * m_xsi[1][1] - 18. * m_xsi[1][0] - 27. * m_xsi[1][1] - 27.),
-		0.03125 * (27. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][0] - 9. * m_xsi[1][0] * m_xsi[1][0] - 27. * m_xsi[1][0] + 9.) },
-	  { 0.03125 * (-81. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][1] - 81. * m_xsi[1][0] * m_xsi[1][0] - 18. * m_xsi[1][0] * m_xsi[1][1] - 18. * m_xsi[1][0] + 27. * m_xsi[1][1] + 27.),
-		0.03125 * (-27. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][0] - 9. * m_xsi[1][0] * m_xsi[1][0] + 27. * m_xsi[1][0] + 9.) },
-	  { 0.03125 * (27. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][1] + 27. * m_xsi[1][0] * m_xsi[1][0] + 18. * m_xsi[1][0] * m_xsi[1][1] + 18. * m_xsi[1][0] - m_xsi[1][1] - 1.),
-		0.03125 * (9. * m_xsi[1][0] * m_xsi[1][0] * m_xsi[1][0] + 9. * m_xsi[1][0] * m_xsi[1][0] - m_xsi[1][0] - 1.) } },
+	{ { 0.03125 * (27. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][1] - 27. * mv_xsi[1][0] * mv_xsi[1][0] - 18. * mv_xsi[1][0] * mv_xsi[1][1] + 18. * mv_xsi[1][0] - mv_xsi[1][1] + 1.),
+		0.03125 * (9. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][0] - 9. * mv_xsi[1][0] * mv_xsi[1][0] - mv_xsi[1][0] + 1.) },
+	  { 0.03125 * (-81. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][1] + 81. * mv_xsi[1][0] * mv_xsi[1][0] + 18. * mv_xsi[1][0] * mv_xsi[1][1] - 18. * mv_xsi[1][0] + 27. * mv_xsi[1][1] - 27.),
+		0.03125 * (-27. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][0] + 9. * mv_xsi[1][0] * mv_xsi[1][0] + 27. * mv_xsi[1][0] - 9.) },
+	  { 0.03125 * (81. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][1] - 81. * mv_xsi[1][0] * mv_xsi[1][0] + 18. * mv_xsi[1][0] * mv_xsi[1][1] - 18. * mv_xsi[1][0] - 27. * mv_xsi[1][1] + 27.),
+		0.03125 * (27. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][0] + 9. * mv_xsi[1][0] * mv_xsi[1][0] - 27. * mv_xsi[1][0] - 9.) },
+	  { 0.03125 * (-27. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][1] + 27. * mv_xsi[1][0] * mv_xsi[1][0] - 18. * mv_xsi[1][0] * mv_xsi[1][1] + 18. * mv_xsi[1][0] + mv_xsi[1][1] - 1.),
+		0.03125 * (-9. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][0] - 9. * mv_xsi[1][0] * mv_xsi[1][0] + mv_xsi[1][0] + 1.) },
+	  { 0.03125 * (-27. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][1] - 27. * mv_xsi[1][0] * mv_xsi[1][0] + 18. * mv_xsi[1][0] * mv_xsi[1][1] + 18. * mv_xsi[1][0] + mv_xsi[1][1] + 1.),
+		0.03125 * (-9. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][0] + 9. * mv_xsi[1][0] * mv_xsi[1][0] + mv_xsi[1][0] - 1.) },
+	  { 0.03125 * (81. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][1] + 81. * mv_xsi[1][0] * mv_xsi[1][0] - 18. * mv_xsi[1][0] * mv_xsi[1][1] - 18. * mv_xsi[1][0] - 27. * mv_xsi[1][1] - 27.),
+		0.03125 * (27. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][0] - 9. * mv_xsi[1][0] * mv_xsi[1][0] - 27. * mv_xsi[1][0] + 9.) },
+	  { 0.03125 * (-81. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][1] - 81. * mv_xsi[1][0] * mv_xsi[1][0] - 18. * mv_xsi[1][0] * mv_xsi[1][1] - 18. * mv_xsi[1][0] + 27. * mv_xsi[1][1] + 27.),
+		0.03125 * (-27. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][0] - 9. * mv_xsi[1][0] * mv_xsi[1][0] + 27. * mv_xsi[1][0] + 9.) },
+	  { 0.03125 * (27. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][1] + 27. * mv_xsi[1][0] * mv_xsi[1][0] + 18. * mv_xsi[1][0] * mv_xsi[1][1] + 18. * mv_xsi[1][0] - mv_xsi[1][1] - 1.),
+		0.03125 * (9. * mv_xsi[1][0] * mv_xsi[1][0] * mv_xsi[1][0] + 9. * mv_xsi[1][0] * mv_xsi[1][0] - mv_xsi[1][0] - 1.) } },
 
-	{ { 0.03125 * (27. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][1] - 27. * m_xsi[2][0] * m_xsi[2][0] - 18. * m_xsi[2][0] * m_xsi[2][1] + 18. * m_xsi[2][0] - m_xsi[2][1] + 1.),
-		0.03125 * (9. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][0] - 9. * m_xsi[2][0] * m_xsi[2][0] - m_xsi[2][0] + 1.) },
-	  { 0.03125 * (-81. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][1] + 81. * m_xsi[2][0] * m_xsi[2][0] + 18. * m_xsi[2][0] * m_xsi[2][1] - 18. * m_xsi[2][0] + 27. * m_xsi[2][1] - 27.),
-		0.03125 * (-27. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][0] + 9. * m_xsi[2][0] * m_xsi[2][0] + 27. * m_xsi[2][0] - 9.) },
-	  { 0.03125 * (81. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][1] - 81. * m_xsi[2][0] * m_xsi[2][0] + 18. * m_xsi[2][0] * m_xsi[2][1] - 18. * m_xsi[2][0] - 27. * m_xsi[2][1] + 27.),
-		0.03125 * (27. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][0] + 9. * m_xsi[2][0] * m_xsi[2][0] - 27. * m_xsi[2][0] - 9.) },
-	  { 0.03125 * (-27. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][1] + 27. * m_xsi[2][0] * m_xsi[2][0] - 18. * m_xsi[2][0] * m_xsi[2][1] + 18. * m_xsi[2][0] + m_xsi[2][1] - 1.),
-		0.03125 * (-9. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][0] - 9. * m_xsi[2][0] * m_xsi[2][0] + m_xsi[2][0] + 1.) },
-	  { 0.03125 * (-27. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][1] - 27. * m_xsi[2][0] * m_xsi[2][0] + 18. * m_xsi[2][0] * m_xsi[2][1] + 18. * m_xsi[2][0] + m_xsi[2][1] + 1.),
-		0.03125 * (-9. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][0] + 9. * m_xsi[2][0] * m_xsi[2][0] + m_xsi[2][0] - 1.) },
-	  { 0.03125 * (81. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][1] + 81. * m_xsi[2][0] * m_xsi[2][0] - 18. * m_xsi[2][0] * m_xsi[2][1] - 18. * m_xsi[2][0] - 27. * m_xsi[2][1] - 27.),
-		0.03125 * (27. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][0] - 9. * m_xsi[2][0] * m_xsi[2][0] - 27. * m_xsi[2][0] + 9.) },
-	  { 0.03125 * (-81. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][1] - 81. * m_xsi[2][0] * m_xsi[2][0] - 18. * m_xsi[2][0] * m_xsi[2][1] - 18. * m_xsi[2][0] + 27. * m_xsi[2][1] + 27.),
-		0.03125 * (-27. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][0] - 9. * m_xsi[2][0] * m_xsi[2][0] + 27. * m_xsi[2][0] + 9.) },
-	  { 0.03125 * (27. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][1] + 27. * m_xsi[2][0] * m_xsi[2][0] + 18. * m_xsi[2][0] * m_xsi[2][1] + 18. * m_xsi[2][0] - m_xsi[2][1] - 1.),
-		0.03125 * (9. * m_xsi[2][0] * m_xsi[2][0] * m_xsi[2][0] + 9. * m_xsi[2][0] * m_xsi[2][0] - m_xsi[2][0] - 1.) } },
+	{ { 0.03125 * (27. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][1] - 27. * mv_xsi[2][0] * mv_xsi[2][0] - 18. * mv_xsi[2][0] * mv_xsi[2][1] + 18. * mv_xsi[2][0] - mv_xsi[2][1] + 1.),
+		0.03125 * (9. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][0] - 9. * mv_xsi[2][0] * mv_xsi[2][0] - mv_xsi[2][0] + 1.) },
+	  { 0.03125 * (-81. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][1] + 81. * mv_xsi[2][0] * mv_xsi[2][0] + 18. * mv_xsi[2][0] * mv_xsi[2][1] - 18. * mv_xsi[2][0] + 27. * mv_xsi[2][1] - 27.),
+		0.03125 * (-27. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][0] + 9. * mv_xsi[2][0] * mv_xsi[2][0] + 27. * mv_xsi[2][0] - 9.) },
+	  { 0.03125 * (81. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][1] - 81. * mv_xsi[2][0] * mv_xsi[2][0] + 18. * mv_xsi[2][0] * mv_xsi[2][1] - 18. * mv_xsi[2][0] - 27. * mv_xsi[2][1] + 27.),
+		0.03125 * (27. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][0] + 9. * mv_xsi[2][0] * mv_xsi[2][0] - 27. * mv_xsi[2][0] - 9.) },
+	  { 0.03125 * (-27. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][1] + 27. * mv_xsi[2][0] * mv_xsi[2][0] - 18. * mv_xsi[2][0] * mv_xsi[2][1] + 18. * mv_xsi[2][0] + mv_xsi[2][1] - 1.),
+		0.03125 * (-9. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][0] - 9. * mv_xsi[2][0] * mv_xsi[2][0] + mv_xsi[2][0] + 1.) },
+	  { 0.03125 * (-27. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][1] - 27. * mv_xsi[2][0] * mv_xsi[2][0] + 18. * mv_xsi[2][0] * mv_xsi[2][1] + 18. * mv_xsi[2][0] + mv_xsi[2][1] + 1.),
+		0.03125 * (-9. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][0] + 9. * mv_xsi[2][0] * mv_xsi[2][0] + mv_xsi[2][0] - 1.) },
+	  { 0.03125 * (81. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][1] + 81. * mv_xsi[2][0] * mv_xsi[2][0] - 18. * mv_xsi[2][0] * mv_xsi[2][1] - 18. * mv_xsi[2][0] - 27. * mv_xsi[2][1] - 27.),
+		0.03125 * (27. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][0] - 9. * mv_xsi[2][0] * mv_xsi[2][0] - 27. * mv_xsi[2][0] + 9.) },
+	  { 0.03125 * (-81. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][1] - 81. * mv_xsi[2][0] * mv_xsi[2][0] - 18. * mv_xsi[2][0] * mv_xsi[2][1] - 18. * mv_xsi[2][0] + 27. * mv_xsi[2][1] + 27.),
+		0.03125 * (-27. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][0] - 9. * mv_xsi[2][0] * mv_xsi[2][0] + 27. * mv_xsi[2][0] + 9.) },
+	  { 0.03125 * (27. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][1] + 27. * mv_xsi[2][0] * mv_xsi[2][0] + 18. * mv_xsi[2][0] * mv_xsi[2][1] + 18. * mv_xsi[2][0] - mv_xsi[2][1] - 1.),
+		0.03125 * (9. * mv_xsi[2][0] * mv_xsi[2][0] * mv_xsi[2][0] + 9. * mv_xsi[2][0] * mv_xsi[2][0] - mv_xsi[2][0] - 1.) } },
 
-	{ { 0.03125 * (27. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][1] - 27. * m_xsi[3][0] * m_xsi[3][0] - 18. * m_xsi[3][0] * m_xsi[3][1] + 18. * m_xsi[3][0] - m_xsi[3][1] + 1.),
-		0.03125 * (9. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][0] - 9. * m_xsi[3][0] * m_xsi[3][0] - m_xsi[3][0] + 1.) },
-	  { 0.03125 * (-81. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][1] + 81. * m_xsi[3][0] * m_xsi[3][0] + 18. * m_xsi[3][0] * m_xsi[3][1] - 18. * m_xsi[3][0] + 27. * m_xsi[3][1] - 27.),
-		0.03125 * (-27. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][0] + 9. * m_xsi[3][0] * m_xsi[3][0] + 27. * m_xsi[3][0] - 9.) },
-	  { 0.03125 * (81. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][1] - 81. * m_xsi[3][0] * m_xsi[3][0] + 18. * m_xsi[3][0] * m_xsi[3][1] - 18. * m_xsi[3][0] - 27. * m_xsi[3][1] + 27.),
-		0.03125 * (27. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][0] + 9. * m_xsi[3][0] * m_xsi[3][0] - 27. * m_xsi[3][0] - 9.) },
-	  { 0.03125 * (-27. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][1] + 27. * m_xsi[3][0] * m_xsi[3][0] - 18. * m_xsi[3][0] * m_xsi[3][1] + 18. * m_xsi[3][0] + m_xsi[3][1] - 1.),
-		0.03125 * (-9. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][0] - 9. * m_xsi[3][0] * m_xsi[3][0] + m_xsi[3][0] + 1.) },
-	  { 0.03125 * (-27. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][1] - 27. * m_xsi[3][0] * m_xsi[3][0] + 18. * m_xsi[3][0] * m_xsi[3][1] + 18. * m_xsi[3][0] + m_xsi[3][1] + 1.),
-		0.03125 * (-9. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][0] + 9. * m_xsi[3][0] * m_xsi[3][0] + m_xsi[3][0] - 1.) },
-	  { 0.03125 * (81. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][1] + 81. * m_xsi[3][0] * m_xsi[3][0] - 18. * m_xsi[3][0] * m_xsi[3][1] - 18. * m_xsi[3][0] - 27. * m_xsi[3][1] - 27.),
-		0.03125 * (27. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][0] - 9. * m_xsi[3][0] * m_xsi[3][0] - 27. * m_xsi[3][0] + 9.) },
-	  { 0.03125 * (-81. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][1] - 81. * m_xsi[3][0] * m_xsi[3][0] - 18. * m_xsi[3][0] * m_xsi[3][1] - 18. * m_xsi[3][0] + 27. * m_xsi[3][1] + 27.),
-		0.03125 * (-27. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][0] - 9. * m_xsi[3][0] * m_xsi[3][0] + 27. * m_xsi[3][0] + 9.) },
-	  { 0.03125 * (27. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][1] + 27. * m_xsi[3][0] * m_xsi[3][0] + 18. * m_xsi[3][0] * m_xsi[3][1] + 18. * m_xsi[3][0] - m_xsi[3][1] - 1.),
-		0.03125 * (9. * m_xsi[3][0] * m_xsi[3][0] * m_xsi[3][0] + 9. * m_xsi[3][0] * m_xsi[3][0] - m_xsi[3][0] - 1.) } },
+	{ { 0.03125 * (27. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][1] - 27. * mv_xsi[3][0] * mv_xsi[3][0] - 18. * mv_xsi[3][0] * mv_xsi[3][1] + 18. * mv_xsi[3][0] - mv_xsi[3][1] + 1.),
+		0.03125 * (9. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][0] - 9. * mv_xsi[3][0] * mv_xsi[3][0] - mv_xsi[3][0] + 1.) },
+	  { 0.03125 * (-81. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][1] + 81. * mv_xsi[3][0] * mv_xsi[3][0] + 18. * mv_xsi[3][0] * mv_xsi[3][1] - 18. * mv_xsi[3][0] + 27. * mv_xsi[3][1] - 27.),
+		0.03125 * (-27. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][0] + 9. * mv_xsi[3][0] * mv_xsi[3][0] + 27. * mv_xsi[3][0] - 9.) },
+	  { 0.03125 * (81. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][1] - 81. * mv_xsi[3][0] * mv_xsi[3][0] + 18. * mv_xsi[3][0] * mv_xsi[3][1] - 18. * mv_xsi[3][0] - 27. * mv_xsi[3][1] + 27.),
+		0.03125 * (27. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][0] + 9. * mv_xsi[3][0] * mv_xsi[3][0] - 27. * mv_xsi[3][0] - 9.) },
+	  { 0.03125 * (-27. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][1] + 27. * mv_xsi[3][0] * mv_xsi[3][0] - 18. * mv_xsi[3][0] * mv_xsi[3][1] + 18. * mv_xsi[3][0] + mv_xsi[3][1] - 1.),
+		0.03125 * (-9. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][0] - 9. * mv_xsi[3][0] * mv_xsi[3][0] + mv_xsi[3][0] + 1.) },
+	  { 0.03125 * (-27. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][1] - 27. * mv_xsi[3][0] * mv_xsi[3][0] + 18. * mv_xsi[3][0] * mv_xsi[3][1] + 18. * mv_xsi[3][0] + mv_xsi[3][1] + 1.),
+		0.03125 * (-9. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][0] + 9. * mv_xsi[3][0] * mv_xsi[3][0] + mv_xsi[3][0] - 1.) },
+	  { 0.03125 * (81. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][1] + 81. * mv_xsi[3][0] * mv_xsi[3][0] - 18. * mv_xsi[3][0] * mv_xsi[3][1] - 18. * mv_xsi[3][0] - 27. * mv_xsi[3][1] - 27.),
+		0.03125 * (27. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][0] - 9. * mv_xsi[3][0] * mv_xsi[3][0] - 27. * mv_xsi[3][0] + 9.) },
+	  { 0.03125 * (-81. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][1] - 81. * mv_xsi[3][0] * mv_xsi[3][0] - 18. * mv_xsi[3][0] * mv_xsi[3][1] - 18. * mv_xsi[3][0] + 27. * mv_xsi[3][1] + 27.),
+		0.03125 * (-27. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][0] - 9. * mv_xsi[3][0] * mv_xsi[3][0] + 27. * mv_xsi[3][0] + 9.) },
+	  { 0.03125 * (27. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][1] + 27. * mv_xsi[3][0] * mv_xsi[3][0] + 18. * mv_xsi[3][0] * mv_xsi[3][1] + 18. * mv_xsi[3][0] - mv_xsi[3][1] - 1.),
+		0.03125 * (9. * mv_xsi[3][0] * mv_xsi[3][0] * mv_xsi[3][0] + 9. * mv_xsi[3][0] * mv_xsi[3][0] - mv_xsi[3][0] - 1.) } },
 
-	{ { 0.03125 * (27. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][1] - 27. * m_xsi[4][0] * m_xsi[4][0] - 18. * m_xsi[4][0] * m_xsi[4][1] + 18. * m_xsi[4][0] - m_xsi[4][1] + 1.),
-		0.03125 * (9. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][0] - 9. * m_xsi[4][0] * m_xsi[4][0] - m_xsi[4][0] + 1.) },
-	  { 0.03125 * (-81. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][1] + 81. * m_xsi[4][0] * m_xsi[4][0] + 18. * m_xsi[4][0] * m_xsi[4][1] - 18. * m_xsi[4][0] + 27. * m_xsi[4][1] - 27.),
-		0.03125 * (-27. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][0] + 9. * m_xsi[4][0] * m_xsi[4][0] + 27. * m_xsi[4][0] - 9.) },
-	  { 0.03125 * (81. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][1] - 81. * m_xsi[4][0] * m_xsi[4][0] + 18. * m_xsi[4][0] * m_xsi[4][1] - 18. * m_xsi[4][0] - 27. * m_xsi[4][1] + 27.),
-		0.03125 * (27. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][0] + 9. * m_xsi[4][0] * m_xsi[4][0] - 27. * m_xsi[4][0] - 9.) },
-	  { 0.03125 * (-27. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][1] + 27. * m_xsi[4][0] * m_xsi[4][0] - 18. * m_xsi[4][0] * m_xsi[4][1] + 18. * m_xsi[4][0] + m_xsi[4][1] - 1.),
-		0.03125 * (-9. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][0] - 9. * m_xsi[4][0] * m_xsi[4][0] + m_xsi[4][0] + 1.) },
-	  { 0.03125 * (-27. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][1] - 27. * m_xsi[4][0] * m_xsi[4][0] + 18. * m_xsi[4][0] * m_xsi[4][1] + 18. * m_xsi[4][0] + m_xsi[4][1] + 1.),
-		0.03125 * (-9. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][0] + 9. * m_xsi[4][0] * m_xsi[4][0] + m_xsi[4][0] - 1.) },
-	  { 0.03125 * (81. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][1] + 81. * m_xsi[4][0] * m_xsi[4][0] - 18. * m_xsi[4][0] * m_xsi[4][1] - 18. * m_xsi[4][0] - 27. * m_xsi[4][1] - 27.),
-		0.03125 * (27. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][0] - 9. * m_xsi[4][0] * m_xsi[4][0] - 27. * m_xsi[4][0] + 9.) },
-	  { 0.03125 * (-81. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][1] - 81. * m_xsi[4][0] * m_xsi[4][0] - 18. * m_xsi[4][0] * m_xsi[4][1] - 18. * m_xsi[4][0] + 27. * m_xsi[4][1] + 27.),
-		0.03125 * (-27. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][0] - 9. * m_xsi[4][0] * m_xsi[4][0] + 27. * m_xsi[4][0] + 9.) },
-	  { 0.03125 * (27. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][1] + 27. * m_xsi[4][0] * m_xsi[4][0] + 18. * m_xsi[4][0] * m_xsi[4][1] + 18. * m_xsi[4][0] - m_xsi[4][1] - 1.),
-		0.03125 * (9. * m_xsi[4][0] * m_xsi[4][0] * m_xsi[4][0] + 9. * m_xsi[4][0] * m_xsi[4][0] - m_xsi[4][0] - 1.) } },
+	{ { 0.03125 * (27. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][1] - 27. * mv_xsi[4][0] * mv_xsi[4][0] - 18. * mv_xsi[4][0] * mv_xsi[4][1] + 18. * mv_xsi[4][0] - mv_xsi[4][1] + 1.),
+		0.03125 * (9. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][0] - 9. * mv_xsi[4][0] * mv_xsi[4][0] - mv_xsi[4][0] + 1.) },
+	  { 0.03125 * (-81. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][1] + 81. * mv_xsi[4][0] * mv_xsi[4][0] + 18. * mv_xsi[4][0] * mv_xsi[4][1] - 18. * mv_xsi[4][0] + 27. * mv_xsi[4][1] - 27.),
+		0.03125 * (-27. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][0] + 9. * mv_xsi[4][0] * mv_xsi[4][0] + 27. * mv_xsi[4][0] - 9.) },
+	  { 0.03125 * (81. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][1] - 81. * mv_xsi[4][0] * mv_xsi[4][0] + 18. * mv_xsi[4][0] * mv_xsi[4][1] - 18. * mv_xsi[4][0] - 27. * mv_xsi[4][1] + 27.),
+		0.03125 * (27. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][0] + 9. * mv_xsi[4][0] * mv_xsi[4][0] - 27. * mv_xsi[4][0] - 9.) },
+	  { 0.03125 * (-27. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][1] + 27. * mv_xsi[4][0] * mv_xsi[4][0] - 18. * mv_xsi[4][0] * mv_xsi[4][1] + 18. * mv_xsi[4][0] + mv_xsi[4][1] - 1.),
+		0.03125 * (-9. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][0] - 9. * mv_xsi[4][0] * mv_xsi[4][0] + mv_xsi[4][0] + 1.) },
+	  { 0.03125 * (-27. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][1] - 27. * mv_xsi[4][0] * mv_xsi[4][0] + 18. * mv_xsi[4][0] * mv_xsi[4][1] + 18. * mv_xsi[4][0] + mv_xsi[4][1] + 1.),
+		0.03125 * (-9. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][0] + 9. * mv_xsi[4][0] * mv_xsi[4][0] + mv_xsi[4][0] - 1.) },
+	  { 0.03125 * (81. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][1] + 81. * mv_xsi[4][0] * mv_xsi[4][0] - 18. * mv_xsi[4][0] * mv_xsi[4][1] - 18. * mv_xsi[4][0] - 27. * mv_xsi[4][1] - 27.),
+		0.03125 * (27. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][0] - 9. * mv_xsi[4][0] * mv_xsi[4][0] - 27. * mv_xsi[4][0] + 9.) },
+	  { 0.03125 * (-81. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][1] - 81. * mv_xsi[4][0] * mv_xsi[4][0] - 18. * mv_xsi[4][0] * mv_xsi[4][1] - 18. * mv_xsi[4][0] + 27. * mv_xsi[4][1] + 27.),
+		0.03125 * (-27. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][0] - 9. * mv_xsi[4][0] * mv_xsi[4][0] + 27. * mv_xsi[4][0] + 9.) },
+	  { 0.03125 * (27. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][1] + 27. * mv_xsi[4][0] * mv_xsi[4][0] + 18. * mv_xsi[4][0] * mv_xsi[4][1] + 18. * mv_xsi[4][0] - mv_xsi[4][1] - 1.),
+		0.03125 * (9. * mv_xsi[4][0] * mv_xsi[4][0] * mv_xsi[4][0] + 9. * mv_xsi[4][0] * mv_xsi[4][0] - mv_xsi[4][0] - 1.) } },
 
-	{ { 0.03125 * (27. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][1] - 27. * m_xsi[5][0] * m_xsi[5][0] - 18. * m_xsi[5][0] * m_xsi[5][1] + 18. * m_xsi[5][0] - m_xsi[5][1] + 1.),
-		0.03125 * (9. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][0] - 9. * m_xsi[5][0] * m_xsi[5][0] - m_xsi[5][0] + 1.) },
-	  { 0.03125 * (-81. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][1] + 81. * m_xsi[5][0] * m_xsi[5][0] + 18. * m_xsi[5][0] * m_xsi[5][1] - 18. * m_xsi[5][0] + 27. * m_xsi[5][1] - 27.),
-		0.03125 * (-27. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][0] + 9. * m_xsi[5][0] * m_xsi[5][0] + 27. * m_xsi[5][0] - 9.) },
-	  { 0.03125 * (81. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][1] - 81. * m_xsi[5][0] * m_xsi[5][0] + 18. * m_xsi[5][0] * m_xsi[5][1] - 18. * m_xsi[5][0] - 27. * m_xsi[5][1] + 27.),
-		0.03125 * (27. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][0] + 9. * m_xsi[5][0] * m_xsi[5][0] - 27. * m_xsi[5][0] - 9.) },
-	  { 0.03125 * (-27. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][1] + 27. * m_xsi[5][0] * m_xsi[5][0] - 18. * m_xsi[5][0] * m_xsi[5][1] + 18. * m_xsi[5][0] + m_xsi[5][1] - 1.),
-		0.03125 * (-9. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][0] - 9. * m_xsi[5][0] * m_xsi[5][0] + m_xsi[5][0] + 1.) },
-	  { 0.03125 * (-27. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][1] - 27. * m_xsi[5][0] * m_xsi[5][0] + 18. * m_xsi[5][0] * m_xsi[5][1] + 18. * m_xsi[5][0] + m_xsi[5][1] + 1.),
-		0.03125 * (-9. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][0] + 9. * m_xsi[5][0] * m_xsi[5][0] + m_xsi[5][0] - 1.) },
-	  { 0.03125 * (81. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][1] + 81. * m_xsi[5][0] * m_xsi[5][0] - 18. * m_xsi[5][0] * m_xsi[5][1] - 18. * m_xsi[5][0] - 27. * m_xsi[5][1] - 27.),
-		0.03125 * (27. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][0] - 9. * m_xsi[5][0] * m_xsi[5][0] - 27. * m_xsi[5][0] + 9.) },
-	  { 0.03125 * (-81. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][1] - 81. * m_xsi[5][0] * m_xsi[5][0] - 18. * m_xsi[5][0] * m_xsi[5][1] - 18. * m_xsi[5][0] + 27. * m_xsi[5][1] + 27.),
-		0.03125 * (-27. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][0] - 9. * m_xsi[5][0] * m_xsi[5][0] + 27. * m_xsi[5][0] + 9.) },
-	  { 0.03125 * (27. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][1] + 27. * m_xsi[5][0] * m_xsi[5][0] + 18. * m_xsi[5][0] * m_xsi[5][1] + 18. * m_xsi[5][0] - m_xsi[5][1] - 1.),
-		0.03125 * (9. * m_xsi[5][0] * m_xsi[5][0] * m_xsi[5][0] + 9. * m_xsi[5][0] * m_xsi[5][0] - m_xsi[5][0] - 1.) } },
+	{ { 0.03125 * (27. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][1] - 27. * mv_xsi[5][0] * mv_xsi[5][0] - 18. * mv_xsi[5][0] * mv_xsi[5][1] + 18. * mv_xsi[5][0] - mv_xsi[5][1] + 1.),
+		0.03125 * (9. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][0] - 9. * mv_xsi[5][0] * mv_xsi[5][0] - mv_xsi[5][0] + 1.) },
+	  { 0.03125 * (-81. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][1] + 81. * mv_xsi[5][0] * mv_xsi[5][0] + 18. * mv_xsi[5][0] * mv_xsi[5][1] - 18. * mv_xsi[5][0] + 27. * mv_xsi[5][1] - 27.),
+		0.03125 * (-27. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][0] + 9. * mv_xsi[5][0] * mv_xsi[5][0] + 27. * mv_xsi[5][0] - 9.) },
+	  { 0.03125 * (81. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][1] - 81. * mv_xsi[5][0] * mv_xsi[5][0] + 18. * mv_xsi[5][0] * mv_xsi[5][1] - 18. * mv_xsi[5][0] - 27. * mv_xsi[5][1] + 27.),
+		0.03125 * (27. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][0] + 9. * mv_xsi[5][0] * mv_xsi[5][0] - 27. * mv_xsi[5][0] - 9.) },
+	  { 0.03125 * (-27. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][1] + 27. * mv_xsi[5][0] * mv_xsi[5][0] - 18. * mv_xsi[5][0] * mv_xsi[5][1] + 18. * mv_xsi[5][0] + mv_xsi[5][1] - 1.),
+		0.03125 * (-9. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][0] - 9. * mv_xsi[5][0] * mv_xsi[5][0] + mv_xsi[5][0] + 1.) },
+	  { 0.03125 * (-27. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][1] - 27. * mv_xsi[5][0] * mv_xsi[5][0] + 18. * mv_xsi[5][0] * mv_xsi[5][1] + 18. * mv_xsi[5][0] + mv_xsi[5][1] + 1.),
+		0.03125 * (-9. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][0] + 9. * mv_xsi[5][0] * mv_xsi[5][0] + mv_xsi[5][0] - 1.) },
+	  { 0.03125 * (81. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][1] + 81. * mv_xsi[5][0] * mv_xsi[5][0] - 18. * mv_xsi[5][0] * mv_xsi[5][1] - 18. * mv_xsi[5][0] - 27. * mv_xsi[5][1] - 27.),
+		0.03125 * (27. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][0] - 9. * mv_xsi[5][0] * mv_xsi[5][0] - 27. * mv_xsi[5][0] + 9.) },
+	  { 0.03125 * (-81. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][1] - 81. * mv_xsi[5][0] * mv_xsi[5][0] - 18. * mv_xsi[5][0] * mv_xsi[5][1] - 18. * mv_xsi[5][0] + 27. * mv_xsi[5][1] + 27.),
+		0.03125 * (-27. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][0] - 9. * mv_xsi[5][0] * mv_xsi[5][0] + 27. * mv_xsi[5][0] + 9.) },
+	  { 0.03125 * (27. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][1] + 27. * mv_xsi[5][0] * mv_xsi[5][0] + 18. * mv_xsi[5][0] * mv_xsi[5][1] + 18. * mv_xsi[5][0] - mv_xsi[5][1] - 1.),
+		0.03125 * (9. * mv_xsi[5][0] * mv_xsi[5][0] * mv_xsi[5][0] + 9. * mv_xsi[5][0] * mv_xsi[5][0] - mv_xsi[5][0] - 1.) } },
 
-	{ { 0.03125 * (27. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][1] - 27. * m_xsi[6][0] * m_xsi[6][0] - 18. * m_xsi[6][0] * m_xsi[6][1] + 18. * m_xsi[6][0] - m_xsi[6][1] + 1.),
-		0.03125 * (9. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][0] - 9. * m_xsi[6][0] * m_xsi[6][0] - m_xsi[6][0] + 1.) },
-	  { 0.03125 * (-81. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][1] + 81. * m_xsi[6][0] * m_xsi[6][0] + 18. * m_xsi[6][0] * m_xsi[6][1] - 18. * m_xsi[6][0] + 27. * m_xsi[6][1] - 27.),
-		0.03125 * (-27. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][0] + 9. * m_xsi[6][0] * m_xsi[6][0] + 27. * m_xsi[6][0] - 9.) },
-	  { 0.03125 * (81. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][1] - 81. * m_xsi[6][0] * m_xsi[6][0] + 18. * m_xsi[6][0] * m_xsi[6][1] - 18. * m_xsi[6][0] - 27. * m_xsi[6][1] + 27.),
-		0.03125 * (27. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][0] + 9. * m_xsi[6][0] * m_xsi[6][0] - 27. * m_xsi[6][0] - 9.) },
-	  { 0.03125 * (-27. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][1] + 27. * m_xsi[6][0] * m_xsi[6][0] - 18. * m_xsi[6][0] * m_xsi[6][1] + 18. * m_xsi[6][0] + m_xsi[6][1] - 1.),
-		0.03125 * (-9. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][0] - 9. * m_xsi[6][0] * m_xsi[6][0] + m_xsi[6][0] + 1.) },
-	  { 0.03125 * (-27. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][1] - 27. * m_xsi[6][0] * m_xsi[6][0] + 18. * m_xsi[6][0] * m_xsi[6][1] + 18. * m_xsi[6][0] + m_xsi[6][1] + 1.),
-		0.03125 * (-9. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][0] + 9. * m_xsi[6][0] * m_xsi[6][0] + m_xsi[6][0] - 1.) },
-	  { 0.03125 * (81. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][1] + 81. * m_xsi[6][0] * m_xsi[6][0] - 18. * m_xsi[6][0] * m_xsi[6][1] - 18. * m_xsi[6][0] - 27. * m_xsi[6][1] - 27.),
-		0.03125 * (27. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][0] - 9. * m_xsi[6][0] * m_xsi[6][0] - 27. * m_xsi[6][0] + 9.) },
-	  { 0.03125 * (-81. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][1] - 81. * m_xsi[6][0] * m_xsi[6][0] - 18. * m_xsi[6][0] * m_xsi[6][1] - 18. * m_xsi[6][0] + 27. * m_xsi[6][1] + 27.),
-		0.03125 * (-27. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][0] - 9. * m_xsi[6][0] * m_xsi[6][0] + 27. * m_xsi[6][0] + 9.) },
-	  { 0.03125 * (27. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][1] + 27. * m_xsi[6][0] * m_xsi[6][0] + 18. * m_xsi[6][0] * m_xsi[6][1] + 18. * m_xsi[6][0] - m_xsi[6][1] - 1.),
-		0.03125 * (9. * m_xsi[6][0] * m_xsi[6][0] * m_xsi[6][0] + 9. * m_xsi[6][0] * m_xsi[6][0] - m_xsi[6][0] - 1.) } },
+	{ { 0.03125 * (27. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][1] - 27. * mv_xsi[6][0] * mv_xsi[6][0] - 18. * mv_xsi[6][0] * mv_xsi[6][1] + 18. * mv_xsi[6][0] - mv_xsi[6][1] + 1.),
+		0.03125 * (9. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][0] - 9. * mv_xsi[6][0] * mv_xsi[6][0] - mv_xsi[6][0] + 1.) },
+	  { 0.03125 * (-81. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][1] + 81. * mv_xsi[6][0] * mv_xsi[6][0] + 18. * mv_xsi[6][0] * mv_xsi[6][1] - 18. * mv_xsi[6][0] + 27. * mv_xsi[6][1] - 27.),
+		0.03125 * (-27. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][0] + 9. * mv_xsi[6][0] * mv_xsi[6][0] + 27. * mv_xsi[6][0] - 9.) },
+	  { 0.03125 * (81. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][1] - 81. * mv_xsi[6][0] * mv_xsi[6][0] + 18. * mv_xsi[6][0] * mv_xsi[6][1] - 18. * mv_xsi[6][0] - 27. * mv_xsi[6][1] + 27.),
+		0.03125 * (27. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][0] + 9. * mv_xsi[6][0] * mv_xsi[6][0] - 27. * mv_xsi[6][0] - 9.) },
+	  { 0.03125 * (-27. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][1] + 27. * mv_xsi[6][0] * mv_xsi[6][0] - 18. * mv_xsi[6][0] * mv_xsi[6][1] + 18. * mv_xsi[6][0] + mv_xsi[6][1] - 1.),
+		0.03125 * (-9. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][0] - 9. * mv_xsi[6][0] * mv_xsi[6][0] + mv_xsi[6][0] + 1.) },
+	  { 0.03125 * (-27. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][1] - 27. * mv_xsi[6][0] * mv_xsi[6][0] + 18. * mv_xsi[6][0] * mv_xsi[6][1] + 18. * mv_xsi[6][0] + mv_xsi[6][1] + 1.),
+		0.03125 * (-9. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][0] + 9. * mv_xsi[6][0] * mv_xsi[6][0] + mv_xsi[6][0] - 1.) },
+	  { 0.03125 * (81. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][1] + 81. * mv_xsi[6][0] * mv_xsi[6][0] - 18. * mv_xsi[6][0] * mv_xsi[6][1] - 18. * mv_xsi[6][0] - 27. * mv_xsi[6][1] - 27.),
+		0.03125 * (27. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][0] - 9. * mv_xsi[6][0] * mv_xsi[6][0] - 27. * mv_xsi[6][0] + 9.) },
+	  { 0.03125 * (-81. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][1] - 81. * mv_xsi[6][0] * mv_xsi[6][0] - 18. * mv_xsi[6][0] * mv_xsi[6][1] - 18. * mv_xsi[6][0] + 27. * mv_xsi[6][1] + 27.),
+		0.03125 * (-27. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][0] - 9. * mv_xsi[6][0] * mv_xsi[6][0] + 27. * mv_xsi[6][0] + 9.) },
+	  { 0.03125 * (27. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][1] + 27. * mv_xsi[6][0] * mv_xsi[6][0] + 18. * mv_xsi[6][0] * mv_xsi[6][1] + 18. * mv_xsi[6][0] - mv_xsi[6][1] - 1.),
+		0.03125 * (9. * mv_xsi[6][0] * mv_xsi[6][0] * mv_xsi[6][0] + 9. * mv_xsi[6][0] * mv_xsi[6][0] - mv_xsi[6][0] - 1.) } },
 
-	{ { 0.03125 * (27. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][1] - 27. * m_xsi[7][0] * m_xsi[7][0] - 18. * m_xsi[7][0] * m_xsi[7][1] + 18. * m_xsi[7][0] - m_xsi[7][1] + 1.),
-		0.03125 * (9. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][0] - 9. * m_xsi[7][0] * m_xsi[7][0] - m_xsi[7][0] + 1.) },
-	  { 0.03125 * (-81. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][1] + 81. * m_xsi[7][0] * m_xsi[7][0] + 18. * m_xsi[7][0] * m_xsi[7][1] - 18. * m_xsi[7][0] + 27. * m_xsi[7][1] - 27.),
-		0.03125 * (-27. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][0] + 9. * m_xsi[7][0] * m_xsi[7][0] + 27. * m_xsi[7][0] - 9.) },
-	  { 0.03125 * (81. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][1] - 81. * m_xsi[7][0] * m_xsi[7][0] + 18. * m_xsi[7][0] * m_xsi[7][1] - 18. * m_xsi[7][0] - 27. * m_xsi[7][1] + 27.),
-		0.03125 * (27. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][0] + 9. * m_xsi[7][0] * m_xsi[7][0] - 27. * m_xsi[7][0] - 9.) },
-	  { 0.03125 * (-27. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][1] + 27. * m_xsi[7][0] * m_xsi[7][0] - 18. * m_xsi[7][0] * m_xsi[7][1] + 18. * m_xsi[7][0] + m_xsi[7][1] - 1.),
-		0.03125 * (-9. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][0] - 9. * m_xsi[7][0] * m_xsi[7][0] + m_xsi[7][0] + 1.) },
-	  { 0.03125 * (-27. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][1] - 27. * m_xsi[7][0] * m_xsi[7][0] + 18. * m_xsi[7][0] * m_xsi[7][1] + 18. * m_xsi[7][0] + m_xsi[7][1] + 1.),
-		0.03125 * (-9. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][0] + 9. * m_xsi[7][0] * m_xsi[7][0] + m_xsi[7][0] - 1.) },
-	  { 0.03125 * (81. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][1] + 81. * m_xsi[7][0] * m_xsi[7][0] - 18. * m_xsi[7][0] * m_xsi[7][1] - 18. * m_xsi[7][0] - 27. * m_xsi[7][1] - 27.),
-		0.03125 * (27. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][0] - 9. * m_xsi[7][0] * m_xsi[7][0] - 27. * m_xsi[7][0] + 9.) },
-	  { 0.03125 * (-81. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][1] - 81. * m_xsi[7][0] * m_xsi[7][0] - 18. * m_xsi[7][0] * m_xsi[7][1] - 18. * m_xsi[7][0] + 27. * m_xsi[7][1] + 27.),
-		0.03125 * (-27. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][0] - 9. * m_xsi[7][0] * m_xsi[7][0] + 27. * m_xsi[7][0] + 9.) },
-	  { 0.03125 * (27. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][1] + 27. * m_xsi[7][0] * m_xsi[7][0] + 18. * m_xsi[7][0] * m_xsi[7][1] + 18. * m_xsi[7][0] - m_xsi[7][1] - 1.),
-		0.03125 * (9. * m_xsi[7][0] * m_xsi[7][0] * m_xsi[7][0] + 9. * m_xsi[7][0] * m_xsi[7][0] - m_xsi[7][0] - 1.) } } };
+	{ { 0.03125 * (27. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][1] - 27. * mv_xsi[7][0] * mv_xsi[7][0] - 18. * mv_xsi[7][0] * mv_xsi[7][1] + 18. * mv_xsi[7][0] - mv_xsi[7][1] + 1.),
+		0.03125 * (9. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][0] - 9. * mv_xsi[7][0] * mv_xsi[7][0] - mv_xsi[7][0] + 1.) },
+	  { 0.03125 * (-81. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][1] + 81. * mv_xsi[7][0] * mv_xsi[7][0] + 18. * mv_xsi[7][0] * mv_xsi[7][1] - 18. * mv_xsi[7][0] + 27. * mv_xsi[7][1] - 27.),
+		0.03125 * (-27. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][0] + 9. * mv_xsi[7][0] * mv_xsi[7][0] + 27. * mv_xsi[7][0] - 9.) },
+	  { 0.03125 * (81. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][1] - 81. * mv_xsi[7][0] * mv_xsi[7][0] + 18. * mv_xsi[7][0] * mv_xsi[7][1] - 18. * mv_xsi[7][0] - 27. * mv_xsi[7][1] + 27.),
+		0.03125 * (27. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][0] + 9. * mv_xsi[7][0] * mv_xsi[7][0] - 27. * mv_xsi[7][0] - 9.) },
+	  { 0.03125 * (-27. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][1] + 27. * mv_xsi[7][0] * mv_xsi[7][0] - 18. * mv_xsi[7][0] * mv_xsi[7][1] + 18. * mv_xsi[7][0] + mv_xsi[7][1] - 1.),
+		0.03125 * (-9. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][0] - 9. * mv_xsi[7][0] * mv_xsi[7][0] + mv_xsi[7][0] + 1.) },
+	  { 0.03125 * (-27. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][1] - 27. * mv_xsi[7][0] * mv_xsi[7][0] + 18. * mv_xsi[7][0] * mv_xsi[7][1] + 18. * mv_xsi[7][0] + mv_xsi[7][1] + 1.),
+		0.03125 * (-9. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][0] + 9. * mv_xsi[7][0] * mv_xsi[7][0] + mv_xsi[7][0] - 1.) },
+	  { 0.03125 * (81. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][1] + 81. * mv_xsi[7][0] * mv_xsi[7][0] - 18. * mv_xsi[7][0] * mv_xsi[7][1] - 18. * mv_xsi[7][0] - 27. * mv_xsi[7][1] - 27.),
+		0.03125 * (27. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][0] - 9. * mv_xsi[7][0] * mv_xsi[7][0] - 27. * mv_xsi[7][0] + 9.) },
+	  { 0.03125 * (-81. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][1] - 81. * mv_xsi[7][0] * mv_xsi[7][0] - 18. * mv_xsi[7][0] * mv_xsi[7][1] - 18. * mv_xsi[7][0] + 27. * mv_xsi[7][1] + 27.),
+		0.03125 * (-27. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][0] - 9. * mv_xsi[7][0] * mv_xsi[7][0] + 27. * mv_xsi[7][0] + 9.) },
+	  { 0.03125 * (27. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][1] + 27. * mv_xsi[7][0] * mv_xsi[7][0] + 18. * mv_xsi[7][0] * mv_xsi[7][1] + 18. * mv_xsi[7][0] - mv_xsi[7][1] - 1.),
+		0.03125 * (9. * mv_xsi[7][0] * mv_xsi[7][0] * mv_xsi[7][0] + 9. * mv_xsi[7][0] * mv_xsi[7][0] - mv_xsi[7][0] - 1.) } } };

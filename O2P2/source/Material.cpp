@@ -16,7 +16,7 @@
 // Saint Venant Kirchhoff isotropic elastic material: constructor
 // 
 // ================================================================================================
-O2P2::Prep::Mat_SVK_ISO::Mat_SVK_ISO(const size_t& index) : Material(index)
+O2P2::Geom::Mat_SVK_ISO::Mat_SVK_ISO(const size_t& index) : Material(index)
 {
 	mv_E11 = 1.;
 	mv_nu12 = 0.;
@@ -35,7 +35,7 @@ O2P2::Prep::Mat_SVK_ISO::Mat_SVK_ISO(const size_t& index) : Material(index)
 // Saint Venant Kirchhoff isotropic elastic material: constructor
 // 
 // ================================================================================================
-O2P2::Prep::Mat_SVK_ISO::Mat_SVK_ISO(const size_t& index, const std::vector<double>& Param) : Material(index)
+O2P2::Geom::Mat_SVK_ISO::Mat_SVK_ISO(const size_t& index, const std::vector<double>& Param) : Material(index)
 {
 	if (Param.size() < 2 || Param.size() > 4) {
 		LOG("\n\nMat_SVK_ISO.constructor: The number of input material parameters (" + std::to_string(Param.size()) + ") is wrong for material: " + std::to_string(this->mv_index) + "\n\n\n");
@@ -60,7 +60,7 @@ O2P2::Prep::Mat_SVK_ISO::Mat_SVK_ISO(const size_t& index, const std::vector<doub
 // Saint Venant Kirchhoff isotropic elastic material
 // 
 // ================================================================================================
-void O2P2::Prep::Mat_SVK_ISO::setParameters(const std::vector<double>& Param)
+void O2P2::Geom::Mat_SVK_ISO::setParameters(const std::vector<double>& Param)
 {
 	if (Param.size() < 2 || Param.size() > 4) {
 		LOG("\n\nMat_SVK_ISO.setParameters: The number of input material parameters (" + std::to_string(Param.size()) + ") is wrong for material: " + std::to_string(this->mv_index) + "\n\n\n");
@@ -84,7 +84,7 @@ void O2P2::Prep::Mat_SVK_ISO::setParameters(const std::vector<double>& Param)
 // Saint Venant Kirchhoff isotropic elastic material
 // 
 // ================================================================================================
-M2S2::Dyadic4C O2P2::Prep::Mat_SVK_ISO::getConstitutiveMatrix(int nDim, PlaneStateType PS)
+M2S2::Dyadic4C O2P2::Geom::Mat_SVK_ISO::getConstitutiveMatrix(int nDim, PlaneStateType PS)
 {
 	// 3D Constitutive matrix
 	M2S2::Dyadic4C mi_E(nDim);

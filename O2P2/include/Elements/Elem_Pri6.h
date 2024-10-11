@@ -19,7 +19,7 @@
 #include "Element.h"
 
 namespace O2P2 {
-	namespace Prep {
+	namespace Geom {
 		namespace Elem {
 			/** @ingroup Elements
 			  * @class Elem_Pri6
@@ -28,17 +28,18 @@ namespace O2P2 {
 			  * @details Solid element, with linear interpolation functions, prism shape.
 			  * @image html Elem_Pri6.png height=300
 			  */
-			class Elem_Pri6 : public ElementSolid
+			class Elem_Pri6 : public ElemSolid
 			{
 			private:
+				// Default constructor is deleted. Use explicit constructor only.
 				Elem_Pri6() = delete;
 
 			public:
 				/** Constructor for prism linear elements.
 				  * @param Material Pointer to Material class.
 				  */
-				explicit Elem_Pri6(std::shared_ptr<O2P2::Prep::Material>& Material)
-					: ElementSolid(Material) { }
+				explicit Elem_Pri6(std::shared_ptr<O2P2::Geom::Material>& Material)
+					: ElemSolid(Material) { }
 
 				// Output function for AcadView, based on element index.
 				const std::string printByIndex_AV(const size_t add) const override {
@@ -76,37 +77,33 @@ namespace O2P2 {
 				// Returns a pointer to the first element of the shape functions (with size [nIP][mv_numNodes]).
 				double const* getShapeFc() const override { return &mv_Psi[0][0]; }
 
-				// Returns a pointer to the first element of the derivative of shape functions (with size [nIP][mv_numNodes][mv_Dim]).
+				// Returns a pointer to the first element of the derivative of shape functions (with size [nIP][mv_numNodes][mv_ElDim]).
 				double const* getShapeDerivative() const override { return &mv_DPsi[0][0][0]; }
 
 				// Returns a pointer to the weight of the integation points (with size [nIP]).
 				double const* getWeight() const override { return &mv_weight[0]; }
 
 				// Returns the number of nodes of current element.
-				int getNumNodes() override { return mv_numNodes; }
+				const int getNumNodes() const override { return mv_numNodes; }
 
 				// Returns the number of faces of current element.
-				int getNumFaces() override { return mv_numFaces; }
+				const int getNumFaces() const override { return mv_numFaces; }
 
 				// Returns the number of integration points of current element.
-				int getNumIP() override { return mv_numIP; }
+				const int getNumIP() const override { return mv_numIP; }
 
-				/** Verifies dimensionless coordinates from input - if it is immersed on the element.
-				  * @return True if input falls within the element.
-				  * @param xsi Trial dimensionless coordinates.
-				  */
-				inline bool evaluateXsi(const std::array<double, mv_Dim> xsi) override {
+				// Verifies dimensionless coordinates from input - if it is immersed on the element.
+				inline bool evaluateXsi(const double* xsi) override {
+					std::array<double, mv_ElDim + 1> new_xsi = {};
 
-					std::array<double, mv_Dim + 1> new_xsi = {};
-
-					for (int i = 0; i < mv_Dim - 1; ++i) {
-						new_xsi.at(i) = xsi.at(i);
-						new_xsi.at(mv_Dim - 1) -= xsi.at(i);
+					for (int i = 0; i < mv_ElDim - 1; ++i) {
+						new_xsi.at(i) = *(xsi + i);
+						new_xsi.at(mv_ElDim - 1) -= *(xsi + i);
 					}
-					new_xsi.at(mv_Dim - 1) += 1.;
-					new_xsi.at(mv_Dim) = xsi.at(mv_Dim - 1);
+					new_xsi.at(mv_ElDim - 1) += 1.;
+					new_xsi.at(mv_ElDim) = *(xsi + mv_ElDim);
 
-					if (*std::max_element(new_xsi.begin(), new_xsi.end()) < 1.000001 && *std::min_element(new_xsi.begin(), new_xsi.end() - 1) > -0.000001 && new_xsi.at(mv_Dim) > -1.000001) return true;
+					if (*std::max_element(new_xsi.begin(), new_xsi.end()) < 1.000001 && *std::min_element(new_xsi.begin(), new_xsi.end() - 1) > -0.000001 && new_xsi.at(mv_ElDim) > -1.000001) return true;
 					return false;
 				}
 
@@ -131,13 +128,13 @@ namespace O2P2 {
 				static const double mv_Psi[mv_numIP][mv_numNodes];
 
 				/** @brief Shape functions derivative */
-				static const double mv_DPsi[mv_numIP][mv_numNodes][mv_Dim];
+				static const double mv_DPsi[mv_numIP][mv_numNodes][mv_ElDim];
 
 				/** @brief Integration points */
-				static const double m_xsi[mv_numIP][mv_Dim];
+				static const double mv_xsi[mv_numIP][mv_ElDim];
 			};
 		} // End of Elem Namespace
-	} // End of Prep Namespace
+	} // End of Geom Namespace
 } // End of O2P2 Namespace
 
 
@@ -147,7 +144,7 @@ namespace O2P2 {
 // Shape functions evaluated on Point
 // 
 // ================================================================================================
-inline std::vector<double> O2P2::Prep::Elem::Elem_Pri6::getShapeFcOnPoint(const double* Point) {
+inline std::vector<double> O2P2::Geom::Elem::Elem_Pri6::getShapeFcOnPoint(const double* Point) {
 	std::vector<double> mi_Psi(6);
 
 	mi_Psi.at(0) = 0.5 * (1. - Point[0] - Point[1]) * (1. - Point[2]);
@@ -166,7 +163,7 @@ inline std::vector<double> O2P2::Prep::Elem::Elem_Pri6::getShapeFcOnPoint(const 
 // Shape functions derivative evaluated on Point
 // 
 // ================================================================================================
-inline std::vector<double> O2P2::Prep::Elem::Elem_Pri6::getShapeDerivOnPoint(const double* Point) {
+inline std::vector<double> O2P2::Geom::Elem::Elem_Pri6::getShapeDerivOnPoint(const double* Point) {
 	std::vector<double> mi_DPsi(6 * 3);
 
 	mi_DPsi.at(0) = -0.5 * (1. - Point[2]);
@@ -200,15 +197,16 @@ inline std::vector<double> O2P2::Prep::Elem::Elem_Pri6::getShapeDerivOnPoint(con
 // Evaluate initial properties
 // 
 // ================================================================================================
-inline void O2P2::Prep::Elem::Elem_Pri6::setGeomProperties() {
+inline void O2P2::Geom::Elem::Elem_Pri6::setGeomProperties() {
 
 	const int nVertices = 6;
+	const int mi_Dim = mv_Conect.at(0)->getDIM();	// Dimensionality of vector space (2D or 3D)
 
-	// Allocate an array with size mv_Dim to which mv_Centroid points to.
-	mv_Centroid = std::make_unique<double[]>(mv_Dim);
+
+	mv_Centroid = std::make_unique<double[]>(mi_Dim);
 
 	// Create a temporary array with the vertices of the polygon
-	std::array<O2P2::Prep::Node<mv_Dim>*, nVertices> vertices;
+	std::array<O2P2::Geom::Node*, nVertices> vertices;
 	vertices[0] = mv_Conect[0].get();
 	vertices[1] = mv_Conect[1].get();
 	vertices[2] = mv_Conect[2].get();
@@ -217,29 +215,24 @@ inline void O2P2::Prep::Elem::Elem_Pri6::setGeomProperties() {
 	vertices[5] = mv_Conect[5].get();
 
 	// Memory requested by make_unique is not empty
-	for (int i = 0; i < mv_Dim; i++) mv_Centroid[i] = 0.;
+	for (int i = 0; i < mi_Dim; i++) mv_Centroid[i] = 0.;
 
 	for (auto& node : vertices) {
-		std::array<double, mv_Dim> x = node->getInitPos();
-
-		for (int i = 0; i < mv_Dim; i++) mv_Centroid[i] += x[i];
+		for (int i = 0; i < mi_Dim; i++) mv_Centroid[i] += node->getInitPos()[i];
 	}
 
 	// Finishing up
-	for (int i = 0; i < mv_Dim; i++) mv_Centroid[i] /= nVertices;
+	for (int i = 0; i < mi_Dim; i++) mv_Centroid[i] /= nVertices;
 
 	// Distance from centroid to vertices
 	double dist[nVertices] = {};
 	int i = 0;
 
 	for (auto& node : vertices) {
-		std::array<double, mv_Dim> x = node->getInitPos();
-
-		for (int j = 0; j < mv_Dim; j++) {
-			dist[i] += (mv_Centroid[j] - x[j]) * (mv_Centroid[j] - x[j]);
+		for (int j = 0; j < mi_Dim; j++) {
+			dist[i] += (mv_Centroid[j] - node->getInitPos()[j]) * (mv_Centroid[j] - node->getInitPos()[j]);
 		}
 		dist[i] = std::sqrt(dist[i]);
-
 		i++;
 	}
 
@@ -254,7 +247,7 @@ inline void O2P2::Prep::Elem::Elem_Pri6::setGeomProperties() {
 // Return the values on the integration points currently known in the element' nodes
 // 
 // ================================================================================================
-inline std::vector<double> O2P2::Prep::Elem::Elem_Pri6::getValueOnIPs(const double* value) {
+inline std::vector<double> O2P2::Geom::Elem::Elem_Pri6::getValueOnIPs(const double* value) {
 
 	// return value
 	std::vector<double> mi_valueOnIp(mv_numIP, 0.);
@@ -274,7 +267,7 @@ inline std::vector<double> O2P2::Prep::Elem::Elem_Pri6::getValueOnIPs(const doub
 // Integration Points
 //
 // ================================================================================================
-inline const double O2P2::Prep::Elem::Elem_Pri6::m_xsi[mv_numIP][mv_Dim] =
+inline const double O2P2::Geom::Elem::Elem_Pri6::mv_xsi[mv_numIP][mv_ElDim] =
 	{ { 1. / 3., 1. / 3. , -0.5773502691896257645091488 },
 	  { 3. / 5., 1. / 5. , -0.5773502691896257645091488 },
 	  { 1. / 5., 3. / 5. , -0.5773502691896257645091488 },
@@ -289,89 +282,89 @@ inline const double O2P2::Prep::Elem::Elem_Pri6::m_xsi[mv_numIP][mv_Dim] =
 // Weights for numerical integration
 //
 // ================================================================================================
-inline const double O2P2::Prep::Elem::Elem_Pri6::mv_weight[mv_numIP] = { -9.0 / 32.0, 25.0 / 96.0, 25.0 / 96.0, 25.0 / 96.0, -9.0 / 32.0, 25.0 / 96.0, 25.0 / 96.0, 25.0 / 96.0 };
+inline const double O2P2::Geom::Elem::Elem_Pri6::mv_weight[mv_numIP] = { -9.0 / 32.0, 25.0 / 96.0, 25.0 / 96.0, 25.0 / 96.0, -9.0 / 32.0, 25.0 / 96.0, 25.0 / 96.0, 25.0 / 96.0 };
 
 // ================================================================================================
 //
 // Shape function
 //
 // ================================================================================================
-inline const double O2P2::Prep::Elem::Elem_Pri6::mv_Psi[mv_numIP][mv_numNodes] = {
-	{ 0.5 * (1. - m_xsi[0][0] - m_xsi[0][1]) * (1. - m_xsi[0][2]), 0.5 * m_xsi[0][0] * (1. - m_xsi[0][2]), 0.5 * m_xsi[0][1] * (1. - m_xsi[0][2]),
-	  0.5 * (1. - m_xsi[0][0] - m_xsi[0][1]) * (1. + m_xsi[0][2]), 0.5 * m_xsi[0][0] * (1. + m_xsi[0][2]), 0.5 * m_xsi[0][1] * (1. + m_xsi[0][2]) },
-	{ 0.5 * (1. - m_xsi[1][0] - m_xsi[1][1]) * (1. - m_xsi[1][2]), 0.5 * m_xsi[1][0] * (1. - m_xsi[1][2]), 0.5 * m_xsi[1][1] * (1. - m_xsi[1][2]),
-	  0.5 * (1. - m_xsi[1][0] - m_xsi[1][1]) * (1. + m_xsi[1][2]), 0.5 * m_xsi[1][0] * (1. + m_xsi[1][2]), 0.5 * m_xsi[1][1] * (1. + m_xsi[1][2]) },
-	{ 0.5 * (1. - m_xsi[2][0] - m_xsi[2][1]) * (1. - m_xsi[2][2]), 0.5 * m_xsi[2][0] * (1. - m_xsi[2][2]), 0.5 * m_xsi[2][1] * (1. - m_xsi[2][2]),
-	  0.5 * (1. - m_xsi[2][0] - m_xsi[2][1]) * (1. + m_xsi[2][2]), 0.5 * m_xsi[2][0] * (1. + m_xsi[2][2]), 0.5 * m_xsi[2][1] * (1. + m_xsi[2][2]) },
-	{ 0.5 * (1. - m_xsi[3][0] - m_xsi[3][1]) * (1. - m_xsi[3][2]), 0.5 * m_xsi[3][0] * (1. - m_xsi[3][2]), 0.5 * m_xsi[3][1] * (1. - m_xsi[3][2]),
-	  0.5 * (1. - m_xsi[3][0] - m_xsi[3][1]) * (1. + m_xsi[3][2]), 0.5 * m_xsi[3][0] * (1. + m_xsi[3][2]), 0.5 * m_xsi[3][1] * (1. + m_xsi[3][2]) },
-	{ 0.5 * (1. - m_xsi[4][0] - m_xsi[4][1]) * (1. - m_xsi[4][2]), 0.5 * m_xsi[4][0] * (1. - m_xsi[4][2]), 0.5 * m_xsi[4][1] * (1. - m_xsi[4][2]),
-	  0.5 * (1. - m_xsi[4][0] - m_xsi[4][1]) * (1. + m_xsi[4][2]), 0.5 * m_xsi[4][0] * (1. + m_xsi[4][2]), 0.5 * m_xsi[4][1] * (1. + m_xsi[4][2]) },
-	{ 0.5 * (1. - m_xsi[5][0] - m_xsi[5][1]) * (1. - m_xsi[5][2]), 0.5 * m_xsi[5][0] * (1. - m_xsi[5][2]), 0.5 * m_xsi[5][1] * (1. - m_xsi[5][2]),
-	  0.5 * (1. - m_xsi[5][0] - m_xsi[5][1]) * (1. + m_xsi[5][2]), 0.5 * m_xsi[5][0] * (1. + m_xsi[5][2]), 0.5 * m_xsi[5][1] * (1. + m_xsi[5][2]) },
-	{ 0.5 * (1. - m_xsi[6][0] - m_xsi[6][1]) * (1. - m_xsi[6][2]), 0.5 * m_xsi[6][0] * (1. - m_xsi[6][2]), 0.5 * m_xsi[6][1] * (1. - m_xsi[6][2]),
-	  0.5 * (1. - m_xsi[6][0] - m_xsi[6][1]) * (1. + m_xsi[6][2]), 0.5 * m_xsi[6][0] * (1. + m_xsi[6][2]), 0.5 * m_xsi[6][1] * (1. + m_xsi[6][2]) },
-	{ 0.5 * (1. - m_xsi[7][0] - m_xsi[7][1]) * (1. - m_xsi[7][2]), 0.5 * m_xsi[7][0] * (1. - m_xsi[7][2]), 0.5 * m_xsi[7][1] * (1. - m_xsi[7][2]),
-	  0.5 * (1. - m_xsi[7][0] - m_xsi[7][1]) * (1. + m_xsi[7][2]), 0.5 * m_xsi[7][0] * (1. + m_xsi[7][2]), 0.5 * m_xsi[7][1] * (1. + m_xsi[7][2]) } };
+inline const double O2P2::Geom::Elem::Elem_Pri6::mv_Psi[mv_numIP][mv_numNodes] = {
+	{ 0.5 * (1. - mv_xsi[0][0] - mv_xsi[0][1]) * (1. - mv_xsi[0][2]), 0.5 * mv_xsi[0][0] * (1. - mv_xsi[0][2]), 0.5 * mv_xsi[0][1] * (1. - mv_xsi[0][2]),
+	  0.5 * (1. - mv_xsi[0][0] - mv_xsi[0][1]) * (1. + mv_xsi[0][2]), 0.5 * mv_xsi[0][0] * (1. + mv_xsi[0][2]), 0.5 * mv_xsi[0][1] * (1. + mv_xsi[0][2]) },
+	{ 0.5 * (1. - mv_xsi[1][0] - mv_xsi[1][1]) * (1. - mv_xsi[1][2]), 0.5 * mv_xsi[1][0] * (1. - mv_xsi[1][2]), 0.5 * mv_xsi[1][1] * (1. - mv_xsi[1][2]),
+	  0.5 * (1. - mv_xsi[1][0] - mv_xsi[1][1]) * (1. + mv_xsi[1][2]), 0.5 * mv_xsi[1][0] * (1. + mv_xsi[1][2]), 0.5 * mv_xsi[1][1] * (1. + mv_xsi[1][2]) },
+	{ 0.5 * (1. - mv_xsi[2][0] - mv_xsi[2][1]) * (1. - mv_xsi[2][2]), 0.5 * mv_xsi[2][0] * (1. - mv_xsi[2][2]), 0.5 * mv_xsi[2][1] * (1. - mv_xsi[2][2]),
+	  0.5 * (1. - mv_xsi[2][0] - mv_xsi[2][1]) * (1. + mv_xsi[2][2]), 0.5 * mv_xsi[2][0] * (1. + mv_xsi[2][2]), 0.5 * mv_xsi[2][1] * (1. + mv_xsi[2][2]) },
+	{ 0.5 * (1. - mv_xsi[3][0] - mv_xsi[3][1]) * (1. - mv_xsi[3][2]), 0.5 * mv_xsi[3][0] * (1. - mv_xsi[3][2]), 0.5 * mv_xsi[3][1] * (1. - mv_xsi[3][2]),
+	  0.5 * (1. - mv_xsi[3][0] - mv_xsi[3][1]) * (1. + mv_xsi[3][2]), 0.5 * mv_xsi[3][0] * (1. + mv_xsi[3][2]), 0.5 * mv_xsi[3][1] * (1. + mv_xsi[3][2]) },
+	{ 0.5 * (1. - mv_xsi[4][0] - mv_xsi[4][1]) * (1. - mv_xsi[4][2]), 0.5 * mv_xsi[4][0] * (1. - mv_xsi[4][2]), 0.5 * mv_xsi[4][1] * (1. - mv_xsi[4][2]),
+	  0.5 * (1. - mv_xsi[4][0] - mv_xsi[4][1]) * (1. + mv_xsi[4][2]), 0.5 * mv_xsi[4][0] * (1. + mv_xsi[4][2]), 0.5 * mv_xsi[4][1] * (1. + mv_xsi[4][2]) },
+	{ 0.5 * (1. - mv_xsi[5][0] - mv_xsi[5][1]) * (1. - mv_xsi[5][2]), 0.5 * mv_xsi[5][0] * (1. - mv_xsi[5][2]), 0.5 * mv_xsi[5][1] * (1. - mv_xsi[5][2]),
+	  0.5 * (1. - mv_xsi[5][0] - mv_xsi[5][1]) * (1. + mv_xsi[5][2]), 0.5 * mv_xsi[5][0] * (1. + mv_xsi[5][2]), 0.5 * mv_xsi[5][1] * (1. + mv_xsi[5][2]) },
+	{ 0.5 * (1. - mv_xsi[6][0] - mv_xsi[6][1]) * (1. - mv_xsi[6][2]), 0.5 * mv_xsi[6][0] * (1. - mv_xsi[6][2]), 0.5 * mv_xsi[6][1] * (1. - mv_xsi[6][2]),
+	  0.5 * (1. - mv_xsi[6][0] - mv_xsi[6][1]) * (1. + mv_xsi[6][2]), 0.5 * mv_xsi[6][0] * (1. + mv_xsi[6][2]), 0.5 * mv_xsi[6][1] * (1. + mv_xsi[6][2]) },
+	{ 0.5 * (1. - mv_xsi[7][0] - mv_xsi[7][1]) * (1. - mv_xsi[7][2]), 0.5 * mv_xsi[7][0] * (1. - mv_xsi[7][2]), 0.5 * mv_xsi[7][1] * (1. - mv_xsi[7][2]),
+	  0.5 * (1. - mv_xsi[7][0] - mv_xsi[7][1]) * (1. + mv_xsi[7][2]), 0.5 * mv_xsi[7][0] * (1. + mv_xsi[7][2]), 0.5 * mv_xsi[7][1] * (1. + mv_xsi[7][2]) } };
 
 // ================================================================================================
 //
 // Shape functions derivative
 //
 // ================================================================================================
-inline const double O2P2::Prep::Elem::Elem_Pri6::mv_DPsi[mv_numIP][mv_numNodes][mv_Dim] =
-	{ { { -0.5 * (1. - m_xsi[0][2]), -0.5 * (1. - m_xsi[0][2]), -0.5 * (1. - m_xsi[0][0] - m_xsi[0][1]) },
-		{  0.5 * (1. - m_xsi[0][2]), 0., -0.5 * m_xsi[0][0] },
-		{  0., 0.5 * (1. - m_xsi[0][2]), -0.5 * m_xsi[0][1] },
-		{ -0.5 * (1. + m_xsi[0][2]), -0.5 * (1. + m_xsi[0][2]), 0.5 * (1. - m_xsi[0][0] - m_xsi[0][1]) },
-		{  0.5 * (1. + m_xsi[0][2]), 0., 0.5 * m_xsi[0][0] },
-		{  0., 0.5 * (1. + m_xsi[0][2]), 0.5 * m_xsi[0][1] } },
+inline const double O2P2::Geom::Elem::Elem_Pri6::mv_DPsi[mv_numIP][mv_numNodes][mv_ElDim] =
+	{ { { -0.5 * (1. - mv_xsi[0][2]), -0.5 * (1. - mv_xsi[0][2]), -0.5 * (1. - mv_xsi[0][0] - mv_xsi[0][1]) },
+		{  0.5 * (1. - mv_xsi[0][2]), 0., -0.5 * mv_xsi[0][0] },
+		{  0., 0.5 * (1. - mv_xsi[0][2]), -0.5 * mv_xsi[0][1] },
+		{ -0.5 * (1. + mv_xsi[0][2]), -0.5 * (1. + mv_xsi[0][2]), 0.5 * (1. - mv_xsi[0][0] - mv_xsi[0][1]) },
+		{  0.5 * (1. + mv_xsi[0][2]), 0., 0.5 * mv_xsi[0][0] },
+		{  0., 0.5 * (1. + mv_xsi[0][2]), 0.5 * mv_xsi[0][1] } },
 
-	  { { -0.5 * (1. - m_xsi[1][2]), -0.5 * (1. - m_xsi[1][2]), -0.5 * (1. - m_xsi[1][0] - m_xsi[1][1]) },
-		{  0.5 * (1. - m_xsi[1][2]), 0., -0.5 * m_xsi[1][0] },
-		{  0., 0.5 * (1. - m_xsi[1][2]), -0.5 * m_xsi[1][1] },
-		{ -0.5 * (1. + m_xsi[1][2]), -0.5 * (1. + m_xsi[1][2]), 0.5 * (1. - m_xsi[1][0] - m_xsi[1][1]) },
-		{  0.5 * (1. + m_xsi[1][2]), 0., 0.5 * m_xsi[1][0] },
-		{  0., 0.5 * (1. + m_xsi[1][2]), 0.5 * m_xsi[1][1] } },
+	  { { -0.5 * (1. - mv_xsi[1][2]), -0.5 * (1. - mv_xsi[1][2]), -0.5 * (1. - mv_xsi[1][0] - mv_xsi[1][1]) },
+		{  0.5 * (1. - mv_xsi[1][2]), 0., -0.5 * mv_xsi[1][0] },
+		{  0., 0.5 * (1. - mv_xsi[1][2]), -0.5 * mv_xsi[1][1] },
+		{ -0.5 * (1. + mv_xsi[1][2]), -0.5 * (1. + mv_xsi[1][2]), 0.5 * (1. - mv_xsi[1][0] - mv_xsi[1][1]) },
+		{  0.5 * (1. + mv_xsi[1][2]), 0., 0.5 * mv_xsi[1][0] },
+		{  0., 0.5 * (1. + mv_xsi[1][2]), 0.5 * mv_xsi[1][1] } },
 
-	  { { -0.5 * (1. - m_xsi[2][2]), -0.5 * (1. - m_xsi[2][2]), -0.5 * (1. - m_xsi[2][0] - m_xsi[2][1]) },
-		{  0.5 * (1. - m_xsi[2][2]), 0., -0.5 * m_xsi[2][0] },
-		{  0., 0.5 * (1. - m_xsi[2][2]), -0.5 * m_xsi[2][1] },
-		{ -0.5 * (1. + m_xsi[2][2]), -0.5 * (1. + m_xsi[2][2]), 0.5 * (1. - m_xsi[2][0] - m_xsi[2][1]) },
-		{  0.5 * (1. + m_xsi[2][2]), 0., 0.5 * m_xsi[2][0] },
-		{  0., 0.5 * (1. + m_xsi[2][2]), 0.5 * m_xsi[2][1] } },
+	  { { -0.5 * (1. - mv_xsi[2][2]), -0.5 * (1. - mv_xsi[2][2]), -0.5 * (1. - mv_xsi[2][0] - mv_xsi[2][1]) },
+		{  0.5 * (1. - mv_xsi[2][2]), 0., -0.5 * mv_xsi[2][0] },
+		{  0., 0.5 * (1. - mv_xsi[2][2]), -0.5 * mv_xsi[2][1] },
+		{ -0.5 * (1. + mv_xsi[2][2]), -0.5 * (1. + mv_xsi[2][2]), 0.5 * (1. - mv_xsi[2][0] - mv_xsi[2][1]) },
+		{  0.5 * (1. + mv_xsi[2][2]), 0., 0.5 * mv_xsi[2][0] },
+		{  0., 0.5 * (1. + mv_xsi[2][2]), 0.5 * mv_xsi[2][1] } },
 
-	  { { -0.5 * (1. - m_xsi[3][2]), -0.5 * (1. - m_xsi[3][2]), -0.5 * (1. - m_xsi[3][0] - m_xsi[3][1]) },
-		{  0.5 * (1. - m_xsi[3][2]), 0., -0.5 * m_xsi[3][0] },
-		{  0., 0.5 * (1. - m_xsi[3][2]), -0.5 * m_xsi[3][1] },
-		{ -0.5 * (1. + m_xsi[3][2]), -0.5 * (1. + m_xsi[3][2]), 0.5 * (1. - m_xsi[3][0] - m_xsi[3][1]) },
-		{  0.5 * (1. + m_xsi[3][2]), 0., 0.5 * m_xsi[3][0] },
-		{  0., 0.5 * (1. + m_xsi[3][2]), 0.5 * m_xsi[3][1] } },
+	  { { -0.5 * (1. - mv_xsi[3][2]), -0.5 * (1. - mv_xsi[3][2]), -0.5 * (1. - mv_xsi[3][0] - mv_xsi[3][1]) },
+		{  0.5 * (1. - mv_xsi[3][2]), 0., -0.5 * mv_xsi[3][0] },
+		{  0., 0.5 * (1. - mv_xsi[3][2]), -0.5 * mv_xsi[3][1] },
+		{ -0.5 * (1. + mv_xsi[3][2]), -0.5 * (1. + mv_xsi[3][2]), 0.5 * (1. - mv_xsi[3][0] - mv_xsi[3][1]) },
+		{  0.5 * (1. + mv_xsi[3][2]), 0., 0.5 * mv_xsi[3][0] },
+		{  0., 0.5 * (1. + mv_xsi[3][2]), 0.5 * mv_xsi[3][1] } },
 
-	  { { -0.5 * (1. - m_xsi[4][2]), -0.5 * (1. - m_xsi[4][2]), -0.5 * (1. - m_xsi[4][0] - m_xsi[4][1]) },
-		{  0.5 * (1. - m_xsi[4][2]), 0., -0.5 * m_xsi[4][0] },
-		{  0., 0.5 * (1. - m_xsi[4][2]), -0.5 * m_xsi[4][1] },
-		{ -0.5 * (1. + m_xsi[4][2]), -0.5 * (1. + m_xsi[4][2]), 0.5 * (1. - m_xsi[4][0] - m_xsi[4][1]) },
-		{  0.5 * (1. + m_xsi[4][2]), 0., 0.5 * m_xsi[4][0] },
-		{  0., 0.5 * (1. + m_xsi[4][2]), 0.5 * m_xsi[4][1] } },
+	  { { -0.5 * (1. - mv_xsi[4][2]), -0.5 * (1. - mv_xsi[4][2]), -0.5 * (1. - mv_xsi[4][0] - mv_xsi[4][1]) },
+		{  0.5 * (1. - mv_xsi[4][2]), 0., -0.5 * mv_xsi[4][0] },
+		{  0., 0.5 * (1. - mv_xsi[4][2]), -0.5 * mv_xsi[4][1] },
+		{ -0.5 * (1. + mv_xsi[4][2]), -0.5 * (1. + mv_xsi[4][2]), 0.5 * (1. - mv_xsi[4][0] - mv_xsi[4][1]) },
+		{  0.5 * (1. + mv_xsi[4][2]), 0., 0.5 * mv_xsi[4][0] },
+		{  0., 0.5 * (1. + mv_xsi[4][2]), 0.5 * mv_xsi[4][1] } },
 
-	  { { -0.5 * (1. - m_xsi[5][2]), -0.5 * (1. - m_xsi[5][2]), -0.5 * (1. - m_xsi[5][0] - m_xsi[5][1]) },
-		{  0.5 * (1. - m_xsi[5][2]), 0., -0.5 * m_xsi[5][0] },
-		{  0., 0.5 * (1. - m_xsi[5][2]), -0.5 * m_xsi[5][1] },
-		{ -0.5 * (1. + m_xsi[5][2]), -0.5 * (1. + m_xsi[5][2]), 0.5 * (1. - m_xsi[5][0] - m_xsi[5][1]) },
-		{  0.5 * (1. + m_xsi[5][2]), 0., 0.5 * m_xsi[5][0] },
-		{  0., 0.5 * (1. + m_xsi[5][2]), 0.5 * m_xsi[5][1] } },
+	  { { -0.5 * (1. - mv_xsi[5][2]), -0.5 * (1. - mv_xsi[5][2]), -0.5 * (1. - mv_xsi[5][0] - mv_xsi[5][1]) },
+		{  0.5 * (1. - mv_xsi[5][2]), 0., -0.5 * mv_xsi[5][0] },
+		{  0., 0.5 * (1. - mv_xsi[5][2]), -0.5 * mv_xsi[5][1] },
+		{ -0.5 * (1. + mv_xsi[5][2]), -0.5 * (1. + mv_xsi[5][2]), 0.5 * (1. - mv_xsi[5][0] - mv_xsi[5][1]) },
+		{  0.5 * (1. + mv_xsi[5][2]), 0., 0.5 * mv_xsi[5][0] },
+		{  0., 0.5 * (1. + mv_xsi[5][2]), 0.5 * mv_xsi[5][1] } },
 
-	  { { -0.5 * (1. - m_xsi[6][2]), -0.5 * (1. - m_xsi[6][2]), -0.5 * (1. - m_xsi[6][0] - m_xsi[6][1]) },
-		{  0.5 * (1. - m_xsi[6][2]), 0., -0.5 * m_xsi[6][0] },
-		{  0., 0.5 * (1. - m_xsi[6][2]), -0.5 * m_xsi[6][1] },
-		{ -0.5 * (1. + m_xsi[6][2]), -0.5 * (1. + m_xsi[6][2]), 0.5 * (1. - m_xsi[6][0] - m_xsi[6][1]) },
-		{  0.5 * (1. + m_xsi[6][2]), 0., 0.5 * m_xsi[6][0] },
-		{  0., 0.5 * (1. + m_xsi[6][2]), 0.5 * m_xsi[6][1] } },
+	  { { -0.5 * (1. - mv_xsi[6][2]), -0.5 * (1. - mv_xsi[6][2]), -0.5 * (1. - mv_xsi[6][0] - mv_xsi[6][1]) },
+		{  0.5 * (1. - mv_xsi[6][2]), 0., -0.5 * mv_xsi[6][0] },
+		{  0., 0.5 * (1. - mv_xsi[6][2]), -0.5 * mv_xsi[6][1] },
+		{ -0.5 * (1. + mv_xsi[6][2]), -0.5 * (1. + mv_xsi[6][2]), 0.5 * (1. - mv_xsi[6][0] - mv_xsi[6][1]) },
+		{  0.5 * (1. + mv_xsi[6][2]), 0., 0.5 * mv_xsi[6][0] },
+		{  0., 0.5 * (1. + mv_xsi[6][2]), 0.5 * mv_xsi[6][1] } },
 
-	  { { -0.5 * (1. - m_xsi[7][2]), -0.5 * (1. - m_xsi[7][2]), -0.5 * (1. - m_xsi[7][0] - m_xsi[7][1]) },
-		{  0.5 * (1. - m_xsi[7][2]), 0., -0.5 * m_xsi[7][0] },
-		{  0., 0.5 * (1. - m_xsi[7][2]), -0.5 * m_xsi[7][1] },
-		{ -0.5 * (1. + m_xsi[7][2]), -0.5 * (1. + m_xsi[7][2]), 0.5 * (1. - m_xsi[7][0] - m_xsi[7][1]) },
-		{  0.5 * (1. + m_xsi[7][2]), 0., 0.5 * m_xsi[7][0] },
-		{  0., 0.5 * (1. + m_xsi[7][2]), 0.5 * m_xsi[7][1] } } };
+	  { { -0.5 * (1. - mv_xsi[7][2]), -0.5 * (1. - mv_xsi[7][2]), -0.5 * (1. - mv_xsi[7][0] - mv_xsi[7][1]) },
+		{  0.5 * (1. - mv_xsi[7][2]), 0., -0.5 * mv_xsi[7][0] },
+		{  0., 0.5 * (1. - mv_xsi[7][2]), -0.5 * mv_xsi[7][1] },
+		{ -0.5 * (1. + mv_xsi[7][2]), -0.5 * (1. + mv_xsi[7][2]), 0.5 * (1. - mv_xsi[7][0] - mv_xsi[7][1]) },
+		{  0.5 * (1. + mv_xsi[7][2]), 0., 0.5 * mv_xsi[7][0] },
+		{  0., 0.5 * (1. + mv_xsi[7][2]), 0.5 * mv_xsi[7][1] } } };

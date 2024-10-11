@@ -16,6 +16,9 @@
 #include "Domain.h"
 
 #include "Mesh.h"
+#include "Mesh_MQS.h"
+#include "Mesh_MD.h"
+
 #include "TimeStepping.h"
 #include "NonLinearSolver.h"
 
@@ -49,7 +52,7 @@ namespace O2P2 {
 			  * @param Problem Type of problem - mechanical, thermodynamics or coupled thermomechanical.
 			  * @param numLS Number of Load Steps.
 			  * @param minIt Minimum number of iterations.
-			  * @param maxIt Maximum number of iterations .
+			  * @param maxIt Maximum number of iterations.
 			  * @param tolerance Tolerance.
 			  */
 			explicit SolutionAlgorithm(const AnalysisType& Analysis, const NLSolverType& Solver, const ProblemType& Problem,
@@ -104,7 +107,7 @@ namespace O2P2 {
 			  * @param theDomain Container with nodal and elements information.
 			  * @param thePost Container with solutions for post-process.
 			  */
-			bool initFEModel(O2P2::Prep::Domain<2>* theDomain, O2P2::Post::PostProcess* thePost) {
+			bool initFEModel(O2P2::Geom::Domain<2>* theDomain, O2P2::Post::PostProcess* thePost) {
 				PROFILE_FUNCTION();
 				return this->initFEM(theDomain, thePost);
 			}
@@ -115,7 +118,7 @@ namespace O2P2 {
 			  * @param theDomain Container with nodal and elements information.
 			  * @param thePost Container with solutions for post-process.
 			  */
-			bool initFEModel(O2P2::Prep::Domain<3>* theDomain, O2P2::Post::PostProcess* thePost) {
+			bool initFEModel(O2P2::Geom::Domain<3>* theDomain, O2P2::Post::PostProcess* thePost) {
 				PROFILE_FUNCTION();
 				return this->initFEM(theDomain, thePost);
 			}
@@ -123,7 +126,7 @@ namespace O2P2 {
 			/** Run the analysis, based on previous setup.
 			  * @param theDomain Container with nodal and elements information.
 			  */
-			void runSolutionAlgorithm(O2P2::Prep::Domain<2>* theDomain) {
+			void runSolutionAlgorithm(O2P2::Geom::Domain<2>* theDomain) {
 				PROFILE_FUNCTION();
 				this->runSolution(theDomain);
 			}
@@ -131,7 +134,7 @@ namespace O2P2 {
 			/** Run the analysis, based on previous setup.
 			  * @param theDomain Container with nodal and elements information.
 			  */
-			void runSolutionAlgorithm(O2P2::Prep::Domain<3>* theDomain) {
+			void runSolutionAlgorithm(O2P2::Geom::Domain<3>* theDomain) {
 				PROFILE_FUNCTION();
 				this->runSolution(theDomain);
 			}
@@ -169,7 +172,7 @@ namespace O2P2 {
 			  * @param index Node container index with imposed boundary condition.
 			  * @param iDir  Direction of the imposed boundary condition.
 			  * @param value Value of the boundary condition.
-			  * @param var Time behavior, for a quadratic polinomial(var[0] + var[1].t + var[2].t ^ 2).
+			  * @param var Time behavior (var[0] + var[1].t + var[2].t^2 + var[3].sin(var[4] * dt) + var[5].cos(var[6] * dt))
 			  *
 			  * @sa Mesh
 			  */
@@ -182,7 +185,7 @@ namespace O2P2 {
 			  * @param index Node container index with imposed boundary condition.
 			  * @param iDir  Direction of the imposed boundary condition.
 			  * @param value Value of the boundary condition.
-			  * @param var Time behavior, for a quadratic polinomial(var[0] + var[1].t + var[2].t ^ 2).
+			  * @param var Time behavior (var[0] + var[1].t + var[2].t^2 + var[3].sin(var[4] * dt) + var[5].cos(var[6] * dt))
 			  *
 			  * @sa Mesh
 			  */
@@ -200,11 +203,13 @@ namespace O2P2 {
 			}
 
 		private:
+			// Internal initialization of FEM model
 			template<int nDim>
-			bool initFEM(O2P2::Prep::Domain<nDim>* theDomain, O2P2::Post::PostProcess* thePost);
+			bool initFEM(O2P2::Geom::Domain<nDim>* theDomain, O2P2::Post::PostProcess* thePost);
 
+			// Internal call of solution system
 			template<int nDim>
-			void runSolution(O2P2::Prep::Domain<nDim>* theDomain);
+			void runSolution(O2P2::Geom::Domain<nDim>* theDomain);
 
 		private:
 			/** Type of analysis */
@@ -230,4 +235,3 @@ namespace O2P2 {
 		};
 	} // End of Proc Namespace
 } // End of O2P2 Namespace
-

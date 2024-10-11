@@ -30,45 +30,48 @@ namespace O2P2 {
 		class OutputSystem
 		{
 		private:
+			// Default constructor
 			OutputSystem() = delete;
+
+			// OutputSystem is unique. Copy constructor will be deleted.
+			OutputSystem(const OutputSystem& other) = delete;
+
+			// OutputSystem is unique. Move constructor will be deleted.
+			OutputSystem(OutputSystem&& other) = delete;
 
 		public:
 			/** Constructor for OutputSystem object.
-			  * @param fileType Type of output.
 			  * @param projectName Name of the project, employed to give name to files.
 			  */
-			OutputSystem(OutputType fileType, const std::string& projectName) {
-				mv_OutputType = fileType;
-				mv_Project = projectName + OutputTypeExtension[fileType];
+			explicit OutputSystem(const std::string& projectName) {
+				mv_Project = projectName;
 			}
 
-			// Default destructor of private / protected pointers.
+			// Default destructor
 			~OutputSystem() = default;
 
 			/** Prepare output.
 			  * @param theDomain Reference to the Domain object.
 			  * @param thePost Container with solutions for post-process.
 			  */
-			void draw(O2P2::Prep::Domain<nDim>* theDomain, O2P2::Post::PostProcess* thePost) {
+			void draw(O2P2::Geom::Domain<nDim>* theDomain, O2P2::Post::PostProcess* thePost) {
 				std::ofstream file;
-				file.open(mv_Project, std::ios::trunc);
 
-				if (mv_OutputType == OutputType::OGL) {
+				if (thePost->getOutputType() == OutputType::OGL) {
+					file.open(mv_Project + ".post.desloc" + OutputTypeExtension[OutputType::OGL], std::ios::trunc);
+
 					draw_AcadView_Node(file, theDomain, thePost);
 				}
 			}
 
 		private:
 			// Write file for AcadView Visualizer, based on node information (such as displacement)
-			void draw_AcadView_Node(std::ofstream& file, O2P2::Prep::Domain<nDim>* theDomain, O2P2::Post::PostProcess* thePost);
+			void draw_AcadView_Node(std::ofstream& file, O2P2::Geom::Domain<nDim>* theDomain, O2P2::Post::PostProcess* thePost);
 
 			// Write file for AcadView Visualizer, based on element information (single value at nodes) 
-			void draw_AcadView_Elem(std::ofstream& file, O2P2::Prep::Domain<nDim>* theDomain, O2P2::Post::PostProcess* thePost);
+			void draw_AcadView_Elem(std::ofstream& file, O2P2::Geom::Domain<nDim>* theDomain, O2P2::Post::PostProcess* thePost);
 
 		private:
-			/** @brief Type of output */
-			OutputType mv_OutputType;
-
 			/** @brief Name of the Project */
 			std::string mv_Project;
 		};

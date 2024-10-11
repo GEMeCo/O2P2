@@ -30,6 +30,7 @@ namespace O2P2 {
 			class LoadStep
 			{
 			private:
+				// Default constructor is deleted. Use explicit constructor only.
 				LoadStep() = delete;
 
 			public:
@@ -51,7 +52,7 @@ namespace O2P2 {
 				/** Adds a Dirichlet Boundary Condition
 				  * @param Dof Degree of Freedom with imposed boundary condition.
 				  * @param value Value of the boundary condition
-				  * @param var Time behavior, for a quadratic polinomial (var[0] + var[1].t + var[2].t^2)
+				  * @param var Time behavior (var[0] + var[1].t + var[2].t^2 + var[3].sin(var[4] * dt) + var[5].cos(var[6] * dt))
 				  */
 				void addDirichletBC(const size_t& Dof, const double& value, const double var[]) {
 					mv_DirichletBC.push_back(std::make_unique<O2P2::Proc::Comp::Constraint>(Dof, value, var));
@@ -60,7 +61,7 @@ namespace O2P2 {
 				/** Adds a Neumann Boundary Condition on the flux variable
 				  * @param Dof Degree of Freedom with imposed boundary condition.
 				  * @param value Value of the boundary condition
-				  * @param var Time behavior, for a quadratic polinomial (var[0] + var[1].t + var[2].t^2)
+				  * @param var Time behavior (var[0] + var[1].t + var[2].t^2 + var[3].sin(var[4] * dt) + var[5].cos(var[6] * dt))
 				  */
 				void addNeumannBC(const size_t& Dof, const double& value, const double var[]) {
 					mv_NeumannBC.push_back(std::make_unique<O2P2::Proc::Comp::Constraint>(Dof, value, var));

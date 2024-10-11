@@ -17,11 +17,11 @@
 // Explicit template member functions instantiation
 //
 // ================================================================================================
-template bool O2P2::Proc::SolutionAlgorithm::initFEM<2>(O2P2::Prep::Domain<2>* theDomain, O2P2::Post::PostProcess* thePost);
-template bool O2P2::Proc::SolutionAlgorithm::initFEM<3>(O2P2::Prep::Domain<3>* theDomain, O2P2::Post::PostProcess* thePost);
+template bool O2P2::Proc::SolutionAlgorithm::initFEM<2>(O2P2::Geom::Domain<2>* theDomain, O2P2::Post::PostProcess* thePost);
+template bool O2P2::Proc::SolutionAlgorithm::initFEM<3>(O2P2::Geom::Domain<3>* theDomain, O2P2::Post::PostProcess* thePost);
 
-template void O2P2::Proc::SolutionAlgorithm::runSolution<2>(O2P2::Prep::Domain<2>* theDomain);
-template void O2P2::Proc::SolutionAlgorithm::runSolution<3>(O2P2::Prep::Domain<3>* theDomain);
+template void O2P2::Proc::SolutionAlgorithm::runSolution<2>(O2P2::Geom::Domain<2>* theDomain);
+template void O2P2::Proc::SolutionAlgorithm::runSolution<3>(O2P2::Geom::Domain<3>* theDomain);
 
 
 // ================================================================================================
@@ -29,7 +29,8 @@ template void O2P2::Proc::SolutionAlgorithm::runSolution<3>(O2P2::Prep::Domain<3
 // Implementation of Template Member Function (2D and 3D): initFEM
 //
 // ================================================================================================
-template<int nDim> inline bool O2P2::Proc::SolutionAlgorithm::initFEM(O2P2::Prep::Domain<nDim>* theDomain, O2P2::Post::PostProcess* thePost)
+template<int nDim>
+inline bool O2P2::Proc::SolutionAlgorithm::initFEM(O2P2::Geom::Domain<nDim>* theDomain, O2P2::Post::PostProcess* thePost)
 {
 	LOG("\nSolutionAlgorithm.initFEModel: Basic Definitions");
 	LOG("SolutionAlgorithm.initFEModel: Initiating DOF Mapping system");
@@ -38,16 +39,16 @@ template<int nDim> inline bool O2P2::Proc::SolutionAlgorithm::initFEM(O2P2::Prep
 	{
 	case AnalysisType::STATIC:
 	{
-		mv_theFEModel = std::make_unique<O2P2::Proc::Mesh_MQS<nDim>>(theDomain, thePost);
-		O2P2::Proc::Mesh_MQS<nDim>* theModel = static_cast<O2P2::Proc::Mesh_MQS<nDim>*>(mv_theFEModel.get());
-		theModel->initMesh(theDomain);
+		auto mi_FEModel = std::make_unique<O2P2::Proc::Mesh_MQS<nDim>>(theDomain, thePost);
+		mi_FEModel->initMesh(theDomain);
+		mv_theFEModel = std::move(mi_FEModel);
 		break;
 	}
 	case AnalysisType::TRANSIENT_2ndORDER_NEWMARK:
 	{
-		mv_theFEModel = std::make_unique<O2P2::Proc::Mesh_MD<nDim>>(theDomain, thePost);
-		O2P2::Proc::Mesh_MD<nDim>* theModel = static_cast<O2P2::Proc::Mesh_MD<nDim>*>(mv_theFEModel.get());
-		theModel->initMesh(theDomain);
+		auto mi_FEModel = std::make_unique<O2P2::Proc::Mesh_MD<nDim>>(theDomain, thePost);
+		mi_FEModel->initMesh(theDomain);
+		mv_theFEModel = std::move(mi_FEModel);
 		break;
 	}
 	case AnalysisType::TRANSIENT_1stORDER:
@@ -63,10 +64,11 @@ template<int nDim> inline bool O2P2::Proc::SolutionAlgorithm::initFEM(O2P2::Prep
 
 // ================================================================================================
 //
-// Implementation of Template Member Function (2D and 3D): runSolutionAlgorithm
+// Implementation of Template Member Function (2D and 3D): runSolution
 //
 // ================================================================================================
-template<int nDim> inline void O2P2::Proc::SolutionAlgorithm::runSolution(O2P2::Prep::Domain<nDim>* theDomain)
+template<int nDim>
+inline void O2P2::Proc::SolutionAlgorithm::runSolution(O2P2::Geom::Domain<nDim>* theDomain)
 {
 	std::cout << "\n\n------------------------------------------------------------"
 		<< "\nIniting Solution Algorithm"

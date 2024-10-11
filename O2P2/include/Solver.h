@@ -25,7 +25,12 @@
   */
 inline void solve(int size, M2S2::CSR& csrMatrix, std::vector<double>& RHS, std::vector<double>& LHS)
 {
-	int mtype = -2;       /* Real symmetric matrix */
+	int mtype;
+	// 2: real and symmetric positive definite matrix
+	// -2: real and symmetric indefinite matrix
+	// 11: real and nonsymmetric
+	mtype = csrMatrix.mv_sym ? 2 : 11;
+
 	int nrhs = 1;         /* Number of right hand sides. */
 
 	int idum;             /* Integer dummy. */
@@ -43,16 +48,14 @@ inline void solve(int size, M2S2::CSR& csrMatrix, std::vector<double>& RHS, std:
 	/* -------------------------------------*/
 	/* .. Setup Pardiso control parameters. */
 	/* -------------------------------------*/
-	for (int i = 0; i < 64; i++)
-	{
-		iparm[i] = 0;
-	}
+	memset(&iparm[0], 0., 64 * sizeof(int));
+
 	iparm[0] = 1;         /* No solver default */
 	iparm[1] = 2;         /* Fill-in reordering from METIS */
 	iparm[3] = 0;         /* No iterative-direct algorithm */
 	iparm[4] = 0;         /* No user fill-in reducing permutation */
 	iparm[5] = 0;         /* Write solution into x */
-	iparm[7] = 2;         /* Max numbers of iterative refinement steps */
+	iparm[7] = 3;         /* Max numbers of iterative refinement steps */
 	iparm[9] = 13;        /* Perturb the pivot elements with 1E-13 */
 	iparm[10] = 1;        /* Use nonsymmetric permutation and scaling MPS */
 	iparm[12] = 0;        /* Maximum weighted matching algorithm is switched-off (default for symmetric). Try iparm[12] = 1 in case of inappropriate accuracy */
@@ -82,14 +85,14 @@ inline void solve(int size, M2S2::CSR& csrMatrix, std::vector<double>& RHS, std:
 	/* --------------------------------------------------------------------*/
 	phase = 11;
 	PARDISO(pt, &maxfct, &mnum, &mtype, &phase,
-		&size, csrMatrix.mv_value.data(), csrMatrix.mv_nz.data(), csrMatrix.mv_col.data(),
+		&size, csrMatrix.mv_value.data(), csrMatrix.mv_rowIndex.data(), csrMatrix.mv_colIndex.data(),
 		&idum, &nrhs, iparm, &msglvl, &ddum, &ddum, &error);
 	if (error != 0)
 	{
 		std::cout << "\nERROR during symbolic factorization: " << error;
 		std::cout << "\nClick a button to exit!";
 		std::cin.get();
-		exit(1);
+		exit(error);
 	}
 	//std::cout << "\nReordering completed ... ";
 	//std::cout << "\nNumber of nonzeros in factors = " << iparm[17];
@@ -100,14 +103,14 @@ inline void solve(int size, M2S2::CSR& csrMatrix, std::vector<double>& RHS, std:
 	/* ----------------------------*/
 	phase = 22;
 	PARDISO(pt, &maxfct, &mnum, &mtype, &phase,
-		&size, csrMatrix.mv_value.data(), csrMatrix.mv_nz.data(), csrMatrix.mv_col.data(),
+		&size, csrMatrix.mv_value.data(), csrMatrix.mv_rowIndex.data(), csrMatrix.mv_colIndex.data(),
 		&idum, &nrhs, iparm, &msglvl, &ddum, &ddum, &error);
 	if (error != 0)
 	{
 		std::cout << "\nERROR during numerical factorization: " << error;
 		std::cout << "\n\nClick a button to exit!";
 		std::cin.get();
-		exit(2);
+		exit(error);
 	}
 	//std::cout << "\nFactorization completed ... ";
 
@@ -119,14 +122,14 @@ inline void solve(int size, M2S2::CSR& csrMatrix, std::vector<double>& RHS, std:
 
 	/* Set right hand side to one. */
 	PARDISO(pt, &maxfct, &mnum, &mtype, &phase,
-		&size, csrMatrix.mv_value.data(), csrMatrix.mv_nz.data(), csrMatrix.mv_col.data(),
+		&size, csrMatrix.mv_value.data(), csrMatrix.mv_rowIndex.data(), csrMatrix.mv_colIndex.data(),
 		&idum, &nrhs, iparm, &msglvl, RHS.data(), LHS.data(), &error);
 	if (error != 0)
 	{
 		std::cout << "\nERROR during solution: " << error;
 		std::cout << "\n\nClick a button to exit!";
 		std::cin.get();
-		exit(3);
+		exit(error);
 	}
 	//std::cout << "\nSolve completed ... ";
 
@@ -135,7 +138,7 @@ inline void solve(int size, M2S2::CSR& csrMatrix, std::vector<double>& RHS, std:
 	/* --------------------------------------*/
 	phase = -1;           /* Release internal memory. */
 	PARDISO(pt, &maxfct, &mnum, &mtype, &phase,
-		&size, &ddum, csrMatrix.mv_nz.data(), csrMatrix.mv_col.data(),
+		&size, &ddum, csrMatrix.mv_rowIndex.data(), csrMatrix.mv_colIndex.data(),
 		&idum, &nrhs, iparm, &msglvl, &ddum, &ddum, &error);
 	// ------------------------------------------------------------------------------------
 }

@@ -16,7 +16,7 @@
 #include "M2S2/M2S2.h"
 
 namespace O2P2 {
-	namespace Prep {
+	namespace Geom {
 		/** @ingroup PreProcessor_Module
 		  * @class Material
 		  *
@@ -26,19 +26,20 @@ namespace O2P2 {
 		class Material
 		{
 		private:
+			// Default constructor is deleted. Use explicit constructor only.
 			Material() = delete;
 
 		protected:
 			/** Basic constructor for material objects.
 			  * @param index Material number.
 			  */
-			Material(const size_t& index) : mv_index(index) {}
+			explicit Material(const size_t& index) : mv_index(index) {}
 
 			/** Basic constructor for material objects.
 			  * @param index Material number.
 			  * @param Param Vector with the material properties.
 			  */
-			Material(const size_t& index, const std::vector<double>& Param) : mv_index(index) { }
+			explicit Material(const size_t& index, const std::vector<double>& Param) : mv_index(index) { }
 
 			// Default destructor of private / protected pointers.
 			virtual ~Material() = default;
@@ -51,6 +52,7 @@ namespace O2P2 {
 			inline double getDamping() { return mv_Damp; }
 
 			/** @param nDim Element dimensionality (2D or 3D).
+			  * @param PS Plane state type for 2D elements (optional).
 			  * @return the constitutive matrix (row major Voigt notation).
 			  */
 			virtual M2S2::Dyadic4C getConstitutiveMatrix(int nDim, PlaneStateType PS = PlaneStateType::PLANE_STRESS) = 0;
@@ -80,11 +82,12 @@ namespace O2P2 {
 		  * @class Mat_SVK_ISO
 		  *
 		  * @brief Saint-Venant-Kirchhoff elastic isotropic constitutive model.
-		  * @details Material properties for an elastic isotropic material, based on Saint-Venant-Kirchhoff constitutive model.
+		  * @details Material properties for an elastic isotropic and isothermal material, based on Saint-Venant-Kirchhoff constitutive model.
 		  */
 		class Mat_SVK_ISO : public Material
 		{
 		private:
+			// Default constructor is deleted. Use explicit constructor only.
 			Mat_SVK_ISO() = delete;
 
 		public:
@@ -93,13 +96,13 @@ namespace O2P2 {
 			/** Constructor for Saint-Venant-Kirchhoff elastic isotropic constitutive model.
 			  * @param index Material number.
 			  */
-			Mat_SVK_ISO(const size_t& index);
+			explicit Mat_SVK_ISO(const size_t& index);
 
 			/** Constructor for Saint-Venant-Kirchhoff elastic isotropic constitutive model.
 			 * @param index Material number.
 			 * @param Param Vector with the material properties  - Param[0] = Young's modulus; Param[1] = Poisson's ratio; Param[2] = Density; Param[3] = Damping.
 			*/
-			Mat_SVK_ISO(const size_t& index, const std::vector<double>& Param);
+			explicit Mat_SVK_ISO(const size_t& index, const std::vector<double>& Param);
 
 			// Set the material parameters: Param[0] = Young's modulus; Param[1] = Poisson's ratio; Param[2] = Density; Param[3] = Damping.
 			void setParameters(const std::vector<double>& Param) override;
@@ -154,6 +157,6 @@ namespace O2P2 {
 			double mv_Lambda;
 		};
 
-	} // End of Prep Namespace
+	} // End of Geom Namespace
 } // End of O2P2 Namespace
 
