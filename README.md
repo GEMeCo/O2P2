@@ -58,10 +58,19 @@ Citation
 --------
   Whether it was used in whole or parts, citation is a must! Our software is under development, and a proper presentation paper is underway.
 
-  Our software is in Zenodo - thus, we got a DOI: [doi.org/10.5281/zenodo.8283439](https://doi.org/10.5281/zenodo.8283439)
-  
+  Our software is in Zenodo - thus, we got a DOI: [doi.org/10.5281/zenodo.7102198](https://doi.org/10.5281/zenodo.7102198)  
+
 Features
 --------
+- v0.3.2: Fabric.
+    - :boom: 2D immersed elements in 3D environment.
+
+- - v0.3.1: Active faces.
+    - :boom: 2D embedded elements on 3D elements.
+
+- v0.3.0: Embedded / Immersed elements.
+    - :boom: Mesh components for particle and fiber elements.
+
 - v0.2.0: Dynamic mechanical analysis.
     - :boom: Newmark-beta time step integration method.
 
@@ -77,10 +86,10 @@ Resources
 ---------
 We are using the following libraries, resources and technologies:
 
-- [Microsoft Visual Studio Community 2022, Version 17.3.4](https://visualstudio.microsoft.com/)
-- [Intel C++ Compiler, Package ID: w_oneAPI_2022.1.0.256](https://software.intel.com/content/www/us/en/develop/tools/oneapi.html)
+- [Microsoft Visual Studio Community 2022, Version 17.9.6](https://visualstudio.microsoft.com/)
+- [Intel C++ Compiler 2024.1](https://software.intel.com/content/www/us/en/develop/tools/oneapi.html)
 - [Doxygen, version 1.9.5](https://doxygen.nl/)
-- [M2S2, version 0.1](https://github.com/GEMeCo/M2S2)
+- [M2S2, version 1.0.3](https://github.com/GEMeCo/M2S2)
 - [AcadView](https://set.eesc.usp.br/?page_id=237)
 
 Building and Running
@@ -116,6 +125,7 @@ Contribution
  - [Emerson Felipe Felix](https://orcid.org/0000-0002-8928-9474)
  - [Alexandre Ten Cate Matté](https://lattes.cnpq.br/8144116395864291)
  - [Chiara Pinheiro Teodoro](http://lattes.cnpq.br/6999948388655115)
+ - [Vitor Freitas Gonçalves](http://lattes.cnpq.br/3162534445180107)
 
 How to contribute
 -----------------

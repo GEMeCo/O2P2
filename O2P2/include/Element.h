@@ -19,30 +19,56 @@
 #include "Node.h"
 
 namespace O2P2 {
-	namespace Prep {
+	namespace Geom {
 		namespace Elem {
 			/** @ingroup PreProcessor_Module
-			  * @class BaseElement
+			  * @class Element
 			  *
-			  * @brief Base geometry element, a Domain component.
-			  * @details Contains the basic definitions for geometry elements (Domain).
+			  * @brief Geometry element for derived classes.
+			  * @details Contains the basic definitions for geometry elements (Domain), including element indexing and element centroid.
 			  * It is also a container for the integration points, weights and functions.
 			  */
-			class BaseElement
+			class Element
 			{
 			private:
-				BaseElement() = delete;
+				// Default constructor is deleted. Use explicit constructor only.
+				Element() = delete;
 
 			protected:
 				/** Constructor for element objects.
 				  * @param Material Pointer to Material class.
 				  */
-				explicit BaseElement(const std::shared_ptr<O2P2::Prep::Material>& Material) : mv_Mat(Material) {}
+				explicit Element(const std::shared_ptr<O2P2::Geom::Material>& Material)
+					: mv_Mat(Material) {
+					mv_Centroid = nullptr;
+				}
 
 				// Default destructor of private / protected pointers.
-				virtual ~BaseElement() = default;
+				virtual ~Element() = default;
+
+				/** Evaluate centroid and circumsphere Radius. Must be called after setting the conectivity. */
+				virtual void setGeomProperties() {};
 
 			public:
+				/** Overloading operator << to stream the node indexing. */
+				friend std::ostream& operator<<(std::ostream& stream, Element const& elem) {
+					stream << elem.print();
+					return stream;
+				}
+
+				/** @return string with incidence for printing. */
+				const std::string print() const {
+					std::string str;
+					for (auto& node : mv_Conect) {
+						str.append(" ");
+						str.append(std::to_string(node->mv_index));
+					}
+					return str;
+				}
+
+				/** @return String with geometric properties. */
+				virtual const std::string printGeom() const = 0;
+
 				/** Output function for AcadView, based on element index.
 				  * @return a string with incidence for printing in AcadView.
 				  * @param add Adder to number indexing.
@@ -70,113 +96,44 @@ namespace O2P2 {
 				/** @return a pointer to the shape functions (with size [mv_numIP][mv_numNodes]). */
 				virtual double const* getShapeFc() const = 0;
 
-				/** @return a pointer to the derivative of shape functions (with size [mv_numIP][mv_Dim][mv_numNodes]). */
+				/** @return a pointer to the derivative of shape functions (with size [mv_numIP][mv_ElDim][mv_numNodes]). */
 				virtual double const* getShapeDerivative() const = 0;
 
 				/** @return a pointer to the weight of the integation points (with size [mv_numIP]). */
 				virtual double const* getWeight() const = 0;
 
 				/** @return the number of nodes of current element. */
-				virtual int getNumNodes() = 0;
+				virtual const int getNumNodes() const = 0;
 
 				/** @return the number of faces of current element. */
-				virtual int getNumFaces() = 0;
+				virtual const int getNumFaces() const = 0;
 
 				/** @return the number of degrees of freedom per node for current element. */
-				virtual int getNumNdDOF() = 0;
+				virtual const int getNumNodalDof() const = 0;
 
 				/** @return the number of integration points for current element. */
-				virtual int getNumIP() = 0;
+				virtual const int getNumIP() const = 0;
 
 				/** @return the dimensionality of current element. */
-				virtual int getDIM() = 0;
+				virtual const int getDIM() const = 0;
 
-				/** @return a reference to the elements Material object. */
-				O2P2::Prep::Material* getMaterial() { return mv_Mat.get(); }
-
+				/** Evaluates values on integration point based on input.
+				  * @return a vector with the approximated value on integration points.
+				  * @param value Vector of values currently known on nodes.
+				  */
 				virtual std::vector<double> getValueOnIPs(const double* value) = 0;
 
-			protected:
-				/** @brief Pointer to the Material. */
-				std::shared_ptr<O2P2::Prep::Material> mv_Mat;
-			};
-
-
-			/**
-			  * @class Element
-			  *
-			  * @brief Geometry element for derived classes.
-			  * @details Includes element indexing and element centroid.
-			  *
-			  * @tparam nDim The dimensionality of the problem. It is either 2 or 3 (bidimensional or tridimensional).
-			  */
-			template<int nDim>
-			class Element : public BaseElement
-			{
-			private:
-				Element() = delete;
-
-			protected:
-				/** Constructor for element objects.
-				  * @param Material Pointer to Material class.
-				  */
-				explicit Element(const std::shared_ptr<O2P2::Prep::Material>& Material)
-					: BaseElement(Material) {
-					mv_Centroid = nullptr;
-				};
-
-				// Default destructor of private / protected pointers.
-				~Element() = default;
-
-				/** Evaluate centroid and circumsphere Radius. Must be called after setting the conectivity. */
-				virtual void setGeomProperties() {}
-
-			public:
-				/** Overloading operator << to stream the node indexing. */
-				friend std::ostream& operator<<(std::ostream& stream, Element<nDim> const& elem) {
-					stream << elem.print();
-					return stream;
-				}
-
-				/** @return string with incidence for printing. */
-				const std::string print() const {
-					std::string str;
-					for (auto& node : mv_Conect) {
-						str.append(std::to_string(node->mv_index + 1));
-						str.append(" ");
-					}
-					return str;
-				}
-
-				/** @return String with geometric properties. */
-				const std::string printGeom() const {
-					std::string str;
-					str.append("Radius: ");
-					str.append(std::to_string(mv_Radius));
-					str.append("; Centroid: ");
-					for (int i = 0; i < nDim; i++) {
-						str.append(std::to_string(mv_Centroid[i]));
-						str.append(" ");
-					}
-					return str;
-				}
-
-				/** Populates the indexing matrix and evaluates initial properties.
-				  * @param Conect The indexing matrix.
-				  */
-				void setConectivity(const std::vector<std::shared_ptr<O2P2::Prep::Node<nDim>>>& Conect) {
-					mv_Conect = std::move(Conect);
-					this->setGeomProperties();
-				}
-
-				/** @return a reference to the element indexing. */
-				std::vector<std::shared_ptr<O2P2::Prep::Node<nDim>>>& getConectivity() { return mv_Conect; }
+				/** @return a reference to the elements Material object. */
+				O2P2::Geom::Material* getMaterial() { return mv_Mat.get(); }
 
 				/** Get a pointer to a specific node from the conectivity.
 				  * @return a pointer to a node.
 				  * @param index Element convectivity container index.
 				  */
-				O2P2::Prep::Node<nDim>* getConectivity(const int& index) { return mv_Conect.at(index).get(); }
+				O2P2::Geom::Node* getConectivity(const int& index) { return mv_Conect.at(index).get(); }
+
+				/** @return a reference to the element indexing. */
+				std::vector<std::shared_ptr<O2P2::Geom::Node>>& getConectivity() { return mv_Conect; }
 
 				/** @return the radius of the element' minimum bounding circle. */
 				double getRadius() { return this->mv_Radius; }
@@ -184,15 +141,26 @@ namespace O2P2 {
 				/** @return a pointer to the centroid of the element (with size [nDim]). */
 				double const* getCentroid() const { return &mv_Centroid[0]; }
 
+				/** Populates the indexing matrix and evaluates initial properties.
+				  * @param Conect The indexing matrix.
+				  */
+				void setConectivity(std::vector<std::shared_ptr<O2P2::Geom::Node>>& Conect) {
+					mv_Conect = std::move(Conect);
+					this->setGeomProperties();
+				}
+
 				/** Verifies dimensionless coordinates from input - if it is immersed on the element.
 				  * @return True if input falls within the element.
-				  * @param xsi Trial dimensionless coordinates.
+				  * @param xsi Trial dimensionless coordinates (with size [nDim]).
 				  */
-				virtual inline bool evaluateXsi(const std::array<double, nDim> xsi) { return false; }
+				virtual inline bool evaluateXsi(const double* xsi) = 0;
 
 			protected:
+				/** @brief Pointer to the Material. */
+				std::shared_ptr<O2P2::Geom::Material> mv_Mat;
+
 				/** @brief Vector with element indexing. */
-				std::vector<std::shared_ptr<O2P2::Prep::Node<nDim>>> mv_Conect;
+				std::vector<std::shared_ptr<O2P2::Geom::Node>> mv_Conect;
 
 				/** @brief Centroid of the polygon (It is not the circumcenter). */
 				std::unique_ptr<double[]> mv_Centroid;
@@ -202,113 +170,158 @@ namespace O2P2 {
 			};
 
 
-			/** @class ElementLinear
+			/** @class ElemLinear
 			  *
 			  * @brief Base geometry class for linear elements.
 			  * @details Holds basic definitios for geometry linear elements.
 			  *
+			  * @tparam nDim The dimensionality of the problem. It is either 2 or 3 (bidimensional or tridimensional).
 			  */
 			template<int nDim>
-			class ElementLinear : public Element<nDim>
+			class ElemLinear : public Element
 			{
 			private:
-				ElementLinear() = delete;
+				// Default constructor is deleted. Use explicit constructor only.
+				ElemLinear() = delete;
 
 			protected:
 				/** Constructor for linear element objects.
 				  * @param Material Pointer to Material class.
 				  * @param Section Pointer to Section class.
 				  */
-				ElementLinear(std::shared_ptr<O2P2::Prep::Material>& Material, std::shared_ptr<O2P2::Prep::Section>& Section)
-					: Element<nDim>(Material), mv_Section(Section) {}
+				explicit ElemLinear(std::shared_ptr<O2P2::Geom::Material>& Material, std::shared_ptr<O2P2::Geom::CrossSection>& Section)
+					: Element(Material), mv_Section(Section) {}
 
 			protected:
 				/** @brief Pointer to the Section. */
-				std::shared_ptr<O2P2::Prep::Section> mv_Section;
+				std::shared_ptr<O2P2::Geom::CrossSection> mv_Section;
 
 				/** @brief Element dimensionality */
-				static inline int const mv_Dim{ 1 };
+				static inline int const mv_ElDim{ 1 };
+
+			private:
+				// There is no need to evaluateXsi in Linear Elements. It is an empty function
+				inline bool evaluateXsi(const double* xsi) override { return false; }
 
 			public:
+				// Returns string with geometric properties.
+				const std::string printGeom() const override {
+					std::string str;
+					str.append("Approx. Length: ");
+					str.append(std::to_string(this->mv_Radius));
+					str.append("; Centroid:");
+					for (int i = 0; i < nDim; i++) {
+						str.append(" ");
+						str.append(std::to_string(this->mv_Centroid[i]));
+					}
+					return str;
+				}
+
 				// Returns the number of DOF per node of current element.
-				int getNumNdDOF() override { return nDim; }
+				const int getNumNodalDof() const override { return nDim; }
 
 				// Returns the dimensionality of current element.
-				int getDIM() override { return mv_Dim; }
+				const int getDIM() const override { return mv_ElDim; }
 
 				/** @return a reference to a section object. */
-				O2P2::Prep::Section* getSection() { return mv_Section.get(); }
+				O2P2::Geom::CrossSection* getSection() { return mv_Section.get(); }
 			};
 
-			/**
-			  * @class ElementPlane
+			/** @class ElemPlane
 			  *
 			  * @brief Base geometry class for plane elements.
 			  * @details Includes basic definitions for plane elements.
-			  *
 			  */
-			class ElementPlane : public Element<2>
+			class ElemPlane : public Element
 			{
 			private:
-				ElementPlane() = delete;
+				// Default constructor is deleted. Use explicit constructor only.
+				ElemPlane() = delete;
 
 			protected:
 				/** Constructor for plane element objects.
 				  * @param Material Pointer to Material class.
-				  * @param Section Pointer to Section class.
+				  * @param Section Pointer to PlaneSection class.
 				  */
-				ElementPlane(std::shared_ptr<O2P2::Prep::Material>& Material, std::shared_ptr<O2P2::Prep::Section>& Section)
-					: Element<2>(Material), mv_Section(Section) {}
+				explicit ElemPlane(std::shared_ptr<O2P2::Geom::Material>& Material, std::shared_ptr<O2P2::Geom::PlaneSection>& Section)
+					: Element(Material), mv_Section(Section) {}
 
 			protected:
-				/** @brief Pointer to Section. */
-				std::shared_ptr<O2P2::Prep::Section> mv_Section;
+				/** @brief Pointer to PlaneSection. */
+				std::shared_ptr<O2P2::Geom::PlaneSection> mv_Section;
 
 				/** @brief Element dimensionality */
-				static inline int const mv_Dim{ 2 };
+				static inline int const mv_ElDim{ 2 };
 
 			public:
+				// Returns string with geometric properties.
+				const std::string printGeom() const override {
+					std::string str;
+					const int mi_Dim = mv_Conect.at(0)->getDIM();	// Dimensionality of vector space (2D or 3D)
+
+					str.append("Radius: ");
+					str.append(std::to_string(this->mv_Radius));
+					str.append("; Centroid:");
+					for (int i = 0; i < mi_Dim; i++) {
+						str.append(" ");
+						str.append(std::to_string(this->mv_Centroid[i]));
+					}
+					return str;
+				}
+
 				// Returns the number of DOF per node of current element.
-				int getNumNdDOF() override { return 2; }
+				const int getNumNodalDof() const override { return 2; }
 
 				// Returns the dimensionality of current element.
-				int getDIM() override { return mv_Dim; }
+				const int getDIM() const override { return mv_ElDim; }
 
 				/** @return a reference to a section object. */
-				O2P2::Prep::Section* getSection() { return mv_Section.get(); }
+				O2P2::Geom::PlaneSection* getSection() { return mv_Section.get(); }
 			};
 
 
-			/**
-			  * @class ElementSolid
+			/** @class ElemSolid
 			  *
 			  * @brief Base geometry class for solid elements.
 			  * @details Includes basic definitions for solid elements.
-			  *
 			  */
-			class ElementSolid : public Element<3>
+			class ElemSolid : public Element
 			{
 			private:
-				ElementSolid() = delete;
+				// Default constructor is deleted. Use explicit constructor only.
+				ElemSolid() = delete;
 
 			protected:
 				/** Constructor for plane solid objects.
 				  * @param Material Pointer to Material class.
 				  */
-				ElementSolid(std::shared_ptr<O2P2::Prep::Material>& Material)
-					: Element<3>(Material) {}
+				explicit ElemSolid(std::shared_ptr<O2P2::Geom::Material>& Material)
+					: Element(Material) {}
 
 			protected:
 				/** @brief Element dimensionality */
-				static inline int const mv_Dim{ 3 };
+				static inline int const mv_ElDim{ 3 };
 
 			public:
+				// Returns string with geometric properties.
+				const std::string printGeom() const override {
+					std::string str;
+					str.append("Radius: ");
+					str.append(std::to_string(this->mv_Radius));
+					str.append("; Centroid:");
+					for (int i = 0; i < mv_ElDim; i++) {
+						str.append(" ");
+						str.append(std::to_string(this->mv_Centroid[i]));
+					}
+					return str;
+				}
+
 				// Returns the number of DOF per node of current element.
-				int getNumNdDOF() override { return 3; }
+				const int getNumNodalDof() const override { return 3; }
 
 				// Returns the dimensionality of current element.
-				int getDIM() override { return mv_Dim; }
+				const int getDIM() const override { return mv_ElDim; }
 			};
 		} // End of Elem Namespace
-	} // End of Prep Namespace
+	} // End of Geom Namespace
 } // End of O2P2 Namespace

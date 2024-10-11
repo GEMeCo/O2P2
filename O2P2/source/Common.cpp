@@ -57,17 +57,17 @@ std::map<PlaneStateType, std::string> PlaneStateTypeNames =
 };
 
 std::map<OutputType, std::string> OutputTypeExtension =
-{ {OutputType::OGL, "_out.ogl"},
-  {OutputType::VTU, "_out.vtu"}
+{ {OutputType::OGL, ".ogl"},
+  {OutputType::VTU, ".vtu"}
 };
 
 // Format function definition
 std::ostream& formatFixed(std::ostream& os) {
 	os.fill(' ');
-	return os << std::fixed << std::setprecision(6) << std::setw(10);
+	return os << std::fixed << std::setprecision(12) << std::setw(16);
 }
 
 std::ostream& formatScien(std::ostream& os) {
 	os.fill(' ');
-	return os << std::scientific << std::setprecision(6) << std::setw(14);;
+	return os << std::scientific << std::setprecision(12) << std::setw(20);;
 }

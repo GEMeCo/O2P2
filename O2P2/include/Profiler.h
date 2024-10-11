@@ -1,6 +1,7 @@
 // ================================================================================================
-// Basic instrumentation profiler by Yan Chernikov and David Churchill
-//
+// Basic instrumentation profiler by Yan Chernikov
+// https://gist.github.com/TheCherno/31f135eea6ee729ab5f26a6908eb3a5e
+// 
 // Singleton usage:
 //
 // // Begin session 

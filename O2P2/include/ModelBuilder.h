@@ -40,13 +40,19 @@ namespace O2P2 {
 		  * @return a pointer to a Domain object already initialized.
 		  * @param file Project file (Main file).
 		  */
-		std::unique_ptr<O2P2::Prep::Domain<nDim>> initMesh(std::istream& file);
+		std::unique_ptr<O2P2::Geom::Domain<nDim>> initMesh(std::istream& file);
 
 		/** Reads the project file, defines the type of analysis and initiates SolutionAlgorithm component.
 		 * @return a pointer to a SolutionAlgorithm object, after initialization.
 		 * @param file Project file (Main file).
 		*/
 		std::unique_ptr<O2P2::Proc::SolutionAlgorithm> initAnalyzer(std::istream& file);
+
+		/** Reads the project file, defines the type of analysis and initiates PostProcess component.
+		 * @return a pointer to a PostProcess object.
+		 * @param file Project file (Main file).
+		*/
+		std::unique_ptr<O2P2::Post::PostProcess> initPostProcess(std::istream& file);
 
 		/** Populates nodes, materials, sections, elements, loads ands constrains.
 		  * @return True if mesh components were correctly initiated.
@@ -56,7 +62,7 @@ namespace O2P2 {
 		  * @sa FEAnalysis
 		  * @sa Domain
 		  */
-		bool populateDomain(std::istream& file, O2P2::Prep::Domain<nDim>* theDomain);
+		bool populateDomain(std::istream& file, O2P2::Geom::Domain<nDim>* theDomain);
 
 		/** Reads the Neumann and Dirichlet Boundary Conditions for all Load Steps.
 		  * @return the total number of steps (load and time steps).
@@ -68,7 +74,7 @@ namespace O2P2 {
 		  * @sa Domain
 		  * @sa SolutionAlgorithm
 		  */
-		int readBondaryConditions(std::istream& file, O2P2::Prep::Domain<nDim>* theDomain, O2P2::Proc::SolutionAlgorithm* theAnalyzer);
+		int readBondaryConditions(std::istream& file, O2P2::Geom::Domain<nDim>* theDomain, O2P2::Proc::SolutionAlgorithm* theAnalyzer);
 
 	public:
 		/** @brief Indicates whether input begins with 0 or 1. */
@@ -82,13 +88,13 @@ namespace O2P2 {
 		ModelBuilder(ModelBuilder&& other) = delete;
 
 		// Reads node file and creates nodes and points.
-		bool populateNodes(std::istream& file, O2P2::Prep::Domain<nDim>* theDomain);
+		bool populateNodes(std::istream& file, O2P2::Geom::Domain<nDim>* theDomain);
 
-		// Reads materials file and creates materials and sections.
-		bool populateMaterials(std::istream& file, O2P2::Prep::Domain<nDim>* theDomain);
+		// Reads materials file and creates materials and cross sections.
+		bool populateMaterials(std::istream& file, O2P2::Geom::Domain<nDim>* theDomain);
 
 		// Reads elements file and creates elements and inclusions (particles and fibers).
-		bool populateElements(std::istream& file, O2P2::Prep::Domain<nDim>* theDomain);
+		bool populateElements(std::istream& file, O2P2::Geom::Domain<nDim>* theDomain);
 
 	private:
 		// Mesh boolean.

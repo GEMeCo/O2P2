@@ -18,6 +18,9 @@ authors:
   - family-names: Teodoro
     given-names: "Chiara Pinheiro"
     website: "http://lattes.cnpq.br/6999948388655115"
+  - family-names: Gonçalves
+    given-names: "Vitor Freitas"
+    website: "http://lattes.cnpq.br/3162534445180107"
 keywords:
   - Thermomechanics
   - "Positional Finite Element Method"
@@ -26,10 +29,10 @@ identifiers:
   - description: "This is the collection of archived versions of O2P2"
     type: doi
     value: 10.5281/zenodo.7102198
-  - description: "This is the archived version 0.1.0 of O2P2"
+  - description: "This is the archived version 0.3.3 of O2P2"
     type: doi
     value: 10.5281/zenodo.7102199
 date-released: 2022-09-21
 license: Apache-2.0
 repository-code: "https://github.com/GEMeCo/O2P2"
-version: v0.2.0
+version: v0.3.3

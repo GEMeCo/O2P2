@@ -16,8 +16,9 @@
 // Explicit template member function instantiation
 //
 // ================================================================================================
-template bool O2P2::Proc::NLS_NewtonRaphson::runNonLinearSolver(O2P2::Proc::Mesh* theModel, const double initialNorm, const bool output);
-
+template bool O2P2::Proc::NLS_NewtonRaphson::runNonLinearSolver(O2P2::Proc::Mesh* theModel, const double initialNorm, const bool symmetry, const bool output);
+template bool O2P2::Proc::NLS_NewtonRaphson::runNonLinearSolver(O2P2::Proc::Comp::MeshPoint<2>* theModel, const double initialNorm, const bool symmetry, const bool output);
+template bool O2P2::Proc::NLS_NewtonRaphson::runNonLinearSolver(O2P2::Proc::Comp::MeshPoint<3>* theModel, const double initialNorm, const bool symmetry, const bool output);
 
 // ================================================================================================
 //
@@ -25,7 +26,7 @@ template bool O2P2::Proc::NLS_NewtonRaphson::runNonLinearSolver(O2P2::Proc::Mesh
 //
 // ================================================================================================
 template<class T>
-inline bool O2P2::Proc::NLS_NewtonRaphson::runNonLinearSolver(T* theModel, const double initialNorm, const bool output)
+inline bool O2P2::Proc::NLS_NewtonRaphson::runNonLinearSolver(T* theModel, const double initialNorm, const bool symmetry, const bool output)
 {
 	// Returns false if results are infeasible.
 	bool feasible = false;
@@ -33,8 +34,8 @@ inline bool O2P2::Proc::NLS_NewtonRaphson::runNonLinearSolver(T* theModel, const
 	// Number of DOF
 	int size = theModel->getNumDof();
 
-	// Hessian is a symmetric square matrix of second-order partial derivatives of a scalar-valued function or scalar field.
-	M2S2::sparseMatrix mi_Hessian(size, true);
+	// Hessian is a square matrix of second-order partial derivatives of a scalar-valued function or scalar field.
+	M2S2::sparseMatrix mi_Hessian(size, symmetry);
 
 	// Vector of independent terms, the right hand side, for system: Hessian.LHS = RHS
 	std::vector<double> mi_RHS(size);

@@ -31,6 +31,12 @@
     <Filter Include="Source Files\Post-Process Components">
       <UniqueIdentifier>{e6716c8a-12c5-406e-ba3e-6f6f41878e38}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Solution Components\Mesh Components">
+      <UniqueIdentifier>{9df1834d-aae8-4ac7-963e-5348d6dea131}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Solution Components\Mesh Components">
+      <UniqueIdentifier>{fe11d577-8ae6-4a62-9f27-816a352d0aa0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\O2P2.cpp">
@@ -57,20 +63,35 @@
     <ClCompile Include="source\PostProcess.cpp">
       <Filter>Source Files\Post-Process Components</Filter>
     </ClCompile>
-    <ClCompile Include="source\Mesh.cpp">
-      <Filter>Source Files\Solution Components</Filter>
-    </ClCompile>
     <ClCompile Include="source\ModelBuilder.cpp">
       <Filter>Source Files\Domain Components</Filter>
-    </ClCompile>
-    <ClCompile Include="source\MeshElem.cpp">
-      <Filter>Source Files\Solution Components</Filter>
     </ClCompile>
     <ClCompile Include="source\OutputSystem.cpp">
       <Filter>Source Files\Post-Process Components</Filter>
     </ClCompile>
     <ClCompile Include="source\O2P2_DOC.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\MeshBars.cpp">
+      <Filter>Source Files\Solution Components\Mesh Components</Filter>
+    </ClCompile>
+    <ClCompile Include="source\MeshFace.cpp">
+      <Filter>Source Files\Solution Components\Mesh Components</Filter>
+    </ClCompile>
+    <ClCompile Include="source\MeshFibs.cpp">
+      <Filter>Source Files\Solution Components\Mesh Components</Filter>
+    </ClCompile>
+    <ClCompile Include="source\MeshIncl.cpp">
+      <Filter>Source Files\Solution Components\Mesh Components</Filter>
+    </ClCompile>
+    <ClCompile Include="source\MeshElem.cpp">
+      <Filter>Source Files\Solution Components\Mesh Components</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Mesh_MD.cpp">
+      <Filter>Source Files\Solution Components</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Mesh_MQS.cpp">
+      <Filter>Source Files\Solution Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -146,9 +167,6 @@
     <ClInclude Include="include\Constraints.h">
       <Filter>Header Files\Solution Components</Filter>
     </ClInclude>
-    <ClInclude Include="include\MeshElem.h">
-      <Filter>Header Files\Solution Components</Filter>
-    </ClInclude>
     <ClInclude Include="include\MaterialPoint.h">
       <Filter>Header Files\Solution Components</Filter>
     </ClInclude>
@@ -197,15 +215,42 @@
     <ClInclude Include="include\ModelBuilder.h">
       <Filter>Header Files\Domain Components</Filter>
     </ClInclude>
-    <ClInclude Include="include\MeshNode.h">
-      <Filter>Header Files\Solution Components</Filter>
-    </ClInclude>
     <ClInclude Include="include\Solver.h">
       <Filter>Header Files\Solution Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Mesh_MD.h">
+      <Filter>Header Files\Solution Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Mesh_MQS.h">
+      <Filter>Header Files\Solution Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Mesh Components\MeshBars.h">
+      <Filter>Header Files\Solution Components\Mesh Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Mesh Components\MeshElem.h">
+      <Filter>Header Files\Solution Components\Mesh Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Mesh Components\MeshFace.h">
+      <Filter>Header Files\Solution Components\Mesh Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Mesh Components\MeshFibs.h">
+      <Filter>Header Files\Solution Components\Mesh Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Mesh Components\MeshIncl.h">
+      <Filter>Header Files\Solution Components\Mesh Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Mesh Components\MeshNode.h">
+      <Filter>Header Files\Solution Components\Mesh Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Mesh Components\MeshPoint.h">
+      <Filter>Header Files\Solution Components\Mesh Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\CITATION.cff">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

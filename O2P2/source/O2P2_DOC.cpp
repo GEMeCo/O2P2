@@ -37,6 +37,8 @@
   * Our software is in Zenodo - thus, we got a DOI: [doi.org/10.5281/zenodo.8283439](https://doi.org/10.5281/zenodo.8283439)
   * 
   * @section features Features
+  * - v0.3.0: Embedded elements, henceforth called inclusions.
+  *
   * - v0.2.0: Dynamic mechanical analysis.
   *   -  Newmark-beta time step integration method.
   * 
@@ -55,8 +57,14 @@
   * - [Microsoft Visual Studio Community 2022, Version 17.3.4](https://visualstudio.microsoft.com/)
   * - [Intel C++ Compiler, Package ID: w_oneAPI_2022.1.0.256](https://software.intel.com/content/www/us/en/develop/tools/oneapi.html)
   * - [Doxygen, version 1.9.5](https://doxygen.nl/)
-  * - [M2S2, version 0.1](https://github.com/GEMeCo/M2S2)
+  * - [M2S2, version v1.0.3](https://github.com/GEMeCo/M2S2)
   * - [AcadView](https://set.eesc.usp.br/?page_id=237)
+  * 
+  * @subsection References
+  * - Carrazedo, R.; Piedade Neto, D.; Paccola, R. R. (2023). M2S2, a C++ header-only library for linear algebra applied to mechanics of solids and structures. URL: https://doi.org/10.5281/zenodo.11152221
+  * - Carrazedo, R.; Paccola, R. R.; Coda, H. B.; Salomão, R. C. (2020). Vibration and stress analysis of orthotropic laminated panels by active face prismatic finite element. Composite Structures, v. 244, n. 112254
+  * - Carrazedo, R.; Paccola, R. R.; Coda, H. B. (2018). Active face prismatic positional finite element for linear and geometrically nonlinear analysis of honeycomb sandwich plates and shells. Composite Structures, v. 200, p. 849-863.
+  * - Chernikov, Y. (2018) - Basic instrumentation profiler. URL: [Github/TheCherno/file-instrumentor](https://gist.github.com/TheCherno/31f135eea6ee729ab5f26a6908eb3a5e)
   * 
   * @section run Building and Running
   * 
@@ -65,7 +73,7 @@
     git clone --recursive https://github.com/GEMeCo/O2P2.git
     @endverbatim
   * 
-  * 2. This will install development dependencies and resources. Nevertheless, check above for missing resources.
+  * 2. This will not install development dependencies and resources. Check above for missing resources.
   * 
   * 3. We provided the .vsxproj file. Some configuration may be needed. Good luck.
   * 
@@ -92,6 +100,7 @@
   * @author	[Emerson Felipe Felix](https://orcid.org/0000-0002-8928-9474)
   * @author	[Alexandre Ten Cate Matté](https://lattes.cnpq.br/8144116395864291)
   * @author	[Chiara Pinheiro Teodoro](http://lattes.cnpq.br/6999948388655115)
+  * @author [Vitor Freitas Gonçalves](http://lattes.cnpq.br/3162534445180107)
   * 
   * @section ack Funding and Acknowledgement
   * 
@@ -109,10 +118,11 @@
   * These page provides the current features available for each release, and some features planned ahead.
   * 
   * @section vers Current version and features
-  * @version 0.2.0
-  * @date 2023.09.01
+  * @version 0.3.1
+  * @date 2024.08.30
   * 
   * @subsection fea Current features
+  * - Newmark-beta time step integration method.
   * - Geometrically nonlinear mechanical analysis using the Finite Element Method based on Positions;
   * - Bi and Tridimensional environments;
   * - Linear, plane and solid finite elements;
@@ -127,19 +137,33 @@
   * - v0.1.1
   *   - Improved documentation (README.md and doxygen html);
   *   - Eigen was included as submodule in git. Doxygen was thus updated.
-  * 
+  *
+  * - v0.3.1: Active faces.
+  *   - Input file has been modified.
+  *   - Documentation was updated.
+  *   - Several bugs fixed, most of then associated to M2S2.
+  *
+  * - v0.3.2: Dynamic mechanical analysis for immersed elements.
+  *   - Fabric: 2D immersed elements in 3D environment.
+  *   - Several modifications to improve performance.
+  *   - Dynamics for mesh components (embedded elements).
+  *
   * @subsection min Minor implementations
   * Each minor version is associated to new features. It creates a new release, and includes all previous patch modifications. Patch numbering is reinitated.
   * 
   * - v0.2.0: Dynamic mechanical analysis.
   *   - Newmark-beta time step integration method.
-  *   - Eigen was removed. Now using M2S2 library. 4x faster!
+  *   - Eigen was removed (even in git). Now using M2S2 custom library. 4x faster due symmetry!
+  *
+  * - v0.3.0: Embedded / Immersed elements.
+  *   - Point class: geometry nodes for embedded elements.
+  *   - MeshPoint class: mesh point.
+  *   - Inclusion class: embedded elements.
   *
   * @subsection maj Major changes
   * The first major update will be the first release, after software goes gold.
   * 
   * @section pln Planned stages of development (and releases)
-  * - v0.3 - an alpha version: immersed elements.
   * - v0.4 - an alpha version: thermodynamic analysis of solids (conduction).
   * - v0.5 - an alpha version: weak coupling of thermal and mechanical analysis (temperature modifying mechanical behavior but not the other way around).
   * - v1.0 - a beta version: thermomechanical analysis of hyperelastic composites.
@@ -165,16 +189,18 @@
   *
   * Then, in a single line, input information about the domain:
   * - Number of nodes
+  * - Number of immersed nodes
   * - Number of elements
+  * - Number of immersed elements
   * - Number of materials
   * - Number of sections (cross sections, required for linear and plane elements)
   * @verbatim
     #DATA#
-    3  1  1  1
+    3  3  1  1  1   1
     @endverbatim
   *
   * Problem setup comes next. In a single line, input the following:
-  * - Time integration scheme (1 for quasi-static, 3 for Newmark-beta, the two available by now)
+  * - Time integration scheme (1 for quasi-static, 3 for Newmark-beta, the only two options available by now)
   * - Nonlinear Solver: (1 - Newton-Raphson)
   * - Type of analysis: (1 - Mechanic)
   * - Tolerance (double)
@@ -186,13 +212,22 @@
     1	1	1	0.0000001	3	10	1
     @endverbatim
   *
-  * Even if time integration scheme is quasi-static, some time integration parameters are required.
+  * This section is required only if the time integration scheme is other than quasi-static.
   * - alfa (for thermal problems)
   * - beta (for Newmark-beta)
   * - gamma (for Newmark-beta)
   * @verbatim
     #TIP#
-    0.  0.25 0.5
+    0.  0. 0.
+    @endverbatim
+  *
+  * Output setup must be stablished
+  * - Print / Output frequency (1 to every time step)
+  * - Save file during process (1 to yes, save intermediate results)
+  * - Output to AcadView or ParaView (1 for AcadView, only option working)
+  * @verbatim
+    #OUTPUT#
+    1	0	1
     @endverbatim
   *
   * @subsection mf Material / Section information
@@ -209,12 +244,15 @@
   * Notice that `#` is mandatory after each group of material information
   *
   * If sections are required (by linear or plane elements), input the following:
+  * - Index
   * - Type of cross section (1 - area; 2 - thickness)
   * - Value
   * - Plane state (1 - Plane stress; 2 - Plane strain)
+  * 
+  * This flag is optional
   * @verbatim
     #SECTION#
-    2   1.  1
+    1   2   1.  1
     @endverbatim
   *
   * @subsection nf Nodal coordinates
@@ -228,6 +266,19 @@
     3   0.5 1.0
     @endverbatim
   * 
+  * @subsection pf Embedded node coordinates - Only required if the number of points is not zero.
+  * The next information required are points coordinates (immersed nodes).
+  * - Number (index)
+  * - Points coordinates (x and y for 2D; x, y and z for 3D)
+  * 
+  * This flag is optional
+  * @verbatim
+    #POINTS#
+    1   0.5 0.0
+    2   0.75 0.5
+    3   0.25 0.5
+    @endverbatim
+  *
   * @subsection ef Element information
   * Some information are necessary:
   * - Number (index)
@@ -241,7 +292,36 @@
     #ELEMENTS#
     1   2   1   3   1   1   1   2   3
     @endverbatim
+  *
+  * @subsection afi Active Face information (Only if needed)
+  * If prismatic elements are detected, you may include information about active faces:
+  * - Number of element to active face
+  * - Which face to active (1 to 5)
+  * - Material number
+  * - Section number
   * 
+  * This flag is optional
+  * @verbatim
+    #FACES#
+    1   5   2   1
+    @endverbatim
+  *
+  * @subsection eei Embedded element information - Only required if the number of immersed elements is not zero.
+  * Some information are necessary:
+  * - Number (index)
+  * - Type of element (1 - bar; 2 - triangular; 3 - rectangular; 4 - tetrahedral; 5 - hexahedral; and 6 - prism)
+  * - Order (1 - linear; 2 - quadratic; and 3 - cubic)
+  * - Number of integration points (see Elem)
+  * - Material number
+  * - Section (if any)
+  * - Conectivity (1 .. number of points)
+  * 
+  * This flag is optional
+  * @verbatim
+    #INCLUSIONS#
+    1   2   1   3   1   1   1   2   3
+    @endverbatim
+  *
   * @subsection df Boundary Conditions for Load Stages
   * Boundary conditions for each load step
   * - Number of time steps
@@ -257,22 +337,22 @@
   * - Node
   * - Direction
   * - Value
-  * - Time behaviour (var[0] + var[1].t + var[2].t^2)
+  * - Time behavior (var[0] + var[1].t + var[2].t^2 + var[3].sin(var[4] * dt) + var[5].cos(var[6] * dt))
   * @verbatim
     #DIR1#
-    1   1   0.  1.  0.  0.
-    1   2   0.  1.  0.  0.
-    2   1   0.  1.  0.  0.
+    1   1   0.  1.  0.  0.  0.  0.  0.  0.
+    1   2   0.  1.  0.  0.  0.  0.  0.  0.
+    2   1   0.  1.  0.  0.  0.  0.  0.  0.
     @endverbatim
   * 
   * Neumann boundary condition
   * - Node
   * - Direction
   * - Value
-  * - Time behaviour (var[0] + var[1].t + var[2].t^2)
+  * - Time behavior (var[0] + var[1].t + var[2].t^2 + var[3].sin(var[4] * dt) + var[5].cos(var[6] * dt))
   * @verbatim
     #NEU1#
-    3   1   0.1  2.  0.  0.
+    3   1   0.1  2.  0.  0.  0.  0.  0.  0.
     @endverbatim
   * 
   * These flags must be redefined for each and every load step (#LS2#; #DIR2#; #NEU2#; and so on).
@@ -297,7 +377,7 @@
   * @image html O2P2_Preprocessor_Module.png width=600
   *
   * @sa O2P2::ModelBuilder
-  * @sa O2P2::Prep::Domain
+  * @sa O2P2::Geom::Domain
   * @sa Elements
   * @sa Material
   *
@@ -312,6 +392,9 @@
   * @ingroup PreProcessor_Module
   * @brief Elements Library.
   * @details The following elements are available:
+  * 
+  * @section Unidimensional
+  * Linear; Quadratic; and Cubic.
   *
   * @section Bidimensional
   * @subsection tri Triangular

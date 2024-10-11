@@ -20,31 +20,32 @@ int main(int argc, char** args)
 	std::string mi_stFile;		// Input File
 	std::ifstream mi_File;		// Input File stream
 
-	// Jabá
-	std::cout << "Copyright(C) 2023 GEMeCO - All Rights Reserved." << std::endl
-		<< "Structural Engineering Department" << std::endl
-		<< "University of Sao Paulo at Sao Carlos School of Engineering." << std::endl << std::endl
-		<< "This program is free: you can redistribute it under the terms of the License." << std::endl << std::endl
-		<< "This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;" << std::endl
-		<< "Without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE." << std::endl << std::endl
-		<< "It is provided \"AS IS\"." << std::endl
-		<< "In no event shall the authors be liable for any claim, damages or other liability," << std::endl
-		<< "whether in an action of contract, tort or otherwire, arising from, out of or in " << std::endl
-		<< "connection with the software or the use of other dealing in the software." << std::endl << std::endl
-		<< "Neither the name of the copyright holder nor the names of any other contributors" << std::endl
-		<< "may be used to endorse or promote products derived from this software without" << std::endl
-		<< "specific prior written permission." << std::endl << std::endl;
+	std::cout << INFO("Copyright(C) 2024 GEMeCO - All Rights Reserved.") << std::endl
+		<< INFO("Structural Engineering Department.") << std::endl
+		<< INFO("University of Sao Paulo at Sao Carlos School of Engineering.") << std::endl << std::endl
+		<< WARN("This program is free: you can redistribute it under the terms of the License.")
+		<< WARN("This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;")
+		<< WARN("Without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.")
+		<< WARN("It is provided \"AS IS\".") << std::endl
+		<< INFO("In no event shall the authors be liable for any claim, damages or other liability,") << std::endl
+		<< INFO("whether in an action of contract, tort or otherwire, arising from, out of or in ") << std::endl
+		<< INFO("connection with the software or the use of other dealing in the software.") << std::endl << std::endl
+		<< INFO("Neither the name of the copyright holder nor the names of any other contributors") << std::endl
+		<< INFO("may be used to endorse or promote products derived from this software without") << std::endl
+		<< INFO("specific prior written permission.") << std::endl << std::endl
+		<< INFO("If you are using, please cite our software in your reseach. We have a DOI: 10.5281/zenodo.8283439") << std::endl << std::endl;
 
 	// --------------------------------------------------------------------------------------------
 	// Check if program call has the project name
 	if (argc > 1)
 	{
-		std::cout << "The following input project was submitted: " << args[1];
+		std::cout << WARN("The following input project was submitted: ") << args[1];
 		mi_stProj = args[1];
 	}
 	else
 	{
-		std::cout << "Project name: ";
+		std::cout << INPUT("Notice: Type exit if closing.\n");
+		std::cout << INPUT("Project name: ");
 		std::cin >> mi_stProj;
 
 		if (mi_stProj.compare("exit") == 0) return 0;
@@ -137,14 +138,14 @@ int main(int argc, char** args)
 	catch (std::invalid_argument& e) {
 		std::cerr << e.what();
 		system("pause");
-		return 1;
+		return 2;
 	}
 
 	// length_error -> Required dimensions are not available
 	catch (std::length_error& e) {
 		std::cerr << "\n\n\nRequired size are invalid: " << e.what() << "\n\n\n";
 		system("pause");
-		return 1;
+		return 3;
 	}
 
 
@@ -152,10 +153,10 @@ int main(int argc, char** args)
 	catch (std::out_of_range& e) {
 		std::cerr << "\n\n\nOut of range size: " << e.what() << "\n\n\n";
 		system("pause");
-		return 1;
+		return 4;
 	}
 
-	std::cout << "\n\nClick a button to exit!";
+	std::cout << OK("\n\nClick a button to exit!");
 	std::cin.get();
 
 	return 0;

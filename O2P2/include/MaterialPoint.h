@@ -29,40 +29,48 @@ namespace O2P2 {
 			class MaterialPoint
 			{
 			private:
+				// Default constructor is deleted. Use explicit constructor only.
 				MaterialPoint() = delete;
 
 			public:
-				/** Constructor for material point information recorded in the integration point.
-				  * @param Jacobian Reference jacobian matrix - A0 / F0.
+				/** Constructor for material point information recorded in the integration point. Use for 2D and 3D elements.
+				  * @param jacobian Reference jacobian matrix - F0.
 				  */
-				MaterialPoint(const M2S2::Dyadic2N& jacobian) {
-					if (jacobian.rows() == 2 || jacobian.rows() == 3)
-					{
-						mv_refJacobian = jacobian.inverse();
-						mv_Jacobian = jacobian.determinant();
-					}
-					else
-					{
-						// Linear element
-						//mv_refJacobian = jacobian;
+				explicit MaterialPoint(const M2S2::Dyadic2N& jacobian) {
+					mv_refJacobian = std::make_unique<M2S2::Dyadic2N>(jacobian.inverse());
+					mv_Jacobian = jacobian.determinant();
+				}
 
-						//for (int i = 0; i < jacobian.size(); ++i) {
-						//	mv_Jacobian += jacobian(i) * jacobian(i);
-						//}
-						//mv_Jacobian = 1. / mv_Jacobian;
+				/** Constructor for material point information recorded in the integration point. Use for linear elements (trusses and fibers).
+				  * @param nDim Dimensionality of domain, not the element dimensionality.
+				  * @param jacobian Reference jacobian matrix - F0.
+				  */
+				explicit MaterialPoint(const int nDim, const double jacobian[]) {
+					for (int i = 0; i < nDim; ++i) {
+						mv_Jacobian += jacobian[i] * jacobian[i];
 					}
-				};
+				}
+
+				/** Constructor for material point information recorded in the integration point. Use only for 2D elements in 3D environment.
+				  * @param jacobian Reference jacobian matrix - F0.
+				  * @param rot Rotation matrix.
+				  */
+				explicit MaterialPoint(const M2S2::Dyadic2N& jacobian, const M2S2::Dyadic2N& rot) {
+					mv_refJacobian = std::make_unique<M2S2::Dyadic2N>(jacobian.inverse());
+					mv_Jacobian = jacobian.determinant();
+					mv_rot = std::make_unique<M2S2::Dyadic2N>(rot); 
+				}
 
 				// Default destructor of private / protected pointers.
 				~MaterialPoint() = default;
 
-				/** @return the inverse of reference Jacobian matrix (A0i / F0i).
+				/** @return the inverse of reference Jacobian matrix (F0i).
 				  */
-				M2S2::Dyadic2N& getJacobianMatrix() { return this->mv_refJacobian; }
+				M2S2::Dyadic2N& getJacobianMatrix() { return *this->mv_refJacobian; }
 
 				/** @return the rotation matrix for 2D elements in 3D environments.
 				  */
-				M2S2::Dyadic2N& getRotationMatrix() { return this->mv_rot; }
+				M2S2::Dyadic2N& getRotationMatrix() { return *this->mv_rot; }
 
 				/** @return the reference Jacobian.
 				  */
@@ -72,11 +80,11 @@ namespace O2P2 {
 				/** @brief Reference Jacobian */
 				double mv_Jacobian{ 0. };
 
-				/** @brief INVERSE of reference Jacobian Matrix / A0 or F0 - Mapping gradient from dimensionless coordinate system to initial position */
-				M2S2::Dyadic2N mv_refJacobian;
+				/** @brief INVERSE of reference Jacobian Matrix / F0 - Mapping gradient from dimensionless coordinate system to initial position */
+				std::unique_ptr<M2S2::Dyadic2N> mv_refJacobian;
 
 				/** @brief Rotation matrix for 2D inclusions in a 3D environment. Not used otherwise. */
-				M2S2::Dyadic2N mv_rot;
+				std::unique_ptr<M2S2::Dyadic2N> mv_rot;
 			};
 		} // End of Comp Namespace
 	} // End of Proc Namespace

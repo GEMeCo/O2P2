@@ -20,7 +20,7 @@
 #include "IntegrationPoint.h"
 
 namespace O2P2 {
-	namespace Prep {
+	namespace Geom {
 		namespace Elem {
 			/** @ingroup Elements
 			  * @class Elem_Tet20
@@ -30,17 +30,18 @@ namespace O2P2 {
 			  * Options for integration points: 10, 11, 14, 15 and 24.
 			  * @image html Elem_Tet20.png height=300
 			  */
-			class Elem_Tet20 : public ElementSolid
+			class Elem_Tet20 : public ElemSolid
 			{
 			private:
+				// Default constructor is deleted. Use explicit constructor only.
 				Elem_Tet20() = delete;
 
 			protected:
 				/** Constructor for tetrahedral cubic elements.
 				  * @param Material Pointer to Material class.
 				  */
-				explicit Elem_Tet20(std::shared_ptr<O2P2::Prep::Material>& Material)
-					: ElementSolid(Material) { }
+				explicit Elem_Tet20(std::shared_ptr<O2P2::Geom::Material>& Material)
+					: ElemSolid(Material) { }
 
 			public:
 				// Output function for AcadView, based on element index.
@@ -90,24 +91,20 @@ namespace O2P2 {
 				std::vector<double> getShapeDerivOnPoint(const double* Point) override;
 
 				// Returns the number of nodes of current element.
-				int getNumNodes() override { return mv_numNodes; }
+				const int getNumNodes() const override { return mv_numNodes; }
 
 				// Returns the number of faces of current element.
-				int getNumFaces() override { return mv_numFaces; }
+				const int getNumFaces() const override { return mv_numFaces; }
 
-				/** Verifies dimensionless coordinates from input - if it is immersed on the element.
-				  * @return True if input falls within the element.
-				  * @param xsi Trial dimensionless coordinates.
-				  */
-				inline bool evaluateXsi(const std::array<double, mv_Dim> xsi) override {
+				// Verifies dimensionless coordinates from input - if it is immersed on the element.
+				inline bool evaluateXsi(const double* xsi) override {
+					std::array<double, mv_ElDim + 1> new_xsi = {};
 
-					std::array<double, mv_Dim + 1> new_xsi = {};
-
-					for (int i = 0; i < mv_Dim; ++i) {
-						new_xsi.at(i) = xsi.at(i);
-						new_xsi.at(mv_Dim) -= xsi.at(i);
+					for (int i = 0; i < mv_ElDim; ++i) {
+						new_xsi.at(i) = *(xsi + i);
+						new_xsi.at(mv_ElDim) -= *(xsi + i);
 					}
-					new_xsi.at(mv_Dim) += 1.;
+					new_xsi.at(mv_ElDim) += 1.;
 
 					const auto [min, max] = std::minmax_element(new_xsi.begin(), new_xsi.end());
 					if (*max < 1.000001 && *min > -0.000001) return true;
@@ -139,13 +136,14 @@ namespace O2P2 {
 			class Elem_Tet20_IP : public Elem_Tet20
 			{
 			private:
+				// Default constructor is deleted. Use explicit constructor only.
 				Elem_Tet20_IP() = delete;
 
 			public:
 				/** Constructor for tetrahedral cubic elements.
 				  * @param Material Pointer to Material class.
 				  */
-				explicit Elem_Tet20_IP(std::shared_ptr<O2P2::Prep::Material>& Material)
+				explicit Elem_Tet20_IP(std::shared_ptr<O2P2::Geom::Material>& Material)
 					: Elem_Tet20(Material) { }
 
 				// Return a vector with values on the integration points currently known in the element' nodes.
@@ -154,14 +152,14 @@ namespace O2P2 {
 				// Returns a pointer to the first element of the shape functions (with size [nIP][mv_numNodes]).
 				double const* getShapeFc() const override { return &mv_Psi[0][0]; }
 
-				// Returns a pointer to the first element of the derivative of shape functions (with size [nIP][mv_numNodes][mv_Dim]).
+				// Returns a pointer to the first element of the derivative of shape functions (with size [nIP][mv_numNodes][mv_ElDim]).
 				double const* getShapeDerivative() const override { return &mv_DPsi[0][0][0]; }
 
 				// Returns a pointer to the weight of the integation points (with size [nIP]).
 				double const* getWeight() const override { return mv_weight; }
 
 				// Returns the number of integration points of current element.
-				int getNumIP() override { return nIP; }
+				const int getNumIP() const override { return nIP; }
 
 			private:
 				// Weights for numerical integration
@@ -171,10 +169,10 @@ namespace O2P2 {
 				static const double mv_Psi[nIP][mv_numNodes];
 
 				// Shape functions derivative
-				static const double mv_DPsi[nIP][mv_numNodes][mv_Dim];
+				static const double mv_DPsi[nIP][mv_numNodes][mv_ElDim];
 			};
 		} // End of Elem Namespace
-	} // End of Prep Namespace
+	} // End of Geom Namespace
 } // End of O2P2 Namespace
 
 
@@ -184,29 +182,29 @@ namespace O2P2 {
 // Shape functions evaluated on Point
 // 
 // ================================================================================================
-inline std::vector<double> O2P2::Prep::Elem::Elem_Tet20::getShapeFcOnPoint(const double* Point) {
+inline std::vector<double> O2P2::Geom::Elem::Elem_Tet20::getShapeFcOnPoint(const double* Point) {
 	std::vector<double> mi_Psi(20);
 
-	mi_Psi.at(1) = 1. - 5.5 * Point[2] + 9. * Point[2] * Point[2] - 4.5 * Point[2] * Point[2] * Point[2] - 5.5 * Point[1] + 18. * Point[1] * Point[2] - 13.5 * Point[1] * Point[2] * Point[2] + 9. * Point[1] * Point[1] - 13.5 * Point[1] * Point[1] * Point[2] - 4.5 * Point[1] * Point[1] * Point[1] - 5.5 * Point[0] + 18. * Point[0] * Point[2] - 13.5 * Point[0] * Point[2] * Point[2] + 18. * Point[0] * Point[1] - 27. * Point[0] * Point[1] * Point[2] - 13.5 * Point[0] * Point[1] * Point[1] + 9. * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[2] - 13.5 * Point[0] * Point[0] * Point[1] - 4.5 * Point[0] * Point[0] * Point[0];
-	mi_Psi.at(2) = 9. * Point[0] - 22.5 * Point[0] * Point[2] + 13.5 * Point[0] * Point[2] * Point[2] - 22.5 * Point[0] * Point[1] + 27. * Point[0] * Point[1] * Point[2] + 13.5 * Point[0] * Point[1] * Point[1] - 22.5 * Point[0] * Point[0] + 27. * Point[0] * Point[0] * Point[2] + 27. * Point[0] * Point[0] * Point[1] + 13.5 * Point[0] * Point[0] * Point[0];
-	mi_Psi.at(3) = -4.5 * Point[0] + 4.5 * Point[0] * Point[2] + 4.5 * Point[0] * Point[1] + 18. * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[2] - 13.5 * Point[0] * Point[0] * Point[1] - 13.5 * Point[0] * Point[0] * Point[0];
-	mi_Psi.at(4) = Point[0] - 4.5 * Point[0] * Point[0] + 4.5 * Point[0] * Point[0] * Point[0];
-	mi_Psi.at(5) = 9. * Point[1] - 22.5 * Point[1] * Point[2] + 13.5 * Point[1] * Point[2] * Point[2] - 22.5 * Point[1] * Point[1] + 27. * Point[1] * Point[1] * Point[2] + 13.5 * Point[1] * Point[1] * Point[1] - 22.5 * Point[0] * Point[1] + 27. * Point[0] * Point[1] * Point[2] + 27. * Point[0] * Point[1] * Point[1] + 13.5 * Point[0] * Point[0] * Point[1];
-	mi_Psi.at(6) = 27. * Point[0] * Point[1] - 27. * Point[0] * Point[1] * Point[2] - 27. * Point[0] * Point[1] * Point[1] - 27. * Point[0] * Point[0] * Point[1];
-	mi_Psi.at(7) = -4.5 * Point[0] * Point[1] + 13.5 * Point[0] * Point[0] * Point[1];
-	mi_Psi.at(8) = -4.5 * Point[1] + 4.5 * Point[1] * Point[2] + 18. * Point[1] * Point[1] - 13.5 * Point[1] * Point[1] * Point[2] - 13.5 * Point[1] * Point[1] * Point[1] + 4.5 * Point[0] * Point[1] - 13.5 * Point[0] * Point[1] * Point[1];
-	mi_Psi.at(9) = -4.5 * Point[0] * Point[1] + 13.5 * Point[0] * Point[1] * Point[1];
-	mi_Psi.at(10) = Point[1] - 4.5 * Point[1] * Point[1] + 4.5 * Point[1] * Point[1] * Point[1];
-	mi_Psi.at(11) = 9. * Point[2] - 22.5 * Point[2] * Point[2] + 13.5 * Point[2] * Point[2] * Point[2] - 22.5 * Point[1] * Point[2] + 27. * Point[1] * Point[2] * Point[2] + 13.5 * Point[1] * Point[1] * Point[2] - 22.5 * Point[0] * Point[2] + 27. * Point[0] * Point[2] * Point[2] + 27. * Point[0] * Point[1] * Point[2] + 13.5 * Point[0] * Point[0] * Point[2];
-	mi_Psi.at(12) = 27. * Point[0] * Point[2] - 27. * Point[0] * Point[2] * Point[2] - 27. * Point[0] * Point[1] * Point[2] - 27. * Point[0] * Point[0] * Point[2];
-	mi_Psi.at(13) = -4.5 * Point[0] * Point[2] + 13.5 * Point[0] * Point[0] * Point[2];
-	mi_Psi.at(14) = 27. * Point[1] * Point[2] - 27. * Point[1] * Point[2] * Point[2] - 27. * Point[1] * Point[1] * Point[2] - 27. * Point[0] * Point[1] * Point[2];
-	mi_Psi.at(15) = 27. * Point[0] * Point[1] * Point[2];
-	mi_Psi.at(16) = -4.5 * Point[1] * Point[2] + 13.5 * Point[1] * Point[1] * Point[2];
-	mi_Psi.at(17) = -4.5 * Point[2] + 18. * Point[2] * Point[2] - 13.5 * Point[2] * Point[2] * Point[2] + 4.5 * Point[1] * Point[2] - 13.5 * Point[1] * Point[2] * Point[2] + 4.5 * Point[0] * Point[2] - 13.5 * Point[0] * Point[2] * Point[2];
-	mi_Psi.at(18) = -4.5 * Point[0] * Point[2] + 13.5 * Point[0] * Point[2] * Point[2];
-	mi_Psi.at(19) = -4.5 * Point[1] * Point[2] + 13.5 * Point[1] * Point[2] * Point[2];
-	mi_Psi.at(20) = Point[2] - 4.5 * Point[2] * Point[2] + 4.5 * Point[2] * Point[2] * Point[2];
+	mi_Psi.at( 0) = 1. - 5.5 * Point[2] + 9. * Point[2] * Point[2] - 4.5 * Point[2] * Point[2] * Point[2] - 5.5 * Point[1] + 18. * Point[1] * Point[2] - 13.5 * Point[1] * Point[2] * Point[2] + 9. * Point[1] * Point[1] - 13.5 * Point[1] * Point[1] * Point[2] - 4.5 * Point[1] * Point[1] * Point[1] - 5.5 * Point[0] + 18. * Point[0] * Point[2] - 13.5 * Point[0] * Point[2] * Point[2] + 18. * Point[0] * Point[1] - 27. * Point[0] * Point[1] * Point[2] - 13.5 * Point[0] * Point[1] * Point[1] + 9. * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[2] - 13.5 * Point[0] * Point[0] * Point[1] - 4.5 * Point[0] * Point[0] * Point[0];
+	mi_Psi.at( 1) = 9. * Point[0] - 22.5 * Point[0] * Point[2] + 13.5 * Point[0] * Point[2] * Point[2] - 22.5 * Point[0] * Point[1] + 27. * Point[0] * Point[1] * Point[2] + 13.5 * Point[0] * Point[1] * Point[1] - 22.5 * Point[0] * Point[0] + 27. * Point[0] * Point[0] * Point[2] + 27. * Point[0] * Point[0] * Point[1] + 13.5 * Point[0] * Point[0] * Point[0];
+	mi_Psi.at( 2) = -4.5 * Point[0] + 4.5 * Point[0] * Point[2] + 4.5 * Point[0] * Point[1] + 18. * Point[0] * Point[0] - 13.5 * Point[0] * Point[0] * Point[2] - 13.5 * Point[0] * Point[0] * Point[1] - 13.5 * Point[0] * Point[0] * Point[0];
+	mi_Psi.at( 3) = Point[0] - 4.5 * Point[0] * Point[0] + 4.5 * Point[0] * Point[0] * Point[0];
+	mi_Psi.at( 4) = 9. * Point[1] - 22.5 * Point[1] * Point[2] + 13.5 * Point[1] * Point[2] * Point[2] - 22.5 * Point[1] * Point[1] + 27. * Point[1] * Point[1] * Point[2] + 13.5 * Point[1] * Point[1] * Point[1] - 22.5 * Point[0] * Point[1] + 27. * Point[0] * Point[1] * Point[2] + 27. * Point[0] * Point[1] * Point[1] + 13.5 * Point[0] * Point[0] * Point[1];
+	mi_Psi.at( 5) = 27. * Point[0] * Point[1] - 27. * Point[0] * Point[1] * Point[2] - 27. * Point[0] * Point[1] * Point[1] - 27. * Point[0] * Point[0] * Point[1];
+	mi_Psi.at( 6) = -4.5 * Point[0] * Point[1] + 13.5 * Point[0] * Point[0] * Point[1];
+	mi_Psi.at( 7) = -4.5 * Point[1] + 4.5 * Point[1] * Point[2] + 18. * Point[1] * Point[1] - 13.5 * Point[1] * Point[1] * Point[2] - 13.5 * Point[1] * Point[1] * Point[1] + 4.5 * Point[0] * Point[1] - 13.5 * Point[0] * Point[1] * Point[1];
+	mi_Psi.at( 8) = -4.5 * Point[0] * Point[1] + 13.5 * Point[0] * Point[1] * Point[1];
+	mi_Psi.at( 9) = Point[1] - 4.5 * Point[1] * Point[1] + 4.5 * Point[1] * Point[1] * Point[1];
+	mi_Psi.at(10) = 9. * Point[2] - 22.5 * Point[2] * Point[2] + 13.5 * Point[2] * Point[2] * Point[2] - 22.5 * Point[1] * Point[2] + 27. * Point[1] * Point[2] * Point[2] + 13.5 * Point[1] * Point[1] * Point[2] - 22.5 * Point[0] * Point[2] + 27. * Point[0] * Point[2] * Point[2] + 27. * Point[0] * Point[1] * Point[2] + 13.5 * Point[0] * Point[0] * Point[2];
+	mi_Psi.at(11) = 27. * Point[0] * Point[2] - 27. * Point[0] * Point[2] * Point[2] - 27. * Point[0] * Point[1] * Point[2] - 27. * Point[0] * Point[0] * Point[2];
+	mi_Psi.at(12) = -4.5 * Point[0] * Point[2] + 13.5 * Point[0] * Point[0] * Point[2];
+	mi_Psi.at(13) = 27. * Point[1] * Point[2] - 27. * Point[1] * Point[2] * Point[2] - 27. * Point[1] * Point[1] * Point[2] - 27. * Point[0] * Point[1] * Point[2];
+	mi_Psi.at(14) = 27. * Point[0] * Point[1] * Point[2];
+	mi_Psi.at(15) = -4.5 * Point[1] * Point[2] + 13.5 * Point[1] * Point[1] * Point[2];
+	mi_Psi.at(16) = -4.5 * Point[2] + 18. * Point[2] * Point[2] - 13.5 * Point[2] * Point[2] * Point[2] + 4.5 * Point[1] * Point[2] - 13.5 * Point[1] * Point[2] * Point[2] + 4.5 * Point[0] * Point[2] - 13.5 * Point[0] * Point[2] * Point[2];
+	mi_Psi.at(17) = -4.5 * Point[0] * Point[2] + 13.5 * Point[0] * Point[2] * Point[2];
+	mi_Psi.at(18) = -4.5 * Point[1] * Point[2] + 13.5 * Point[1] * Point[2] * Point[2];
+	mi_Psi.at(19) = Point[2] - 4.5 * Point[2] * Point[2] + 4.5 * Point[2] * Point[2] * Point[2];
 
 	return mi_Psi;
 };
@@ -217,7 +215,7 @@ inline std::vector<double> O2P2::Prep::Elem::Elem_Tet20::getShapeFcOnPoint(const
 // Shape functions derivative evaluated on Point
 // 
 // ================================================================================================
-inline std::vector<double> O2P2::Prep::Elem::Elem_Tet20::getShapeDerivOnPoint(const double* Point) {
+inline std::vector<double> O2P2::Geom::Elem::Elem_Tet20::getShapeDerivOnPoint(const double* Point) {
 	std::vector<double> mi_DPsi(20 * 3);
 
 	mi_DPsi.at( 0) = -5.5 + 18. * Point[2] - 13.5 * Point[2] * Point[2] + 18. * Point[1] - 27. * Point[1] * Point[2] - 13.5 * Point[1] * Point[1] + 18. * Point[0] - 27. * Point[0] * Point[2] - 27. * Point[0] * Point[1] - 13.5 * Point[0] * Point[0];
@@ -292,44 +290,39 @@ inline std::vector<double> O2P2::Prep::Elem::Elem_Tet20::getShapeDerivOnPoint(co
 // Evaluate initial properties
 // 
 // ================================================================================================
-inline void O2P2::Prep::Elem::Elem_Tet20::setGeomProperties() {
+inline void O2P2::Geom::Elem::Elem_Tet20::setGeomProperties() {
 
 	const int nVertices = 4;
+	const int mi_Dim = mv_Conect.at(0)->getDIM();	// Dimensionality of vector space (2D or 3D)
 
-	// Allocate an array with size mv_Dim to which mv_Centroid points to.
-	mv_Centroid = std::make_unique<double[]>(mv_Dim);
+	mv_Centroid = std::make_unique<double[]>(mi_Dim);
 
 	// Create a temporary array with the vertices of the polygon
-	std::array<O2P2::Prep::Node<mv_Dim>*, nVertices> vertices;
+	std::array<O2P2::Geom::Node*, nVertices> vertices;
 	vertices[0] = mv_Conect[0].get();
 	vertices[1] = mv_Conect[3].get();
 	vertices[2] = mv_Conect[9].get();
 	vertices[3] = mv_Conect[19].get();
 
 	// Memory requested by make_unique is not empty
-	for (int i = 0; i < mv_Dim; i++) mv_Centroid[i] = 0.;
+	for (int i = 0; i < mi_Dim; i++) mv_Centroid[i] = 0.;
 
 	for (auto& node : vertices) {
-		std::array<double, mv_Dim> x = node->getInitPos();
-
-		for (int i = 0; i < mv_Dim; i++) mv_Centroid[i] += x[i];
+		for (int i = 0; i < mi_Dim; i++) mv_Centroid[i] += node->getInitPos()[i];
 	}
 
 	// Finishing up
-	for (int i = 0; i < mv_Dim; i++) mv_Centroid[i] /= nVertices;
+	for (int i = 0; i < mi_Dim; i++) mv_Centroid[i] /= nVertices;
 
 	// Distance from centroid to vertices
 	double dist[nVertices] = {};
 	int i = 0;
 
 	for (auto& node : vertices) {
-		std::array<double, mv_Dim> x = node->getInitPos();
-
-		for (int j = 0; j < mv_Dim; j++) {
-			dist[i] += (mv_Centroid[j] - x[j]) * (mv_Centroid[j] - x[j]);
+		for (int j = 0; j < mi_Dim; j++) {
+			dist[i] += (mv_Centroid[j] - node->getInitPos()[j]) * (mv_Centroid[j] - node->getInitPos()[j]);
 		}
 		dist[i] = std::sqrt(dist[i]);
-
 		i++;
 	}
 
@@ -345,7 +338,7 @@ inline void O2P2::Prep::Elem::Elem_Tet20::setGeomProperties() {
 // 
 // ================================================================================================
 template<int nIP>
-inline std::vector<double> O2P2::Prep::Elem::Elem_Tet20_IP<nIP>::getValueOnIPs(const double* value) {
+inline std::vector<double> O2P2::Geom::Elem::Elem_Tet20_IP<nIP>::getValueOnIPs(const double* value) {
 
 	// return value
 	std::vector<double> mi_valueOnIp(nIP, 0.);
@@ -365,17 +358,17 @@ inline std::vector<double> O2P2::Prep::Elem::Elem_Tet20_IP<nIP>::getValueOnIPs(c
 // Weights for numerical integration
 //
 // ================================================================================================
-template<> const double* O2P2::Prep::Elem::Elem_Tet20_IP<10>::mv_weight = &Hammer3D::Wg_10P[0];
-template<> const double* O2P2::Prep::Elem::Elem_Tet20_IP<11>::mv_weight = &Hammer3D::Wg_11P[0];
-template<> const double* O2P2::Prep::Elem::Elem_Tet20_IP<14>::mv_weight = &Hammer3D::Wg_14P[0];
-template<> const double* O2P2::Prep::Elem::Elem_Tet20_IP<15>::mv_weight = &Hammer3D::Wg_15P[0];
-template<> const double* O2P2::Prep::Elem::Elem_Tet20_IP<24>::mv_weight = &Hammer3D::Wg_24P[0];
+template<> const double* O2P2::Geom::Elem::Elem_Tet20_IP<10>::mv_weight = &Hammer3D::Wg_10P[0];
+template<> const double* O2P2::Geom::Elem::Elem_Tet20_IP<11>::mv_weight = &Hammer3D::Wg_11P[0];
+template<> const double* O2P2::Geom::Elem::Elem_Tet20_IP<14>::mv_weight = &Hammer3D::Wg_14P[0];
+template<> const double* O2P2::Geom::Elem::Elem_Tet20_IP<15>::mv_weight = &Hammer3D::Wg_15P[0];
+template<> const double* O2P2::Geom::Elem::Elem_Tet20_IP<24>::mv_weight = &Hammer3D::Wg_24P[0];
 
 // ================================================================================================
 //
 // Shape functions
 //
-template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<10>::mv_Psi[10][mv_numNodes] = {
+template<> const double O2P2::Geom::Elem::Elem_Tet20_IP<10>::mv_Psi[10][mv_numNodes] = {
 	{ 1. - 5.5 * Hammer3D::Qsi_10P[0][2] + 9. * Hammer3D::Qsi_10P[0][2] * Hammer3D::Qsi_10P[0][2] - 4.5 * Hammer3D::Qsi_10P[0][2] * Hammer3D::Qsi_10P[0][2] * Hammer3D::Qsi_10P[0][2] - 5.5 * Hammer3D::Qsi_10P[0][1] + 18. * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][2] - 13.5 * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][2] * Hammer3D::Qsi_10P[0][2] + 9. * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][1] - 13.5 * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][2] - 4.5 * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][1] - 5.5 * Hammer3D::Qsi_10P[0][0] + 18. * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][2] - 13.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][2] * Hammer3D::Qsi_10P[0][2] + 18. * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][1] - 27. * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][2] - 13.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][1] + 9. * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0] - 13.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][2] - 13.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][1] - 4.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0],
 	  9. * Hammer3D::Qsi_10P[0][0] - 22.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][2] + 13.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][2] * Hammer3D::Qsi_10P[0][2] - 22.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][1] + 27. * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][2] + 13.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][1] - 22.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0] + 27. * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][2] + 27. * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][1] + 13.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0],
 	  -4.5 * Hammer3D::Qsi_10P[0][0] + 4.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][2] + 4.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][1] + 18. * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0] - 13.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][2] - 13.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][1] - 13.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0],
@@ -586,7 +579,7 @@ template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<10>::mv_Psi[10][mv_numNo
 	  -4.5 * Hammer3D::Qsi_10P[9][1] * Hammer3D::Qsi_10P[9][2] + 13.5 * Hammer3D::Qsi_10P[9][1] * Hammer3D::Qsi_10P[9][2] * Hammer3D::Qsi_10P[9][2],
 	  Hammer3D::Qsi_10P[9][2] - 4.5 * Hammer3D::Qsi_10P[9][2] * Hammer3D::Qsi_10P[9][2] + 4.5 * Hammer3D::Qsi_10P[9][2] * Hammer3D::Qsi_10P[9][2] * Hammer3D::Qsi_10P[9][2] } };
 
-template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<11>::mv_Psi[11][mv_numNodes] = {
+template<> const double O2P2::Geom::Elem::Elem_Tet20_IP<11>::mv_Psi[11][mv_numNodes] = {
 	{ 1. - 5.5 * Hammer3D::Qsi_11P[0][2] + 9. * Hammer3D::Qsi_11P[0][2] * Hammer3D::Qsi_11P[0][2] - 4.5 * Hammer3D::Qsi_11P[0][2] * Hammer3D::Qsi_11P[0][2] * Hammer3D::Qsi_11P[0][2] - 5.5 * Hammer3D::Qsi_11P[0][1] + 18. * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][2] - 13.5 * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][2] * Hammer3D::Qsi_11P[0][2] + 9. * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][1] - 13.5 * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][2] - 4.5 * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][1] - 5.5 * Hammer3D::Qsi_11P[0][0] + 18. * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][2] - 13.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][2] * Hammer3D::Qsi_11P[0][2] + 18. * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][1] - 27. * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][2] - 13.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][1] + 9. * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0] - 13.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][2] - 13.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][1] - 4.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0],
 	  9. * Hammer3D::Qsi_11P[0][0] - 22.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][2] + 13.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][2] * Hammer3D::Qsi_11P[0][2] - 22.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][1] + 27. * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][2] + 13.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][1] - 22.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0] + 27. * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][2] + 27. * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][1] + 13.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0],
 	  -4.5 * Hammer3D::Qsi_11P[0][0] + 4.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][2] + 4.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][1] + 18. * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0] - 13.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][2] - 13.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][1] - 13.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0],
@@ -818,7 +811,7 @@ template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<11>::mv_Psi[11][mv_numNo
 	  -4.5 * Hammer3D::Qsi_11P[10][1] * Hammer3D::Qsi_11P[10][2] + 13.5 * Hammer3D::Qsi_11P[10][1] * Hammer3D::Qsi_11P[10][2] * Hammer3D::Qsi_11P[10][2],
 	  Hammer3D::Qsi_11P[10][2] - 4.5 * Hammer3D::Qsi_11P[10][2] * Hammer3D::Qsi_11P[10][2] + 4.5 * Hammer3D::Qsi_11P[10][2] * Hammer3D::Qsi_11P[10][2] * Hammer3D::Qsi_11P[10][2] } };
 
-template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<14>::mv_Psi[14][mv_numNodes] = {
+template<> const double O2P2::Geom::Elem::Elem_Tet20_IP<14>::mv_Psi[14][mv_numNodes] = {
 	{ 1. - 5.5 * Hammer3D::Qsi_14P[0][2] + 9. * Hammer3D::Qsi_14P[0][2] * Hammer3D::Qsi_14P[0][2] - 4.5 * Hammer3D::Qsi_14P[0][2] * Hammer3D::Qsi_14P[0][2] * Hammer3D::Qsi_14P[0][2] - 5.5 * Hammer3D::Qsi_14P[0][1] + 18. * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][2] - 13.5 * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][2] * Hammer3D::Qsi_14P[0][2] + 9. * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][1] - 13.5 * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][2] - 4.5 * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][1] - 5.5 * Hammer3D::Qsi_14P[0][0] + 18. * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][2] - 13.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][2] * Hammer3D::Qsi_14P[0][2] + 18. * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][1] - 27. * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][2] - 13.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][1] + 9. * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0] - 13.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][2] - 13.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][1] - 4.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0],
 	  9. * Hammer3D::Qsi_14P[0][0] - 22.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][2] + 13.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][2] * Hammer3D::Qsi_14P[0][2] - 22.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][1] + 27. * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][2] + 13.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][1] - 22.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0] + 27. * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][2] + 27. * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][1] + 13.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0],
 	  -4.5 * Hammer3D::Qsi_14P[0][0] + 4.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][2] + 4.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][1] + 18. * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0] - 13.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][2] - 13.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][1] - 13.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0],
@@ -1114,7 +1107,7 @@ template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<14>::mv_Psi[14][mv_numNo
 	  Hammer3D::Qsi_14P[13][2] - 4.5 * Hammer3D::Qsi_14P[13][2] * Hammer3D::Qsi_14P[13][2] + 4.5 * Hammer3D::Qsi_14P[13][2] * Hammer3D::Qsi_14P[13][2] * Hammer3D::Qsi_14P[13][2] } };
 
 
-template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<15>::mv_Psi[15][mv_numNodes] = {
+template<> const double O2P2::Geom::Elem::Elem_Tet20_IP<15>::mv_Psi[15][mv_numNodes] = {
 	{ 1. - 5.5 * Hammer3D::Qsi_15P[0][2] + 9. * Hammer3D::Qsi_15P[0][2] * Hammer3D::Qsi_15P[0][2] - 4.5 * Hammer3D::Qsi_15P[0][2] * Hammer3D::Qsi_15P[0][2] * Hammer3D::Qsi_15P[0][2] - 5.5 * Hammer3D::Qsi_15P[0][1] + 18. * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][2] - 13.5 * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][2] * Hammer3D::Qsi_15P[0][2] + 9. * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][1] - 13.5 * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][2] - 4.5 * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][1] - 5.5 * Hammer3D::Qsi_15P[0][0] + 18. * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][2] - 13.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][2] * Hammer3D::Qsi_15P[0][2] + 18. * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][1] - 27. * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][2] - 13.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][1] + 9. * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0] - 13.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][2] - 13.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][1] - 4.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0],
 	  9. * Hammer3D::Qsi_15P[0][0] - 22.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][2] + 13.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][2] * Hammer3D::Qsi_15P[0][2] - 22.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][1] + 27. * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][2] + 13.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][1] - 22.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0] + 27. * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][2] + 27. * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][1] + 13.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0],
 	  -4.5 * Hammer3D::Qsi_15P[0][0] + 4.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][2] + 4.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][1] + 18. * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0] - 13.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][2] - 13.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][1] - 13.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0],
@@ -1430,7 +1423,7 @@ template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<15>::mv_Psi[15][mv_numNo
 	  -4.5 * Hammer3D::Qsi_15P[14][1] * Hammer3D::Qsi_15P[14][2] + 13.5 * Hammer3D::Qsi_15P[14][1] * Hammer3D::Qsi_15P[14][2] * Hammer3D::Qsi_15P[14][2],
 	  Hammer3D::Qsi_15P[14][2] - 4.5 * Hammer3D::Qsi_15P[14][2] * Hammer3D::Qsi_15P[14][2] + 4.5 * Hammer3D::Qsi_15P[14][2] * Hammer3D::Qsi_15P[14][2] * Hammer3D::Qsi_15P[14][2] } };
 
-template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<24>::mv_Psi[24][mv_numNodes] = {
+template<> const double O2P2::Geom::Elem::Elem_Tet20_IP<24>::mv_Psi[24][mv_numNodes] = {
 	{ 1. - 5.5 * Hammer3D::Qsi_24P[0][2] + 9. * Hammer3D::Qsi_24P[0][2] * Hammer3D::Qsi_24P[0][2] - 4.5 * Hammer3D::Qsi_24P[0][2] * Hammer3D::Qsi_24P[0][2] * Hammer3D::Qsi_24P[0][2] - 5.5 * Hammer3D::Qsi_24P[0][1] + 18. * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][2] - 13.5 * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][2] * Hammer3D::Qsi_24P[0][2] + 9. * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][1] - 13.5 * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][2] - 4.5 * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][1] - 5.5 * Hammer3D::Qsi_24P[0][0] + 18. * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][2] - 13.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][2] * Hammer3D::Qsi_24P[0][2] + 18. * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][1] - 27. * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][2] - 13.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][1] + 9. * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0] - 13.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][2] - 13.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][1] - 4.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0],
 	  9. * Hammer3D::Qsi_24P[0][0] - 22.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][2] + 13.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][2] * Hammer3D::Qsi_24P[0][2] - 22.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][1] + 27. * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][2] + 13.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][1] - 22.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0] + 27. * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][2] + 27. * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][1] + 13.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0],
 	  -4.5 * Hammer3D::Qsi_24P[0][0] + 4.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][2] + 4.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][1] + 18. * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0] - 13.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][2] - 13.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][1] - 13.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0],
@@ -1940,7 +1933,7 @@ template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<24>::mv_Psi[24][mv_numNo
 // Shape functions derivative
 //
 // ================================================================================================
-template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<10>::mv_DPsi[10][mv_numNodes][mv_Dim] = {
+template<> const double O2P2::Geom::Elem::Elem_Tet20_IP<10>::mv_DPsi[10][mv_numNodes][mv_ElDim] = {
 	{ { -5.5 + 18. * Hammer3D::Qsi_10P[0][2] - 13.5 * Hammer3D::Qsi_10P[0][2] * Hammer3D::Qsi_10P[0][2] + 18. * Hammer3D::Qsi_10P[0][1] - 27. * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][2] - 13.5 * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][1] + 18. * Hammer3D::Qsi_10P[0][0] - 27. * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][2] - 27. * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][1] - 13.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0],
 		-5.5 + 18. * Hammer3D::Qsi_10P[0][2] - 13.5 * Hammer3D::Qsi_10P[0][2] * Hammer3D::Qsi_10P[0][2] + 18. * Hammer3D::Qsi_10P[0][1] - 27. * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][2] - 13.5 * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][1] + 18. * Hammer3D::Qsi_10P[0][0] - 27. * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][2] - 27. * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][1] - 13.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0],
 		-5.5 + 18. * Hammer3D::Qsi_10P[0][2] - 13.5 * Hammer3D::Qsi_10P[0][2] * Hammer3D::Qsi_10P[0][2] + 18. * Hammer3D::Qsi_10P[0][1] - 27. * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][2] - 13.5 * Hammer3D::Qsi_10P[0][1] * Hammer3D::Qsi_10P[0][1] + 18. * Hammer3D::Qsi_10P[0][0] - 27. * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][2] - 27. * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][1] - 13.5 * Hammer3D::Qsi_10P[0][0] * Hammer3D::Qsi_10P[0][0] },
@@ -2231,7 +2224,7 @@ template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<10>::mv_DPsi[10][mv_numN
 		  { 0., -4.5 * Hammer3D::Qsi_10P[9][2] + 13.5 * Hammer3D::Qsi_10P[9][2] * Hammer3D::Qsi_10P[9][2], -4.5 * Hammer3D::Qsi_10P[9][1] + 27. * Hammer3D::Qsi_10P[9][1] * Hammer3D::Qsi_10P[9][2] },
 		  { 0., 0., 1. - 9. * Hammer3D::Qsi_10P[9][2] + 13.5 * Hammer3D::Qsi_10P[9][2] * Hammer3D::Qsi_10P[9][2] } } };
 
-template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<11>::mv_DPsi[11][mv_numNodes][mv_Dim] = {
+template<> const double O2P2::Geom::Elem::Elem_Tet20_IP<11>::mv_DPsi[11][mv_numNodes][mv_ElDim] = {
 	{ { -5.5 + 18. * Hammer3D::Qsi_11P[0][2] - 13.5 * Hammer3D::Qsi_11P[0][2] * Hammer3D::Qsi_11P[0][2] + 18. * Hammer3D::Qsi_11P[0][1] - 27. * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][2] - 13.5 * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][1] + 18. * Hammer3D::Qsi_11P[0][0] - 27. * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][2] - 27. * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][1] - 13.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0],
 		-5.5 + 18. * Hammer3D::Qsi_11P[0][2] - 13.5 * Hammer3D::Qsi_11P[0][2] * Hammer3D::Qsi_11P[0][2] + 18. * Hammer3D::Qsi_11P[0][1] - 27. * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][2] - 13.5 * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][1] + 18. * Hammer3D::Qsi_11P[0][0] - 27. * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][2] - 27. * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][1] - 13.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0],
 		-5.5 + 18. * Hammer3D::Qsi_11P[0][2] - 13.5 * Hammer3D::Qsi_11P[0][2] * Hammer3D::Qsi_11P[0][2] + 18. * Hammer3D::Qsi_11P[0][1] - 27. * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][2] - 13.5 * Hammer3D::Qsi_11P[0][1] * Hammer3D::Qsi_11P[0][1] + 18. * Hammer3D::Qsi_11P[0][0] - 27. * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][2] - 27. * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][1] - 13.5 * Hammer3D::Qsi_11P[0][0] * Hammer3D::Qsi_11P[0][0] },
@@ -2551,7 +2544,7 @@ template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<11>::mv_DPsi[11][mv_numN
 		  { 0., -4.5 * Hammer3D::Qsi_11P[10][2] + 13.5 * Hammer3D::Qsi_11P[10][2] * Hammer3D::Qsi_11P[10][2], -4.5 * Hammer3D::Qsi_11P[10][1] + 27. * Hammer3D::Qsi_11P[10][1] * Hammer3D::Qsi_11P[10][2] },
 		  { 0., 0., 1. - 9. * Hammer3D::Qsi_11P[10][2] + 13.5 * Hammer3D::Qsi_11P[10][2] * Hammer3D::Qsi_11P[10][2] } } };
 
-template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<14>::mv_DPsi[14][mv_numNodes][mv_Dim] = {
+template<> const double O2P2::Geom::Elem::Elem_Tet20_IP<14>::mv_DPsi[14][mv_numNodes][mv_ElDim] = {
 	{ { -5.5 + 18. * Hammer3D::Qsi_14P[0][2] - 13.5 * Hammer3D::Qsi_14P[0][2] * Hammer3D::Qsi_14P[0][2] + 18. * Hammer3D::Qsi_14P[0][1] - 27. * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][2] - 13.5 * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][1] + 18. * Hammer3D::Qsi_14P[0][0] - 27. * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][2] - 27. * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][1] - 13.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0],
 		-5.5 + 18. * Hammer3D::Qsi_14P[0][2] - 13.5 * Hammer3D::Qsi_14P[0][2] * Hammer3D::Qsi_14P[0][2] + 18. * Hammer3D::Qsi_14P[0][1] - 27. * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][2] - 13.5 * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][1] + 18. * Hammer3D::Qsi_14P[0][0] - 27. * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][2] - 27. * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][1] - 13.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0],
 		-5.5 + 18. * Hammer3D::Qsi_14P[0][2] - 13.5 * Hammer3D::Qsi_14P[0][2] * Hammer3D::Qsi_14P[0][2] + 18. * Hammer3D::Qsi_14P[0][1] - 27. * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][2] - 13.5 * Hammer3D::Qsi_14P[0][1] * Hammer3D::Qsi_14P[0][1] + 18. * Hammer3D::Qsi_14P[0][0] - 27. * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][2] - 27. * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][1] - 13.5 * Hammer3D::Qsi_14P[0][0] * Hammer3D::Qsi_14P[0][0] },
@@ -2959,7 +2952,7 @@ template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<14>::mv_DPsi[14][mv_numN
 		  { 0., 0., 1. - 9. * Hammer3D::Qsi_14P[13][2] + 13.5 * Hammer3D::Qsi_14P[13][2] * Hammer3D::Qsi_14P[13][2] } } };
 
 
-template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<15>::mv_DPsi[15][mv_numNodes][mv_Dim] = {
+template<> const double O2P2::Geom::Elem::Elem_Tet20_IP<15>::mv_DPsi[15][mv_numNodes][mv_ElDim] = {
 	{ { -5.5 + 18. * Hammer3D::Qsi_15P[0][2] - 13.5 * Hammer3D::Qsi_15P[0][2] * Hammer3D::Qsi_15P[0][2] + 18. * Hammer3D::Qsi_15P[0][1] - 27. * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][2] - 13.5 * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][1] + 18. * Hammer3D::Qsi_15P[0][0] - 27. * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][2] - 27. * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][1] - 13.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0],
 		-5.5 + 18. * Hammer3D::Qsi_15P[0][2] - 13.5 * Hammer3D::Qsi_15P[0][2] * Hammer3D::Qsi_15P[0][2] + 18. * Hammer3D::Qsi_15P[0][1] - 27. * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][2] - 13.5 * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][1] + 18. * Hammer3D::Qsi_15P[0][0] - 27. * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][2] - 27. * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][1] - 13.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0],
 		-5.5 + 18. * Hammer3D::Qsi_15P[0][2] - 13.5 * Hammer3D::Qsi_15P[0][2] * Hammer3D::Qsi_15P[0][2] + 18. * Hammer3D::Qsi_15P[0][1] - 27. * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][2] - 13.5 * Hammer3D::Qsi_15P[0][1] * Hammer3D::Qsi_15P[0][1] + 18. * Hammer3D::Qsi_15P[0][0] - 27. * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][2] - 27. * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][1] - 13.5 * Hammer3D::Qsi_15P[0][0] * Hammer3D::Qsi_15P[0][0] },
@@ -3395,7 +3388,7 @@ template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<15>::mv_DPsi[15][mv_numN
 		  { 0., -4.5 * Hammer3D::Qsi_15P[14][2] + 13.5 * Hammer3D::Qsi_15P[14][2] * Hammer3D::Qsi_15P[14][2], -4.5 * Hammer3D::Qsi_15P[14][1] + 27. * Hammer3D::Qsi_15P[14][1] * Hammer3D::Qsi_15P[14][2] },
 		  { 0., 0., 1. - 9. * Hammer3D::Qsi_15P[14][2] + 13.5 * Hammer3D::Qsi_15P[14][2] * Hammer3D::Qsi_15P[14][2] } } };
 
-template<> const double O2P2::Prep::Elem::Elem_Tet20_IP<24>::mv_DPsi[24][mv_numNodes][mv_Dim] = {
+template<> const double O2P2::Geom::Elem::Elem_Tet20_IP<24>::mv_DPsi[24][mv_numNodes][mv_ElDim] = {
 	{ { -5.5 + 18. * Hammer3D::Qsi_24P[0][2] - 13.5 * Hammer3D::Qsi_24P[0][2] * Hammer3D::Qsi_24P[0][2] + 18. * Hammer3D::Qsi_24P[0][1] - 27. * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][2] - 13.5 * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][1] + 18. * Hammer3D::Qsi_24P[0][0] - 27. * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][2] - 27. * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][1] - 13.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0],
 		-5.5 + 18. * Hammer3D::Qsi_24P[0][2] - 13.5 * Hammer3D::Qsi_24P[0][2] * Hammer3D::Qsi_24P[0][2] + 18. * Hammer3D::Qsi_24P[0][1] - 27. * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][2] - 13.5 * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][1] + 18. * Hammer3D::Qsi_24P[0][0] - 27. * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][2] - 27. * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][1] - 13.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0],
 		-5.5 + 18. * Hammer3D::Qsi_24P[0][2] - 13.5 * Hammer3D::Qsi_24P[0][2] * Hammer3D::Qsi_24P[0][2] + 18. * Hammer3D::Qsi_24P[0][1] - 27. * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][2] - 13.5 * Hammer3D::Qsi_24P[0][1] * Hammer3D::Qsi_24P[0][1] + 18. * Hammer3D::Qsi_24P[0][0] - 27. * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][2] - 27. * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][1] - 13.5 * Hammer3D::Qsi_24P[0][0] * Hammer3D::Qsi_24P[0][0] },

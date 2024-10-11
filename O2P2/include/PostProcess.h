@@ -24,9 +24,27 @@ namespace O2P2 {
 		  */
 		class PostProcess
 		{
+		private:
+			// Default constructor will be deleted - use the explicit constructor below
+			PostProcess() = delete;
+
+			// Copy constructor. It must be deleted to avoid instantiation.
+			PostProcess(const PostProcess&) = delete;
+
+			// Move constructor will also be deleted.
+			PostProcess(PostProcess&& other) = delete;
+
 		public:
-			/** Constructor */
-			PostProcess() {};
+			/** The only constructor that there is. It defines the post processing system.
+			  * @param outputFrequency Results output frequency.
+			  * @param saveProcess Should intermediate results be saved?
+			  * @param outputType Type of file for output.
+			  */
+			explicit PostProcess(int outputFrequency, int saveProcess, int outputType)
+				: mv_OutputFreq(outputFrequency) {
+				mv_Save = (saveProcess == 0) ? true : false;
+				mv_OutputType = OutputType(outputType - 1);
+			};
 
 			// Default destructor of private / protected pointers.
 			~PostProcess() = default;
@@ -46,12 +64,34 @@ namespace O2P2 {
 				mv_SolOnNode.reserve(entries);
 			}
 
+			/** @return the output file type.
+			  */
+			OutputType getOutputType() { return mv_OutputType; }
+
+			/** @return the output frequency.
+			  */
+			inline int getOutputFrequency() { return mv_OutputFreq; }
+
+			/** @return whether the process should be saved or not.
+			  */
+			inline bool getSaveStatus() { return mv_Save; }
+
 		public:
 			/** @brief Solution on each node dof, for each time step. */
 			std::vector<std::pair<double, std::vector<double>>> mv_SolOnNode;
 
 			/** @brief Solution on each material point dof, for each time step. */
 			//std::vector<double> m_SolOnMatPoint;
+
+		private:
+			/** Results output frequency */
+			int mv_OutputFreq;
+
+			/** Save the entire process? */
+			bool mv_Save;
+
+			/** @brief Type of output */
+			OutputType mv_OutputType;
 		};
 	} // End of Post Namespace
 } // End of O2P2 Namespace

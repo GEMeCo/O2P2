@@ -100,7 +100,7 @@ namespace O2P2 {
 
 	private:
 		// Container of Domain objects.
-		std::unique_ptr<O2P2::Prep::Domain<nDim>> mv_theDomain;
+		std::unique_ptr<O2P2::Geom::Domain<nDim>> mv_theDomain;
 
 		// Manages the processing unity.
 		std::unique_ptr<O2P2::Proc::SolutionAlgorithm> mv_theAnalyzer;
@@ -128,7 +128,7 @@ namespace O2P2 {
 
 		mv_theDomain = mi_theBuilder.initMesh(file);
 		mv_theAnalyzer = mi_theBuilder.initAnalyzer(file);
-		mv_thePost = std::make_unique<O2P2::Post::PostProcess>();
+		mv_thePost = mi_theBuilder.initPostProcess(file);
 
 		bool mi_initMesh = mi_theBuilder.populateDomain(file, mv_theDomain.get());
 
@@ -156,14 +156,17 @@ namespace O2P2 {
 		return true;
 	}
 
-	// Internal implementation of call to output system.
+	// ================================================================================================
+	//
+	// Implementation of Private Template Member Function (2D and 3D): drawResultsImpl
+	//
+	// ================================================================================================
 	template<int nDim>
 	inline bool FEAnalysis<nDim>::drawResultsImpl(const std::string& ProjectName) {
 		LOG("\nFEAnalysis.drawResults: Outputting solution");
 
-		O2P2::Post::OutputSystem<nDim> theSketcher(OutputType::OGL, ProjectName);
-		theSketcher.draw(mv_theDomain.get(), mv_thePost.get());
-
+		O2P2::Post::OutputSystem<nDim> mi_theSketcher(ProjectName);
+		mi_theSketcher.draw(mv_theDomain.get(), mv_thePost.get());
 		return true;
 	}
 } // End of O2P2 namespace

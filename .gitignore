@@ -79,3 +79,6 @@ ipch/
 *.log
 [Rr]esults.json
 *.txt
+
+# Other Libraries
+[Ll]ibraries

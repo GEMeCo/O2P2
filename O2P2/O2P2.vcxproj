@@ -20,7 +20,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>Intel C++ Compiler 2022</PlatformToolset>
+    <PlatformToolset>Intel C++ Compiler 2024</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <UseInteloneMKL>Parallel</UseInteloneMKL>
     <UseILP64Interfaces1A>false</UseILP64Interfaces1A>
@@ -28,7 +28,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>Intel C++ Compiler 2022</PlatformToolset>
+    <PlatformToolset>Intel C++ Compiler 2024</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
     <UseInteloneMKL>Parallel</UseInteloneMKL>
@@ -65,8 +65,8 @@
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(SolutionDir)O2P2\include;$(SolutionDir)O2P2\libraries;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <OpenMP>GenerateParallelCode</OpenMP>
+      <AdditionalIncludeDirectories>$(SolutionDir)O2P2\include;$(SolutionDir)Libraries;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OpenMP>None</OpenMP>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -83,20 +83,27 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(SolutionDir)O2P2\include;$(SolutionDir)O2P2\libraries;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <OpenMP>GenerateParallelCode</OpenMP>
+      <AdditionalIncludeDirectories>$(SolutionDir)O2P2\include;$(SolutionDir)Libraries;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OpenMP>None</OpenMP>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="source\MeshBars.cpp" />
+    <ClCompile Include="source\MeshFace.cpp" />
+    <ClCompile Include="source\MeshFibs.cpp" />
+    <ClCompile Include="source\MeshIncl.cpp" />
+    <ClCompile Include="source\Mesh_MD.cpp" />
+    <ClCompile Include="source\Mesh_MQS.cpp" />
     <ClCompile Include="source\O2P2.cpp" />
     <ClCompile Include="source\O2P2_DOC.cpp" />
-    <ClCompile Include="source\Mesh.cpp" />
     <ClCompile Include="source\Common.cpp" />
     <ClCompile Include="source\Domain.cpp" />
     <ClCompile Include="source\Material.cpp" />
@@ -109,12 +116,18 @@
     <ClCompile Include="source\TimeStepping.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Mesh Components\MeshBars.h" />
+    <ClInclude Include="include\Mesh Components\MeshElem.h" />
+    <ClInclude Include="include\Mesh Components\MeshFace.h" />
+    <ClInclude Include="include\Mesh Components\MeshFibs.h" />
+    <ClInclude Include="include\Mesh Components\MeshIncl.h" />
+    <ClInclude Include="include\Mesh Components\MeshNode.h" />
+    <ClInclude Include="include\Mesh Components\MeshPoint.h" />
     <ClInclude Include="include\Mesh.h" />
     <ClInclude Include="include\Common.h" />
     <ClInclude Include="include\Constraints.h" />
     <ClInclude Include="include\Domain.h" />
     <ClInclude Include="include\Element.h" />
-    <ClInclude Include="include\MeshElem.h" />
     <ClInclude Include="include\Elements\Elem_Hex27.h" />
     <ClInclude Include="include\Elements\Elem_Hex64.h" />
     <ClInclude Include="include\Elements\Elem_Hex8.h" />
@@ -141,6 +154,8 @@
     <ClInclude Include="include\LoadStep.h" />
     <ClInclude Include="include\Material.h" />
     <ClInclude Include="include\MaterialPoint.h" />
+    <ClInclude Include="include\Mesh_MD.h" />
+    <ClInclude Include="include\Mesh_MQS.h" />
     <ClInclude Include="include\ModelBuilder.h" />
     <ClInclude Include="include\Node.h" />
     <ClInclude Include="include\NonLinearSolver.h" />
@@ -151,9 +166,9 @@
     <ClInclude Include="include\SolutionAlgorithm.h" />
     <ClInclude Include="include\Solver.h" />
     <ClInclude Include="include\TimeStepping.h" />
-    <ClInclude Include="include\MeshNode.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\CITATION.cff" />
     <None Include="..\README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

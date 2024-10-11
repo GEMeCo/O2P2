@@ -22,12 +22,26 @@
 #include <vector>			// required by std::vector
 #include <array>			// required by std::array
 #include <map>				// required by std::map
+#include <unordered_map>	// required by std::unordered_map
 #include <algorithm>		// std::max / std::max_element
 #include <chrono>			// standard timing functions
 #include <limits>			// required by std::numeric_limits
-
 #include <algorithm>		// for_each
 #include <execution>		// parallel for_each
+
+// Coloring output
+#define RESET "\x1B[0m"
+#define RED "\x1B[31m"
+#define YELLOW "\x1B[33m"
+#define GREEN "\x1B[32m"
+#define MAGENTA "\x1B[35m"
+#define CYAN "\x1B[36m"
+
+#define ERROR(x) RED "ERROR: " x "\n" RESET
+#define WARN(x) YELLOW "WARNING: " x "\n" RESET
+#define INFO(x) CYAN x RESET
+#define INPUT(x) MAGENTA x RESET
+#define OK(x) GREEN x RESET
 
 // Profiler
 #include "Profiler.h"
@@ -155,11 +169,11 @@ struct Timer
 };
 
 // This was included here only for doxygen documentation :)
-// 
+
 //! Outer bounds of the implementation
 namespace O2P2 {
-	//! Preprocessor classes are gathered in Prep namespace
-	namespace Prep {
+	//! Geometry / Domain classes are gathered in Geom namespace
+	namespace Geom {
 		//! Domain elements are gathered in Elem namespace
 		namespace Elem {}
 	}

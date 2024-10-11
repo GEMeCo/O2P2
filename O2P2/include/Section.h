@@ -15,48 +15,60 @@
 #include "Common.h"
 
 namespace O2P2 {
-	namespace Prep {
+	namespace Geom {
 		/** @ingroup PreProcessor_Module
-		  * @class Section
+		  * @class CrossSection
 		  *
-		  * @brief Section definitions, a Domain component.
-		  * @details Contains the basic definitions of the cross section of linear and plane elements.
+		  * @brief CrossSection definitions, a Domain component.
+		  * @details Contains the basic definitions of the cross section of linear elements.
 		  */
-		class Section
+		class CrossSection
 		{
 		private:
-			Section() = delete;
+			// Default constructor is deleted. Use explicit constructor only.
+			CrossSection() = delete;
 
 		public:
 			/** Constructor for cross section objects.
-			  * @param sec Cross sectional area / thickness.
+			  * @param sec Cross sectional area.
 			  */
-			Section(const double& sec) : mv_section(sec) {
-				mv_PlaneState = PlaneStateType::PLANE_STRESS;
-			};
+			explicit CrossSection(const double& sec) : mv_section(sec) {	};
 
-			/** Constructor for cross section objects.
+			// Default destructor of private / protected pointers.
+			virtual ~CrossSection() = default;
+
+			/** @return Cross sectional area / thickness. */
+			double getSection() { return this->mv_section; }
+
+		private:
+			/** @brief Cross sectional area for truss elements and thickness for plane elements. */
+			double mv_section;
+		};
+
+		/** @class PlaneSection
+		  *
+		  * @brief PlaneSection definitions, a Domain component.
+		  * @details Contains the basic definitions of the cross section of plane elements.
+		  */
+		class PlaneSection : public CrossSection
+		{
+		private:
+			// Default constructor is deleted. Use explicit constructor only.
+			PlaneSection() = delete;
+
+		public:
+			/** Constructor for PlaneSection objects.
 			  * @param PS Plane state type.
 			  * @param thick Thickness of the plane element.
 			  */
-			Section(const PlaneStateType& PS, const double& thick)
-				: mv_section(thick), mv_PlaneState(PS) { }
-
-			// Default destructor of private / protected pointers.
-			~Section() = default;
-
-			/** @return Cross sectional area / thickness. */
-			double getSection() { return mv_section; }
+			explicit PlaneSection(const PlaneStateType& PS, const double& thick) : CrossSection(thick), mv_PlaneState(PS) { }
 
 			/** @return Plane state type. */
 			PlaneStateType getPS() { return mv_PlaneState; }
 
 		private:
-			/** @brief Cross sectional area for truss elements and thickness for plane elements. */
-			double mv_section;
-
 			/** @brief Plane state for plane elements (Stress or Strain Plane State) */
 			PlaneStateType mv_PlaneState;
 		};
-	} // End of Prep Namespace
+	} // End of Geom Namespace
 } // End of O2P2 Namespace

@@ -19,8 +19,8 @@
 template class O2P2::Post::OutputSystem<2>;
 template class O2P2::Post::OutputSystem<3>;
 
-template void O2P2::Post::OutputSystem<2>::draw_AcadView_Node(std::ofstream& file, O2P2::Prep::Domain<2>* theDomain, O2P2::Post::PostProcess* thePost);
-template void O2P2::Post::OutputSystem<3>::draw_AcadView_Node(std::ofstream& file, O2P2::Prep::Domain<3>* theDomain, O2P2::Post::PostProcess* thePost);
+template void O2P2::Post::OutputSystem<2>::draw_AcadView_Node(std::ofstream& file, O2P2::Geom::Domain<2>* theDomain, O2P2::Post::PostProcess* thePost);
+template void O2P2::Post::OutputSystem<3>::draw_AcadView_Node(std::ofstream& file, O2P2::Geom::Domain<3>* theDomain, O2P2::Post::PostProcess* thePost);
 
 // ================================================================================================
 //
@@ -28,7 +28,7 @@ template void O2P2::Post::OutputSystem<3>::draw_AcadView_Node(std::ofstream& fil
 // 
 // ================================================================================================
 template<int nDim>
-void O2P2::Post::OutputSystem<nDim>::draw_AcadView_Node(std::ofstream& file, O2P2::Prep::Domain<nDim>* theDomain, O2P2::Post::PostProcess* thePost)
+void O2P2::Post::OutputSystem<nDim>::draw_AcadView_Node(std::ofstream& file, O2P2::Geom::Domain<nDim>* theDomain, O2P2::Post::PostProcess* thePost)
 {
 	file << "Project Description.\n";
 
@@ -41,8 +41,24 @@ void O2P2::Post::OutputSystem<nDim>::draw_AcadView_Node(std::ofstream& file, O2P
 		nFaces += elem->getNumFaces();
 	}
 
+	// Add Truss elements
+	nFaces += theDomain->getNumBars();
+
+	// Add inclusion elements
+	for (auto& elem : theDomain->getIncl()) {
+		nFaces += elem->getNumFaces();
+	}
+
+	// Add immersed fibers
+	nFaces += theDomain->getNumFibs();
+
+	// Add active face elements
+	for (auto& elem : theDomain->getFaces()) {
+		nFaces += elem->getNumFaces();
+	}
+
 	// Total number of nodes and elements
-	file << theDomain->mv_nNodes << " "
+	file << theDomain->getNumNodes() + theDomain->getNumPoints() << " "
 		<< nFaces << " " << thePost->mv_SolOnNode.size() * nDim << "\n#\n";
 
 	for (auto& node : theDomain->getNode()) {
@@ -55,10 +71,41 @@ void O2P2::Post::OutputSystem<nDim>::draw_AcadView_Node(std::ofstream& file, O2P
 		file << "\n";
 	}
 
+	// Add points
+	for (auto& node : theDomain->getPoint()) {
+		file << *node;
+
+		for (int k = nDim; k < 6; k++) {
+			// format is a function defined in common.h
+			file << formatFixed << 0.F;
+		}
+		file << "\n";
+	}
+
 	file << "#\n";
 
-	// Conectivity and stuff
+	// Element conectivity
 	for (auto& elem : theDomain->getElem()) {
+		file << elem->printByIndex_AV(1);
+	}
+
+	// Truss conectivity
+	for (auto& elem : theDomain->getBars()) {
+		file << elem->printByIndex_AV(1);
+	}
+
+	// Inclusion conectivity
+	for (auto& elem : theDomain->getIncl()) {
+		file << elem->printByIndex_AV(theDomain->getNumNodes() + 1);
+	}
+
+	// Immersed fibers conectivity
+	for (auto& elem : theDomain->getFibs()) {
+		file << elem->printByIndex_AV(theDomain->getNumNodes() + 1);
+	}
+
+	// Active face conectivity
+	for (auto& elem : theDomain->getFaces()) {
 		file << elem->printByIndex_AV(1);
 	}
 
@@ -66,7 +113,8 @@ void O2P2::Post::OutputSystem<nDim>::draw_AcadView_Node(std::ofstream& file, O2P
 		for (int j = 0; j < nDim; ++j) {
 			file << "#\n" << "Desl_" << j << "_t_" << std::defaultfloat << std::get<0>(thePost->mv_SolOnNode[i]) << "\n";
 
-			for (size_t k = 0; k < theDomain->mv_nNodes; ++k) {
+			// Solution on nodes
+			for (int k = 0; k < theDomain->getNumNodes(); ++k) {
 				// Must write four data here -> disp x, y, z, "color" - value to be ploted
 				const auto& node = theDomain->getNode(k);
 				const auto& x = node->getInitPos();
@@ -75,8 +123,20 @@ void O2P2::Post::OutputSystem<nDim>::draw_AcadView_Node(std::ofstream& file, O2P
 					file << formatScien << std::get<1>(thePost->mv_SolOnNode[i])[k * nDim + l] - x[l];
 				}
 				if (nDim == 2) file << formatScien << 0.F;
-
 				file << formatScien << std::get<1>(thePost->mv_SolOnNode[i])[k * nDim + j] - x[j] << "\n";
+			}
+
+			// Solution on points
+			for (int l = 0; l < theDomain->getNumPoints(); ++l) {
+				const auto& point = theDomain->getPoint(l);
+				const auto& x = point->getInitPos();
+
+				// Must write four data here -> disp x, y, z, color
+				for (int k = 0; k < nDim; ++k) {
+					file << formatScien << std::get<1>(thePost->mv_SolOnNode[i])[theDomain->getNumNodes() * nDim + l * nDim + k] - x[k];
+				}
+				if (nDim == 2) file << formatScien << 0.F;
+				file << formatScien << std::get<1>(thePost->mv_SolOnNode[i])[theDomain->getNumNodes() * nDim + l * nDim + j] - x[j] << "\n";
 			}
 		}
 	}
@@ -94,7 +154,7 @@ void O2P2::Post::OutputSystem<nDim>::draw_AcadView_Node(std::ofstream& file, O2P
 // 
 // ================================================================================================
 template<int nDim>
-void O2P2::Post::OutputSystem<nDim>::draw_AcadView_Elem(std::ofstream& file, O2P2::Prep::Domain<nDim>* theDomain, O2P2::Post::PostProcess* thePost)
+void O2P2::Post::OutputSystem<nDim>::draw_AcadView_Elem(std::ofstream& file, O2P2::Geom::Domain<nDim>* theDomain, O2P2::Post::PostProcess* thePost)
 {
 	file << "Project Description.\n";
 
@@ -106,7 +166,7 @@ void O2P2::Post::OutputSystem<nDim>::draw_AcadView_Elem(std::ofstream& file, O2P
 	for (auto& elem : theDomain->getElem()) {
 		iNd += elem->getNumNodes();
 	}
-	file << iNd << " " << theDomain->mv_nElem << " " << thePost->mv_SolOnNode.size() * nDim << "\n#\n";
+	file << iNd << " " << theDomain->getNumElems() << " " << thePost->mv_SolOnNode.size() * nDim << "\n#\n";
 
 	for (auto& elem : theDomain->getElem()) {
 		for (auto& node : elem->getConectivity()) {
